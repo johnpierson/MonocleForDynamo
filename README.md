@@ -4,7 +4,7 @@
   <br>
 </h1>
 
-<h3 align="center">A collection of custom nodes for <a href="http://dynamobim.org/" target="_blank">Dynamo</a>.</h4>
+<h3 align="center">A view extension for <a href="http://dynamobim.org/" target="_blank">Dynamo</a>.</h4>
 
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/johnpierson/MonocleForDynamo/graphs/commit-activity)
 [![GitHub license](https://img.shields.io/github/license/johnpierson/MonocleForDynamo)](https://github.com/johnpierson/MonocleForDynamo/blob/master/LICENSE)
@@ -12,7 +12,7 @@
 
 If you appreciate the work put into this free package, please vote in support of it on Dynamo's package manager. 
 
- _If you feel so inclined, here is a method to donate to this open source project_
+ _If you feel so inclined, here is a method to donate to this project_
 
  <a href="https://www.buymeacoffee.com/j0hnp" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 

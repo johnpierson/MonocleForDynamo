@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Report bugs here to help improve Rhythm
+about: Report bugs here to help improve Monocle
 
 ---
 
