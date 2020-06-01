@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="MonocleViewExtension.SimpleSearch.SimpleSearch"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MonocleViewExtension.SimpleSearch"
+             mc:Ignorable="d" 
+              HorizontalAlignment="Stretch" Width="Auto" VerticalAlignment="Stretch" Height="Auto">
+    <Grid Name="MainGrid" Height="Auto" Width="Auto">
+        <ListView x:Name="ResultsList" Margin="5,75,5,-3" FontSize="14" MouseLeftButtonUp="ResultsList_OnMouseDown" Background="White" BorderBrush="White">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <TextBox x:Name="SearchTextBox" Margin="5,10,5,0" TextWrapping="Wrap" VerticalAlignment="Top" Padding="30 5 5 5" FontSize="16" Foreground="SteelBlue" HorizontalAlignment="Stretch" TextChanged="TextBox_TextChanged" KeyDown="SearchBox_OnKeyDown"/>
+        <Label x:Name="TextSearchBoxPlaceholder" Margin="20,10,10,0" Padding="15 5 5 5" Content="start typing here to find nodes" Height="33" VerticalAlignment="Top" Foreground="SteelBlue" FontSize="16" FontStyle="Italic" IsHitTestVisible="False"  />
+        <Image HorizontalAlignment="Left" Height="29" Margin="5,14,0,0" VerticalAlignment="Top" Width="27" Source="/MonocleViewExtension;component/Resources/magnifyingGlass.png"/>
+        <Grid HorizontalAlignment="Stretch" Height="31" Margin="5,45,5,0" VerticalAlignment="Top" Background="White">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="120"/>
+                <ColumnDefinition Width="140"/>
+                <ColumnDefinition Width="140"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <CheckBox Grid.Column="1" x:Name="NodeNameCheckBox" Content="node name" VerticalAlignment="Center" FontStyle="Italic" Foreground="SteelBlue" IsChecked="True" Checked="OnChecked" Unchecked="OnUnchecked" FontSize="10"/>
+            <CheckBox Grid.Column="2" x:Name="NodeDescriptionCheckBox" Content="node description" VerticalAlignment="Center" FontStyle="Italic" Foreground="SteelBlue" Checked="OnChecked" Unchecked="OnUnchecked" FontSize="10"/>
+            <CheckBox Grid.Column="3" x:Name="NodeCategoryCheckBox" Content="node category" VerticalAlignment="Center" FontStyle="Italic" Foreground="SteelBlue" Checked="OnChecked" Unchecked="OnUnchecked" FontSize="10"/>
+        </Grid>
+    </Grid>
+
+</UserControl>
