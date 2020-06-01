@@ -1,0 +1,29 @@
+﻿<Window x:Class="MonocleViewExtension.StickyNotes.StickyNotesWindow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MonocleViewExtension.StickyNotes"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             mc:Ignorable="d" Height="266.453" Width="267.382" Background="Transparent" ShowInTaskbar="False" WindowStyle="None" AllowsTransparency="True" ResizeMode="NoResize">
+
+    <Border x:Name="Note1" BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="233" Margin="10,12,0,0" VerticalAlignment="Top" Width="235" Background="#FFF4FF9C" RenderTransformOrigin="0.5,0.5">
+        <Border.RenderTransform>
+            <TransformGroup>
+                <ScaleTransform/>
+                <SkewTransform/>
+                <RotateTransform Angle="-3"/>
+                <TranslateTransform/>
+            </TransformGroup>
+        </Border.RenderTransform>
+        <Grid Name="MainGrid" Margin="9">
+            <xctk:WatermarkTextBox Name="Notes" Watermark="paste/enter text here...." AcceptsReturn="True" Margin="10,31,10,10" TextWrapping="Wrap"  Background="{x:Null}" BorderBrush="{x:Null}"/>
+            <Image Name="Close" Margin="0,0,5,0" Source="Resources/close.png" HorizontalAlignment="Right" Width="28" Height="24" VerticalAlignment="Top"/>
+            <Image Name="Doge"  HorizontalAlignment="Left" Height="31" Margin="179,0,0,0" VerticalAlignment="Top" Width="36" Source="Resources/doge.png" Visibility="Hidden"/>
+
+        </Grid>
+
+
+    </Border>
+
+</Window>
