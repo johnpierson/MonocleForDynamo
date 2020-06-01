@@ -33,7 +33,7 @@ Since there is not currently an update notification process on Dynamo's package 
 _Soon_
 
 ## Help improve Monocle
-If you're interested in contributing to Rhythm, just submit a [pull request](https://github.com/johnpierson/MonocleForDynamo/pulls) or a [feature request](https://github.com/johnpierson/MonocleForDynamo/issues) .
+If you're interested in contributing to Monocle, just submit a [pull request](https://github.com/johnpierson/MonocleForDynamo/pulls) or a [feature request](https://github.com/johnpierson/MonocleForDynamo/issues) .
 
 ## Installation
 Monocle is available through Dynamo's built-in package manager. This provides the simplest installation for most users. If you are interested in manual install, there are some fabulous resources out there describing how to build your own Dynamo package.
