@@ -11,12 +11,12 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.1"
    id="svg826"
-   width="33.333332"
-   height="33.333332"
-   viewBox="0 0 33.333332 33.333332"
+   width="25"
+   height="25"
+   viewBox="0 0 25 25"
    sodipodi:docname="verticalCenter_normal.svg"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   inkscape:export-filename="C:\Users\johnpierson\Desktop\New folder\verticalCenter_normal.png"
+   inkscape:export-filename="C:\Users\johnpierson\Documents\Repos\MonocleForDynamo\src\Icons\Alignment\verticalCenter_normal.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96">
   <metadata
@@ -27,7 +27,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -47,15 +47,15 @@
      id="namedview828"
      showgrid="false"
      inkscape:zoom="7.0800003"
-     inkscape:cx="-47.408781"
-     inkscape:cy="-8.3410576"
+     inkscape:cx="9.3002562"
+     inkscape:cy="-2.8325833"
      inkscape:window-x="951"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg826" />
   <g
      id="g1646"
-     transform="translate(40.620031,-29.17345)">
+     transform="matrix(0.66666667,0,0,0.66666667,28.46891,-18.060078)">
     <rect
        y="44.861004"
        x="-38.953365"

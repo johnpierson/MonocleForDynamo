@@ -11,12 +11,12 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.1"
    id="svg826"
-   width="33.333332"
-   height="33.333332"
-   viewBox="0 0 33.333332 33.333332"
+   width="25"
+   height="25"
+   viewBox="0 0 25 25"
    sodipodi:docname="top_disabled.svg"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   inkscape:export-filename="C:\Users\johnpierson\Desktop\New folder\top_disabled.png"
+   inkscape:export-filename="C:\Users\johnpierson\Documents\Repos\MonocleForDynamo\src\Icons\Alignment\top_disabled.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96">
   <metadata
@@ -27,7 +27,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -46,32 +46,36 @@
      inkscape:window-height="1018"
      id="namedview828"
      showgrid="false"
-     inkscape:zoom="5.0063162"
-     inkscape:cx="-30.864913"
-     inkscape:cy="27.896672"
+     inkscape:zoom="20.025265"
+     inkscape:cx="27.372224"
+     inkscape:cy="12.335224"
      inkscape:window-x="951"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg826" />
-  <rect
-     x="5.69524"
-     y="4.9042435"
-     width="9.8732147"
-     height="17.067158"
-     id="rect814"
-     style="stroke-width:0.55852073;fill:#444545;fill-opacity:0.98823529" />
-  <rect
-     x="18.59524"
-     y="4.9042435"
-     width="9.0428572"
-     height="26.762423"
-     id="rect816"
-     style="stroke-width:0.55852073;fill:#444545;fill-opacity:0.98823529" />
-  <rect
-     x="1.6666662"
-     y="1.6666663"
-     width="30"
-     height="1.7468945"
-     id="rect818"
-     style="stroke-width:0.55852073;fill:#ff0000" />
+  <g
+     id="g817"
+     transform="matrix(0.66666667,0,0,0.66666667,1.3888892,1.3888892)">
+    <rect
+       style="fill:#444545;fill-opacity:0.98823529;stroke-width:0.55852073"
+       id="rect814"
+       height="17.067158"
+       width="9.8732147"
+       y="4.9042435"
+       x="5.69524" />
+    <rect
+       style="fill:#444545;fill-opacity:0.98823529;stroke-width:0.55852073"
+       id="rect816"
+       height="26.762423"
+       width="9.0428572"
+       y="4.9042435"
+       x="18.59524" />
+    <rect
+       style="fill:#444545;fill-opacity:0.98823529;stroke-width:0.55852073"
+       id="rect818"
+       height="1.7468945"
+       width="30"
+       y="1.6666663"
+       x="1.6666662" />
+  </g>
 </svg>

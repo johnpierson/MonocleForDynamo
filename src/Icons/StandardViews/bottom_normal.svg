@@ -11,12 +11,12 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.1"
    id="svg826"
-   width="33.333332"
-   height="33.333332"
-   viewBox="0 0 33.333332 33.333332"
+   width="25"
+   height="25"
+   viewBox="0 0 25 25"
    sodipodi:docname="bottom_normal.svg"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   inkscape:export-filename="C:\Users\johnpierson\Desktop\New folder\ViewCube\bottom_normal.png"
+   inkscape:export-filename="C:\Users\johnpierson\Documents\Repos\MonocleForDynamo\src\Icons\StandardViews\bottom_normal.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96">
   <metadata
@@ -27,7 +27,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -47,15 +47,15 @@
      id="namedview828"
      showgrid="false"
      inkscape:zoom="5.0063162"
-     inkscape:cx="-0.53083786"
-     inkscape:cy="60.912778"
+     inkscape:cx="12.153139"
+     inkscape:cy="21.362739"
      inkscape:window-x="951"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg826" />
   <g
      id="g1132"
-     transform="matrix(0.49833059,0,0,0.49832231,42.199875,27.925893)"
+     transform="matrix(0.3322204,0,0,0.33221488,29.522139,20.006152)"
      style="fill:#787879;fill-opacity:1">
     <path
        id="path994"

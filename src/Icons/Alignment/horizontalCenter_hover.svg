@@ -11,12 +11,12 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.1"
    id="svg826"
-   width="33.333332"
-   height="33.333332"
-   viewBox="0 0 33.333332 33.333332"
+   width="25"
+   height="25"
+   viewBox="0 0 25 25"
    sodipodi:docname="horizontalCenter_hover.svg"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   inkscape:export-filename="C:\Users\johnpierson\Desktop\New folder\horizontalCenter_hover.png"
+   inkscape:export-filename="C:\Users\johnpierson\Documents\Repos\MonocleForDynamo\src\Icons\Alignment\horizontalCenter_hover.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96">
   <metadata
@@ -27,7 +27,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -47,35 +47,39 @@
      id="namedview828"
      showgrid="false"
      inkscape:zoom="7.0800003"
-     inkscape:cx="-31.497174"
-     inkscape:cy="16.666666"
+     inkscape:cx="28.742937"
+     inkscape:cy="15.677966"
      inkscape:window-x="951"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg826" />
-  <rect
-     style="opacity:1;vector-effect:none;fill:#ff0000;fill-opacity:0.98823529;stroke:none;stroke-width:1.51181102;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-     id="rect815"
-     width="1.9582245"
-     height="30"
-     x="15.687554"
-     y="1.6666664" />
   <g
-     id="g823"
-     transform="translate(-25.847458,36.160869)">
+     id="g819"
+     transform="matrix(0.66666667,0,0,0.66666667,1.3888893,1.388889)">
     <rect
-       y="-30.462954"
-       x="32.944931"
-       height="9.8732147"
-       width="19.138382"
-       id="rect817"
-       style="opacity:1;vector-effect:none;fill:#cdcccc;fill-opacity:1;stroke:none;stroke-width:1.51181102;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
-    <rect
-       y="-17.562952"
-       x="27.514124"
-       height="9.0375004"
-       width="30"
-       id="rect819"
-       style="opacity:1;vector-effect:none;fill:#cdcccc;fill-opacity:1;stroke:none;stroke-width:1.51181102;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+       y="1.6666664"
+       x="15.687554"
+       height="30"
+       width="1.9582245"
+       id="rect815"
+       style="opacity:1;vector-effect:none;fill:#ff0000;fill-opacity:0.98823529;stroke:none;stroke-width:1.51181102;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <g
+       transform="translate(-25.847458,36.160869)"
+       id="g823">
+      <rect
+         style="opacity:1;vector-effect:none;fill:#cdcccc;fill-opacity:1;stroke:none;stroke-width:1.51181102;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="rect817"
+         width="19.138382"
+         height="9.8732147"
+         x="32.944931"
+         y="-30.462954" />
+      <rect
+         style="opacity:1;vector-effect:none;fill:#cdcccc;fill-opacity:1;stroke:none;stroke-width:1.51181102;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="rect819"
+         width="30"
+         height="9.0375004"
+         x="27.514124"
+         y="-17.562952" />
+    </g>
   </g>
 </svg>

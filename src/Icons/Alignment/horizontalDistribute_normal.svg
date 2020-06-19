@@ -11,12 +11,12 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.1"
    id="svg826"
-   width="33.333332"
-   height="33.333332"
-   viewBox="0 0 33.333332 33.333332"
+   width="25"
+   height="25"
+   viewBox="0 0 25 25"
    sodipodi:docname="horizontalDistribute_normal.svg"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   inkscape:export-filename="C:\Users\johnpierson\Desktop\New folder\horizontalDistribute_normal.png"
+   inkscape:export-filename="C:\Users\johnpierson\Documents\Repos\MonocleForDynamo\src\Icons\Alignment\horizontalDistribute_normal.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96">
   <metadata
@@ -27,7 +27,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -47,15 +47,15 @@
      id="namedview828"
      showgrid="false"
      inkscape:zoom="7.0800003"
-     inkscape:cx="-3.0486769"
-     inkscape:cy="-1.5613969"
+     inkscape:cx="16.230983"
+     inkscape:cy="2.3934052"
      inkscape:window-x="951"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg826" />
   <g
      id="g1700"
-     transform="matrix(0,0.53571429,-0.71701712,0,66.445866,48.546767)">
+     transform="matrix(0,0.35714286,-0.47801142,0,45.686134,33.753401)">
     <rect
        y="81.695396"
        x="-87.509521"

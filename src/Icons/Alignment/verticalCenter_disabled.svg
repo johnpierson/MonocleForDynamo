@@ -11,12 +11,12 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.1"
    id="svg826"
-   width="33.333332"
-   height="33.333332"
-   viewBox="0 0 33.333332 33.333332"
+   width="25"
+   height="25"
+   viewBox="0 0 25 25"
    sodipodi:docname="verticalCenter_disabled.svg"
    inkscape:version="0.92.3 (2405546, 2018-03-11)"
-   inkscape:export-filename="C:\Users\johnpierson\Desktop\New folder\verticalCenter_disabled.png"
+   inkscape:export-filename="C:\Users\johnpierson\Documents\Repos\MonocleForDynamo\src\Icons\Alignment\verticalCenter_disabled.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96">
   <metadata
@@ -27,7 +27,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -46,23 +46,23 @@
      inkscape:window-height="1018"
      id="namedview828"
      showgrid="false"
-     inkscape:zoom="5.0063162"
-     inkscape:cx="-30.864913"
-     inkscape:cy="27.896672"
+     inkscape:zoom="10.012632"
+     inkscape:cx="30.880064"
+     inkscape:cy="14.369838"
      inkscape:window-x="951"
      inkscape:window-y="0"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg826" />
   <g
      id="g1646"
-     transform="translate(40.620031,-29.17345)">
+     transform="matrix(0.66666667,0,0,0.66666667,28.46891,-18.060078)">
     <rect
        y="44.861004"
        x="-38.953365"
        height="1.9582245"
        width="30"
        id="rect1637"
-       style="opacity:1;vector-effect:none;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1.51181102;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+       style="opacity:1;vector-effect:none;fill:#444545;fill-opacity:0.98823529;stroke:none;stroke-width:1.51181102;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
     <rect
        y="36.270927"
        x="-34.924793"
