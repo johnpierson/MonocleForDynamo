@@ -18,9 +18,9 @@
             Foreground="#FF040404" 
             TextAlignment="Center" Background="#FFF2F3F4" Height="49" VerticalAlignment="Bottom" ><Run Text =""/><Run 
 
-                Text="More Information:"/><LineBreak/><Hyperlink 
-                NavigateUri="https://www.youtube.com/watch?v=AYfAYHQmdTA" 
-                RequestNavigate="Hyperlink_RequestNavigate"><Run Text="Monocle Overview"/></Hyperlink><LineBreak/><InlineUIContainer/><InlineUIContainer>
+                Text="Free tools from:"/><LineBreak/><Hyperlink 
+                NavigateUri="https://www.parallaxteam.com/monocle-for-dynamo-released/" 
+                RequestNavigate="Hyperlink_RequestNavigate"><Run Text="Parallax Team"/></Hyperlink><LineBreak/><InlineUIContainer/><InlineUIContainer>
                 
             </InlineUIContainer><LineBreak/></TextBlock>
     </StackPanel>

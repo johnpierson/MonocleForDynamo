@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Dynamo.Graph.Nodes;
 using Dynamo.Graph.Workspaces;
 using Dynamo.Models;
 using Dynamo.Search.SearchElements;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.PackageUsageDoge;
+using Utilities = MonocleViewExtension.PackageUsageDoge.Utilities;
 
 namespace MonocleViewExtension.SimpleSearch
 {
@@ -20,12 +24,14 @@ namespace MonocleViewExtension.SimpleSearch
     public partial class SimpleSearch : UserControl, IDisposable
     {
         public static TextBox _searchTextBox;
-        private static int searchCriteriaFlag = 0;
+        private static int _searchCriteriaFlag = 0;
         private WorkspaceModel currentWorkspace;
-
-
+        private static bool _excludeCustomNodes = false;
+        private static List<NodeSearchElement> NodesToSearch = new List<NodeSearchElement>();
+        private static List<NodeSearchElement> NodesToSearchOOTB = new List<NodeSearchElement>();
+        HashSet<string> hs = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         private ViewLoadedParams loadedParams;
-        //private SimpleSearch dependencyViewExtension;
+        private DispatcherTimer _searchTimer;
 
         public SimpleSearch(ViewLoadedParams p)
         {
@@ -33,29 +39,39 @@ namespace MonocleViewExtension.SimpleSearch
             this.DataContext = this;
             currentWorkspace = p.CurrentWorkspaceModel as WorkspaceModel;
             loadedParams = p;
-            //grid view to add the dynamo info to the list
-            GridView grid = new GridView();
-            //column to contain simple node names
-            GridViewColumn col0 = new GridViewColumn();
-            col0.Width = 20;
-            col0.DisplayMemberBinding = new System.Windows.Data.Binding("Weight");
-            grid.Columns.Add(col0);
-            GridViewColumn col1 = new GridViewColumn();
-            col1.Width = 200;
-            col1.Header = "Node Name";
-            col1.DisplayMemberBinding = new System.Windows.Data.Binding("Name");
-            grid.Columns.Add(col1);
-            //column to contain full node names
-            GridViewColumn col2 = new GridViewColumn();
-            col2.Width = 200;
-            col2.Header = "Node Full Name";
-            col2.DisplayMemberBinding = new System.Windows.Data.Binding("FullCategoryName");
-            grid.Columns.Add(col2);
-            //bind the list view to the grid
-            this.ResultsList.View = grid;
             _searchTextBox = SearchTextBox;
+            PackList();
+            //_searchTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(1)};
+            //_searchTimer.Tick += SearchTimerOnTick;
         }
 
+        private void SearchTimerOnTick(object sender, EventArgs e)
+        {
+            _searchTimer.Stop();
+            this.ResultsList.ItemsSource = SearchAndDisplayResults(this.SearchTextBox.Text.SimplifyString());
+        }
+
+        private void PackList()
+        {
+            NodesToSearch.Clear();
+            NodesToSearch.AddRange(MonocleViewExtension.dynView.Model.SearchModel.SearchEntries.Where(n => n.IsVisibleInSearch));
+
+            //generate the non custom list
+            NodesToSearchOOTB.Clear();
+            foreach (var n in NodesToSearch)
+            {
+                string elemType = n.ElementType.ToString();
+                bool addToList = elemType.Contains("Packaged") || elemType.Contains("CustomNode");
+                if (!addToList)
+                {
+                    NodesToSearchOOTB.Add(n);
+                }
+            }
+            
+            //this.ResultsList.ItemsSource = NodesToSearch;
+        }
+
+        
         /// <summary>
         /// Dispose function for WorkspaceDependencyView
         /// </summary>
@@ -63,7 +79,7 @@ namespace MonocleViewExtension.SimpleSearch
         {
             //loadedParams.CurrentWorkspaceChanged -= OnWorkspaceChanged;
             //loadedParams.CurrentWorkspaceCleared -= OnWorkspaceCleared;
-           
+
             //DynamoView.CloseExtension -= this.OnExtensionTabClosedHandler;
             //HomeWorkspaceModel.WorkspaceClosed -= this.CloseExtensionTab;
         }
@@ -71,69 +87,80 @@ namespace MonocleViewExtension.SimpleSearch
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextSearchBoxPlaceholder.Visibility = Visibility.Hidden;
-            string toSearch = this.SearchTextBox.Text;
-            this.ResultsList.ItemsSource = SearchAndDisplayResults(toSearch);
+            //_searchTimer.Stop();
+            if (string.IsNullOrWhiteSpace(this.SearchTextBox.Text))
+            {
+                return;
+            }
+            //_searchTimer.Start();
+            this.ResultsList.ItemsSource = SearchAndDisplayResults(this.SearchTextBox.Text.SimplifyString());
+            //CollectionViewSource.GetDefaultView(this.ResultsList.ItemsSource).Filter = UserFilter;
+            //CollectionViewSource.GetDefaultView(this.ResultsList.ItemsSource).DeferRefresh();
         }
 
         private static List<NodeSearchElement> SearchAndDisplayResults(string searchString)
         {
-            List<NodeSearchElement> results = new List<NodeSearchElement>();
-            List<int> scores = new List<int>();
-            foreach (NodeSearchElement nsm in MonocleViewExtension.dynView.Model.SearchModel.SearchEntries)
+            if (_excludeCustomNodes)
             {
-                if (!nsm.IsVisibleInSearch)
-                {
-                    continue;
-                }
-
-                string searchableText = string.Empty;
-
-                switch (searchCriteriaFlag)
-                {
-                    case 1:
-                        searchableText = nsm.Name;
-                        break;
-                    case 2:
-                        searchableText = nsm.Description;
-                        break;
-                    case 3:
-                        searchableText = nsm.Name + nsm.Description;
-                        break;
-                    case 4:
-                        searchableText = nsm.FullName;
-                        break;
-                    case 5:
-                        searchableText = nsm.Name + nsm.FullName;
-                        break;
-                    case 6:
-                        searchableText = nsm.FullName + nsm.Description;
-                        break;
-                    case 7:
-                        searchableText = nsm.Name + nsm.FullName + nsm.Description;
-                        break;
-                }
-
-
-                if (searchableText.SimplifyString().Contains(searchString.SimplifyString()))
-                {
-                    results.Add(nsm); 
-                    nsm.Weight = StringComparisonUtilities.Compute(searchString.SimplifyString(),nsm.Name);
-                   
-                }
+                return NodesToSearchOOTB.Where(n => SetSearchName(n).Contains(searchString))
+                    .OrderBy(n => StringComparisonUtilities.Compute(searchString, SetSearchName(n))).ToList();
             }
-            
-            return results.OrderBy(r => r.Weight).ToList();
+            //we reach this for all other searches
+            return NodesToSearch.Where(n => SetSearchName(n).Contains(searchString))
+                .OrderBy(n => StringComparisonUtilities.Compute(searchString, SetSearchName(n))).ToList();
+
+        }
+
+        private static string SetSearchName(NodeSearchElement nsm)
+        {
+            string returnString = (nsm.Name).SimplifyString();
+
+            switch (_searchCriteriaFlag)
+            {
+                case 1:
+                    returnString = (nsm.Name).SimplifyString();
+                    break;
+                case 2:
+                    returnString = nsm.Description.SimplifyString();
+                    break;
+                case 3:
+                    returnString = (nsm.Name + nsm.Description).SimplifyString();
+                    break;
+                case 4:
+                    returnString = (nsm.FullName).SimplifyString();
+                    break;
+                case 5:
+                    returnString = (nsm.Name + nsm.FullName).SimplifyString();
+                    break;
+                case 6:
+                    returnString = (nsm.FullName + nsm.Description).SimplifyString();
+                    break;
+                case 7:
+                    returnString = (nsm.Name + nsm.FullName + nsm.Description).SimplifyString();
+                    break;
+            }
+
+            return returnString;
+        }
+
+        private bool UserFilter(object item)
+        {
+            if (String.IsNullOrEmpty(SearchTextBox.Text.SimplifyString()))
+                return false;
+            string textToSearch = SearchTextBox.Text.SimplifyString();
+            var nse = (NodeSearchElement)item;
+
+            return SetSearchName(nse).Contains(textToSearch);
         }
 
 
-        private void ResultsList_OnMouseDown(object sender, MouseButtonEventArgs e)
+        private void PlaceNode(object sender, MouseButtonEventArgs e)
         {
-            NodeSearchElement simpleNode = ResultsList.SelectedItem as NodeSearchElement;
-            if (simpleNode == null)
+            if (!(ResultsList.SelectedItem is NodeSearchElement simpleNode))
             {
                 return;
             }
- 
+
             try
             {
                 var dynMethod = simpleNode.GetType().GetMethod("ConstructNewNodeModel",
@@ -155,18 +182,22 @@ namespace MonocleViewExtension.SimpleSearch
             switch (cBox.Name)
             {
                 case "NodeNameCheckBox":
-                    searchCriteriaFlag = searchCriteriaFlag + 1;              
+                    _searchCriteriaFlag = _searchCriteriaFlag + 1;
                     break;
                 case "NodeDescriptionCheckBox":
-                    searchCriteriaFlag = searchCriteriaFlag + 2;
+                    _searchCriteriaFlag = _searchCriteriaFlag + 2;
                     break;
                 case "NodeCategoryCheckBox":
-                    searchCriteriaFlag = searchCriteriaFlag + 4;               
+                    _searchCriteriaFlag = _searchCriteriaFlag + 4;
+                    break;
+                case "ExcludeCustomPackagesCheckBox":
+                    _excludeCustomNodes = true;
                     break;
             }
 
             RefreshSearch();
         }
+
 
 
         private void OnUnchecked(object sender, RoutedEventArgs e)
@@ -175,13 +206,16 @@ namespace MonocleViewExtension.SimpleSearch
             switch (cBox.Name)
             {
                 case "NodeNameCheckBox":
-                    searchCriteriaFlag = searchCriteriaFlag - 1;
+                    _searchCriteriaFlag = _searchCriteriaFlag - 1;
                     break;
                 case "NodeDescriptionCheckBox":
-                    searchCriteriaFlag = searchCriteriaFlag - 2;
+                    _searchCriteriaFlag = _searchCriteriaFlag - 2;
                     break;
                 case "NodeCategoryCheckBox":
-                    searchCriteriaFlag = searchCriteriaFlag - 4;
+                    _searchCriteriaFlag = _searchCriteriaFlag - 4;
+                    break;
+                case "ExcludeCustomPackagesCheckBox":
+                    _excludeCustomNodes = false;
                     break;
             }
 
@@ -191,19 +225,16 @@ namespace MonocleViewExtension.SimpleSearch
         {
             if (e.Key == Key.Enter)
             {
-                NodeSearchElement simpleNode = ResultsList.Items[0] as NodeSearchElement;
-                if (simpleNode == null)
+                if (!(ResultsList.Items[0] is NodeSearchElement simpleNode))
                 {
                     return;
                 }
-
                 try
                 {
                     var dynMethod = simpleNode.GetType().GetMethod("ConstructNewNodeModel",
                         BindingFlags.NonPublic | BindingFlags.Instance);
                     var obj = dynMethod.Invoke(simpleNode, new object[] { });
                     var nM = obj as NodeModel;
-
                     MonocleViewExtension.dynView.ExecuteCommand(new DynamoModel.CreateNodeCommand(nM, 0, 0, true, false));
                 }
                 catch (Exception)
@@ -220,14 +251,53 @@ namespace MonocleViewExtension.SimpleSearch
                 {
                     this.SearchTextBox.Text = " " + this.SearchTextBox.Text;
                     this.SearchTextBox.Text = this.SearchTextBox.Text.Remove(0, 1);
-                }  
+                }
             }
             catch (Exception)
             {
                 //suppress
             }
         }
-        
 
+        GridViewColumnHeader _lastHeaderClicked = null;
+        ListSortDirection _lastDirection = ListSortDirection.Ascending;
+        private void ResultsList_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (e.OriginalSource is GridViewColumnHeader headerClicked)
+            {
+                if (headerClicked.Role != GridViewColumnHeaderRole.Padding)
+                {
+                    ListSortDirection direction;
+                    if (headerClicked != _lastHeaderClicked)
+                    {
+                        direction = ListSortDirection.Ascending;
+                    }
+                    else
+                    {
+                        if (_lastDirection == ListSortDirection.Ascending)
+                        {
+                            direction = ListSortDirection.Descending;
+                        }
+                        else
+                        {
+                            direction = ListSortDirection.Ascending;
+                        }
+                    }
+
+                    Sort("Name", direction);
+                    _lastHeaderClicked = headerClicked;
+                    _lastDirection = direction;
+                }
+            }
+        }
+        private void Sort(string sortBy, ListSortDirection direction)
+        {
+            ICollectionView dataView = ResultsList.Items;
+            dataView.SortDescriptions.Clear();
+            SortDescription sd = new SortDescription(sortBy, direction);
+            dataView.SortDescriptions.Add(sd);
+            dataView.Refresh();
+
+        }
     }
 }

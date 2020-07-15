@@ -5,31 +5,75 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:MonocleViewExtension.SimpleSearch"
              mc:Ignorable="d" 
-              HorizontalAlignment="Stretch" Width="Auto" VerticalAlignment="Stretch" Height="Auto">
+              HorizontalAlignment="Stretch" Width="Auto" VerticalAlignment="Stretch" Height="Auto"
+             Background="White">
     <Grid Name="MainGrid" Height="Auto" Width="Auto">
-        <ListView x:Name="ResultsList" Margin="5,75,5,-3" FontSize="14" MouseLeftButtonUp="ResultsList_OnMouseDown" Background="White" BorderBrush="White">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn/>
-                </GridView>
-            </ListView.View>
-        </ListView>
-        <TextBox x:Name="SearchTextBox" Margin="5,10,5,0" TextWrapping="Wrap" VerticalAlignment="Top" Padding="30 5 5 5" FontSize="16" Foreground="SteelBlue" HorizontalAlignment="Stretch" TextChanged="TextBox_TextChanged" KeyDown="SearchBox_OnKeyDown"/>
-        <Label x:Name="TextSearchBoxPlaceholder" Margin="20,10,10,0" Padding="15 5 5 5" Content="start typing here to find nodes" Height="33" VerticalAlignment="Top" Foreground="SteelBlue" FontSize="16" FontStyle="Italic" IsHitTestVisible="False"  />
-        <Image HorizontalAlignment="Left" Height="29" Margin="5,14,0,0" VerticalAlignment="Top" Width="27" Source="/MonocleViewExtension;component/Resources/magnifyingGlass.png"/>
-        <Grid HorizontalAlignment="Stretch" Height="31" Margin="5,45,5,0" VerticalAlignment="Top" Background="White">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="20"/>
-                <ColumnDefinition Width="120"/>
-                <ColumnDefinition Width="140"/>
-                <ColumnDefinition Width="140"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="33"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBox Grid.Row="0" x:Name="SearchTextBox" TextWrapping="Wrap" VerticalAlignment="Top" Padding="30 5 5 5" FontSize="16" Foreground="SteelBlue" HorizontalAlignment="Stretch" TextChanged="TextBox_TextChanged" KeyDown="SearchBox_OnKeyDown" Background="{x:Null}"/>
+        <Label Grid.Row="0" x:Name="TextSearchBoxPlaceholder" Margin="20 0 0 0" Padding="15 5 5 5" Content="start typing here to find nodes" Height="33" VerticalAlignment="Top" Foreground="SteelBlue" FontSize="16" FontStyle="Italic" IsHitTestVisible="False"  />
+        <Image Grid.Row="0" HorizontalAlignment="Left" Height="29" Margin="5 5 0 0" VerticalAlignment="Top" Width="27" Source="/MonocleViewExtension;component/Resources/magnifyingGlass.png"/>
 
-            <CheckBox Grid.Column="1" x:Name="NodeNameCheckBox" Content="node name" VerticalAlignment="Center" FontStyle="Italic" Foreground="SteelBlue" IsChecked="True" Checked="OnChecked" Unchecked="OnUnchecked" FontSize="10"/>
-            <CheckBox Grid.Column="2" x:Name="NodeDescriptionCheckBox" Content="node description" VerticalAlignment="Center" FontStyle="Italic" Foreground="SteelBlue" Checked="OnChecked" Unchecked="OnUnchecked" FontSize="10"/>
-            <CheckBox Grid.Column="3" x:Name="NodeCategoryCheckBox" Content="node category" VerticalAlignment="Center" FontStyle="Italic" Foreground="SteelBlue" Checked="OnChecked" Unchecked="OnUnchecked" FontSize="10"/>
-        </Grid>
+        <StackPanel Grid.Row="1">
+            <WrapPanel Margin="4">
+                <CheckBox Width="100" x:Name="NodeNameCheckBox" Content="node name" VerticalAlignment="Center" FontStyle="Italic" Foreground="SteelBlue" IsChecked="True" Checked="OnChecked" Unchecked="OnUnchecked" FontSize="10"/>
+                <CheckBox Width="140" x:Name="NodeDescriptionCheckBox" Content="node description" VerticalAlignment="Center" FontStyle="Italic" Foreground="SteelBlue" Checked="OnChecked" Unchecked="OnUnchecked" FontSize="10"/>
+                <CheckBox Width="120" x:Name="NodeCategoryCheckBox" Content="full name" VerticalAlignment="Center" FontStyle="Italic" Foreground="SteelBlue" IsChecked="True"  Checked="OnChecked" Unchecked="OnUnchecked" FontSize="10"/>
+                <CheckBox Width="180" x:Name="ExcludeCustomPackagesCheckBox" Content="exclude custom packages" VerticalAlignment="Center" FontStyle="Italic" Foreground="SteelBlue" Checked="OnChecked" Unchecked="OnUnchecked" FontSize="10" ToolTip="Offers the ability to exclude custom packages from the search. Can cause some slowdown."/>
+            </WrapPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1000"/>
+                </Grid.RowDefinitions>
+
+                <!--<ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Visible" CanContentScroll="False">-->
+                    <ListView x:Name="ResultsList" FontSize="14" MouseLeftButtonUp="PlaceNode" Background="{x:Null}" GridViewColumnHeader.Click="ResultsList_OnClick" MaxHeight="2000">
+                        <ListView.Resources>
+                            <Style x:Key="ColHeaderText" TargetType="TextBlock">
+                                <Setter Property="Width" Value="80" />
+                                <Setter Property="Height" Value="14" />
+                                <Setter Property="FontSize" Value="12" />
+                                <Setter Property="Foreground" Value="SteelBlue" />
+                                <Setter Property="FontStyle" Value="Italic" />
+                                <Setter Property="HorizontalAlignment" Value="Center" />
+                            </Style>
+                        </ListView.Resources>
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Width="180" DisplayMemberBinding="{Binding Name}">
+                                    <GridViewColumn.Header>
+                                        <TextBlock Text="Node Name" Style="{StaticResource ColHeaderText}"/>
+                                    </GridViewColumn.Header>
+                                </GridViewColumn>
+                                <GridViewColumn Width="180" DisplayMemberBinding="{Binding FullName}">
+                                    <GridViewColumn.Header>
+                                        <TextBlock Text="Full Name" Style="{StaticResource ColHeaderText}"/>
+                                    </GridViewColumn.Header>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                        <!--<ListView.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                --><!--<StackPanel/>
+                    If StackPanel was used, the memory consumed was over 2GB and dead slow.
+                    --><!--
+                                <VirtualizingStackPanel>
+                                    --><!--Memory footprint is only 200 mb--><!--
+                                </VirtualizingStackPanel>
+                            </ItemsPanelTemplate>
+                        </ListView.ItemsPanel>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}"/>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>-->
+                    </ListView>
+                <!--</ScrollViewer>-->
+
+            </Grid>
+
+        </StackPanel>
     </Grid>
-
 </UserControl>
