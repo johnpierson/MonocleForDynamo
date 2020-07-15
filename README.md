@@ -6,6 +6,7 @@
 
 <h3 align="center">A view extension for <a href="http://dynamobim.org/" target="_blank">Dynamo</a>.</h4>
 
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/johnpierson/monoclefordynamo)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/johnpierson/MonocleForDynamo/graphs/commit-activity)
 [![GitHub license](https://img.shields.io/github/license/johnpierson/MonocleForDynamo)](https://github.com/johnpierson/MonocleForDynamo/blob/master/LICENSE)
 
@@ -23,7 +24,7 @@ Monocle is currently built against the latest Dynamo stable build. At this time 
 - When installing from the package manager for the first time, you may need to restart Dynamo.
 
 ## Contributors
-This package is currently managed by author of http://sixtysecondrevit.com.
+This package is primarily managed by the author of http://sixtysecondrevit.com and by [People Like You™](https://github.com/johnpierson/MonocleForDynamo/graphs/contributors).
 
 ## Updates
 Since there is not currently an update notification process on Dynamo's package manager, I post notifications for updates on twitter.
