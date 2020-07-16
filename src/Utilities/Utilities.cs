@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace MonocleViewExtension.Utilities
 {
@@ -56,6 +53,19 @@ namespace MonocleViewExtension.Utilities
             }
             // Step 7
             return d[n, m];
+        }
+
+        public static string CleanupString(this string str)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (char c in str)
+            {
+                if ((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z'))
+                {
+                    sb.Append(c);
+                }
+            }
+            return sb.ToString().ToLower();
         }
     }
 }
