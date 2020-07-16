@@ -5,16 +5,18 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Shapes;
 using System.Windows.Threading;
 using Dynamo.Graph.Nodes;
 using Dynamo.Graph.Workspaces;
 using Dynamo.Models;
 using Dynamo.Search.SearchElements;
 using Dynamo.Wpf.Extensions;
-using MonocleViewExtension.PackageUsageDoge;
-using Utilities = MonocleViewExtension.PackageUsageDoge.Utilities;
+using MonocleViewExtension.PackageUsage;
+using MonocleViewExtension.Utilities;
 
 namespace MonocleViewExtension.SimpleSearch
 {
@@ -279,6 +281,31 @@ namespace MonocleViewExtension.SimpleSearch
             dataView.SortDescriptions.Add(sd);
             dataView.Refresh();
 
+        }
+
+        private void EventSetter_OnHandler(object sender, RoutedEventArgs e)
+        {
+            GridViewColumnHeader columnHeader = sender as GridViewColumnHeader;
+            Border HeaderBorder = columnHeader.Template.FindName("HeaderBorder", columnHeader) as Border;
+            if (HeaderBorder != null)
+            {
+                HeaderBorder.Background = HeaderBorder.Background;
+            }
+            Border HeaderHoverBorder = columnHeader.Template.FindName("HeaderHoverBorder", columnHeader) as Border;
+            if (HeaderHoverBorder != null)
+            {
+                HeaderHoverBorder.BorderBrush = HeaderHoverBorder.BorderBrush;
+            }
+            Rectangle UpperHighlight = columnHeader.Template.FindName("UpperHighlight", columnHeader) as Rectangle;
+            if (UpperHighlight != null)
+            {
+                UpperHighlight.Visibility = UpperHighlight.Visibility;
+            }
+            Thumb PART_HeaderGripper = columnHeader.Template.FindName("PART_HeaderGripper", columnHeader) as Thumb;
+            if (PART_HeaderGripper != null)
+            {
+                PART_HeaderGripper.Background = PART_HeaderGripper.Background;
+            }
         }
     }
 }
