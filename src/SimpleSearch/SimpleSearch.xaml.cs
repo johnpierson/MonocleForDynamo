@@ -40,40 +40,24 @@ namespace MonocleViewExtension.SimpleSearch
             currentWorkspace = p.CurrentWorkspaceModel as WorkspaceModel;
             loadedParams = p;
             _searchTextBox = SearchTextBox;
-            PackList();
-            //_searchTimer = new DispatcherTimer {Interval = TimeSpan.FromMilliseconds(1)};
-            //_searchTimer.Tick += SearchTimerOnTick;
+            PackLists();
         }
-
-        private void SearchTimerOnTick(object sender, EventArgs e)
+        /// <summary>
+        /// This builds our search list upfront so I don't have to do it later.
+        /// </summary>
+        private void PackLists()
         {
-            _searchTimer.Stop();
-            this.ResultsList.ItemsSource = SearchAndDisplayResults(this.SearchTextBox.Text.SimplifyString());
-        }
-
-        private void PackList()
-        {
+            //generate the custom list to search
             NodesToSearch.Clear();
             NodesToSearch.AddRange(MonocleViewExtension.dynView.Model.SearchModel.SearchEntries.Where(n => n.IsVisibleInSearch));
-
-            //generate the non custom list
+            //generate the non custom list to search
             NodesToSearchOOTB.Clear();
-            foreach (var n in NodesToSearch)
-            {
-                string elemType = n.ElementType.ToString();
-                bool addToList = elemType.Contains("Packaged") || elemType.Contains("CustomNode");
-                if (!addToList)
-                {
-                    NodesToSearchOOTB.Add(n);
-                }
-            }
-            
-            //this.ResultsList.ItemsSource = NodesToSearch;
+            NodesToSearchOOTB.AddRange(NodesToSearch.Where(n => !n.ElementType.ToString().Contains("Packaged") && !n.ElementType.ToString().Contains("CustomNode")));       
         }
 
         
         /// <summary>
-        /// Dispose function for WorkspaceDependencyView
+        /// Dispose function for Simple Search
         /// </summary>
         public void Dispose()
         {
@@ -83,21 +67,21 @@ namespace MonocleViewExtension.SimpleSearch
             //DynamoView.CloseExtension -= this.OnExtensionTabClosedHandler;
             //HomeWorkspaceModel.WorkspaceClosed -= this.CloseExtensionTab;
         }
-
+        /// <summary>
+        /// Refresh the list on textbox changed
+        /// </summary>
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextSearchBoxPlaceholder.Visibility = Visibility.Hidden;
-            //_searchTimer.Stop();
             if (string.IsNullOrWhiteSpace(this.SearchTextBox.Text))
             {
                 return;
             }
-            //_searchTimer.Start();
             this.ResultsList.ItemsSource = SearchAndDisplayResults(this.SearchTextBox.Text.SimplifyString());
-            //CollectionViewSource.GetDefaultView(this.ResultsList.ItemsSource).Filter = UserFilter;
-            //CollectionViewSource.GetDefaultView(this.ResultsList.ItemsSource).DeferRefresh();
         }
-
+        /// <summary>
+        /// Do the search stuff n thangs
+        /// </summary>
         private static List<NodeSearchElement> SearchAndDisplayResults(string searchString)
         {
             if (_excludeCustomNodes)
@@ -110,7 +94,9 @@ namespace MonocleViewExtension.SimpleSearch
                 .OrderBy(n => StringComparisonUtilities.Compute(searchString, SetSearchName(n))).ToList();
 
         }
-
+        /// <summary>
+        /// This builds the string to search by based on the user selections
+        /// </summary>
         private static string SetSearchName(NodeSearchElement nsm)
         {
             string returnString = (nsm.Name).SimplifyString();
@@ -142,18 +128,9 @@ namespace MonocleViewExtension.SimpleSearch
 
             return returnString;
         }
-
-        private bool UserFilter(object item)
-        {
-            if (String.IsNullOrEmpty(SearchTextBox.Text.SimplifyString()))
-                return false;
-            string textToSearch = SearchTextBox.Text.SimplifyString();
-            var nse = (NodeSearchElement)item;
-
-            return SetSearchName(nse).Contains(textToSearch);
-        }
-
-
+        /// <summary>
+        /// Try to place a node because why else are we searching
+        /// </summary>
         private void PlaceNode(object sender, MouseButtonEventArgs e)
         {
             if (!(ResultsList.SelectedItem is NodeSearchElement simpleNode))
@@ -198,8 +175,6 @@ namespace MonocleViewExtension.SimpleSearch
             RefreshSearch();
         }
 
-
-
         private void OnUnchecked(object sender, RoutedEventArgs e)
         {
             CheckBox cBox = sender as CheckBox;
@@ -221,6 +196,9 @@ namespace MonocleViewExtension.SimpleSearch
 
             RefreshSearch();
         }
+        /// <summary>
+        /// Adds the enter command to search.
+        /// </summary>
         private void SearchBox_OnKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
@@ -243,6 +221,9 @@ namespace MonocleViewExtension.SimpleSearch
                 }
             }
         }
+        /// <summary>
+        /// Janky way to refresh the search
+        /// </summary>
         private void RefreshSearch()
         {
             try
@@ -258,7 +239,7 @@ namespace MonocleViewExtension.SimpleSearch
                 //suppress
             }
         }
-
+        //this section is for sorting stuff
         GridViewColumnHeader _lastHeaderClicked = null;
         ListSortDirection _lastDirection = ListSortDirection.Ascending;
         private void ResultsList_OnClick(object sender, RoutedEventArgs e)
