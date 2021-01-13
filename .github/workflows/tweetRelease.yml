@@ -21,7 +21,7 @@ jobs:
           github_token: ${{ secrets.TOKEN }}
       - name: Consume 
         run: |
-          echo ${{ steps.fetch-latest-release.outputs.url }}
+          echo ${{ steps.fetch-latest-release.outputs.html_url }}
       #- uses: ethomson/send-tweet-action@v1
       #  with:
        #   status: "New Monocle Release: " 
