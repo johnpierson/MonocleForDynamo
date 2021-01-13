@@ -11,14 +11,18 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
- tweet:
+ latest-version:
+    name: Get Latest Release
     runs-on: ubuntu-latest
     steps:
-      - id: fetch-latest-release
       - uses: thebritican/fetch-latest-release@v1
+      - name: Get Latest Release
+        id: fetch-latest-release
         with:
           github_token: ${{ secrets.TOKEN }}
-          run: echo steps.run_tests.outputs  
+      - name: Consume 
+        run: |
+          echo steps.fetch-latest-release.url
       #- uses: ethomson/send-tweet-action@v1
       #  with:
        #   status: "New Monocle Release: " 
