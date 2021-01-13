@@ -17,7 +17,7 @@ jobs:
       - id: fetch-latest-release
       - uses: thebritican/fetch-latest-release@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.TOKEN }}
           run: echo steps.run_tests.outputs  
       #- uses: ethomson/send-tweet-action@v1
       #  with:
