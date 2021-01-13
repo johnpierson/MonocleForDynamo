@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Get Latest Release
         id: fetch-latest-release
-        uses: thebritican/fetch-latest-release@v2
+        uses: thebritican/fetch-latest-release@v1
         with:
           github_token: ${{ secrets.TOKEN }}
       - name: Consume 
