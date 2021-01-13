@@ -1,0 +1,29 @@
+name: Tweet New Release
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on release
+  release:
+    types: [published]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+ tweet:
+    runs-on: ubuntu-latest
+    steps:
+      - id: fetch-latest-release
+      - uses: thebritican/fetch-latest-release@v1
+        with:
+          github_token: ${{ github.token }}
+      - name: test
+        run: echo steps.run_tests.outputs  
+      #- uses: ethomson/send-tweet-action@v1
+      #  with:
+       #   status: "New Monocle Release: " 
+       #   consumer-key: ${{ secrets.TWITTER_CONSUMER_API_KEY }}
+        #  consumer-secret: ${{ secrets.TWITTER_CONSUMER_API_SECRET }}
+       #   access-token: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+        #  access-token-secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
