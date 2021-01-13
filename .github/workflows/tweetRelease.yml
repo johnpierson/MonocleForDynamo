@@ -23,10 +23,10 @@ jobs:
       - name: Consume 
         run: |
           echo ${{ steps.fetch-latest-release.outputs.release }}
-     # - uses: ethomson/send-tweet-action@v1
-       # with:
-        #  status: "New Monocle Release: ${{ steps.fetch-latest-release.outputs.html_url }}" 
-        #  consumer-key: ${{ secrets.TWITTER_CONSUMER_API_KEY }}
-        #  consumer-secret: ${{ secrets.TWITTER_CONSUMER_API_SECRET }}
-         # access-token: ${{ secrets.TWITTER_ACCESS_TOKEN }}
-         # access-token-secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
+      - uses: ethomson/send-tweet-action@v1
+        with:
+          status: "New Monocle Release: https://github.com/johnpierson/MonocleForDynamo/releases/tag/${{ steps.fetch-latest-release.outputs.release }}" 
+          consumer-key: ${{ secrets.TWITTER_CONSUMER_API_KEY }}
+          consumer-secret: ${{ secrets.TWITTER_CONSUMER_API_SECRET }}
+          access-token: ${{ secrets.TWITTER_ACCESS_TOKEN }}
+          access-token-secret: ${{ secrets.TWITTER_ACCESS_TOKEN_SECRET }}
