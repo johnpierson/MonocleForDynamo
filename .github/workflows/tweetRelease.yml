@@ -12,7 +12,6 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
  latest-version:
-    name: Get Latest Release
     runs-on: ubuntu-latest
     steps:
       - uses: thebritican/fetch-latest-release@v1
