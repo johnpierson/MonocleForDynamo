@@ -16,12 +16,13 @@ jobs:
     steps:
       - name: Get Latest Release
         id: fetch-latest-release
-        uses: thebritican/fetch-latest-release@v2.0.0
+        uses: pozetroninc/github-action-get-latest-release@master
         with:
-          github_token: ${{ secrets.TOKEN }}
+          owner: johnPierson
+          repo:: MonocleForDynamo
       - name: Consume 
         run: |
-          echo ${{ steps.fetch-latest-release.outputs.html_url }}
+          echo ${{ steps.fetch-latest-release.outputs.release }}
      # - uses: ethomson/send-tweet-action@v1
        # with:
         #  status: "New Monocle Release: ${{ steps.fetch-latest-release.outputs.html_url }}" 
