@@ -6,7 +6,7 @@
 
 <h3 align="center">A view extension for <a href="http://dynamobim.org/" target="_blank">Dynamo</a>.</h4>
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/johnpierson/monoclefordynamo)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/johnpierson/monoclefordynamo?include_prereleases)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/johnpierson/MonocleForDynamo/graphs/commit-activity)
 [![GitHub license](https://img.shields.io/github/license/johnpierson/MonocleForDynamo)](https://github.com/johnpierson/MonocleForDynamo/blob/master/LICENSE)
 
