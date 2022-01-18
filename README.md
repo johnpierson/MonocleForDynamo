@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <img src="!Documentation/monocleLogo.png" alt="Rhythm" width="500">
+  <img src="!Documentation/monocleLogoRoundedSquare.png" alt="monocle" width="200">
   <br>
 </h1>
 
@@ -18,7 +18,7 @@ If you appreciate the work put into this free package, please vote in support of
  <a href="https://www.buymeacoffee.com/j0hnp" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
 ## Current Version
-Monocle is currently built against the latest Dynamo stable build. At this time that is 2.5.0. _However, monocle has been tested for Dynamo 2.0.3 - 2.6.0._
+Monocle is currently built against the latest Dynamo stable build. At this time that is 2.12.0. _However, monocle has been tested for Dynamo 2.0.3 - 2.13.0._
 
 ## Known Issues
 - When installing from the package manager for the first time, you may need to restart Dynamo.
@@ -29,6 +29,8 @@ This package is primarily managed by the author of http://sixtysecondrevit.com, 
 ## Updates
 Since there is not currently an update notification process on Dynamo's package manager, I post notifications for updates on twitter.
 [![](https://img.shields.io/twitter/follow/60secondrevit.svg?label=Follow&style=social)](https://twitter.com/60secondrevit)
+
+Additionally,  updates come through in the extension menu now!
 
 ## Examples
 _Soon_
