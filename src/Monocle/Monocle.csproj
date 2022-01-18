@@ -195,7 +195,7 @@
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="Xceed.Wpf.Toolkit">
-      <HintPath>..\..\..\..\DynamoCoreRuntime2.13.0\nodes\Xceed.Wpf.Toolkit.dll</HintPath>
+      <HintPath>C:\Users\johnpierson\Desktop\DynamoCoreRuntime2.13.0\nodes\Xceed.Wpf.Toolkit.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -334,6 +334,10 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy "$(ProjectDir)bin\Release\*.dll" "C:\Users\JohnPierson\AppData\Roaming\Dynamo\Dynamo Core\2.12\packages\Monocle\bin"
-</PostBuildEvent>
+copy "$(ProjectDir)bin\Release\*.dll" "C:\Users\johnpierson\AppData\Roaming\Dynamo\Dynamo Revit\2.0\packages\Monocle\bin"
+copy "$(ProjectDir)bin\Release\*.dll" "C:\Users\johnpierson\AppData\Roaming\Dynamo\Dynamo Revit\2.3\packages\Monocle\bin"
+copy "$(ProjectDir)bin\Release\*.dll" "C:\Users\johnpierson\AppData\Roaming\Dynamo\Dynamo Revit\2.6\packages\Monocle\bin"
+copy "$(ProjectDir)bin\Release\*.dll" "C:\Users\johnpierson\AppData\Roaming\Dynamo\Dynamo Revit\2.10\packages\Monocle\bin"
+copy "$(ProjectDir)bin\Release\*.dll" "C:\Users\johnpierson\AppData\Roaming\Dynamo\Dynamo Revit\2.12\packages\Monocle\bin"</PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,7 +24,7 @@ namespace MonocleViewExtension.SimpleSearch
         internal static ViewLoadedParams vp;
 
         internal static MenuItem ssMenuItem;
-        public static void AddMenuItem(ViewLoadedParams p,MenuItem menuItem, MonocleViewExtension m)
+        public static void AddMenuItem(ViewLoadedParams p, MenuItem menuItem, MonocleViewExtension m)
         {
             vp = p;
             dvm = p.DynamoWindow.DataContext as DynamoViewModel;
@@ -48,7 +49,15 @@ namespace MonocleViewExtension.SimpleSearch
 
             ssMenuItem.Unchecked += (sender, args) =>
             {
-                CloseSimpleSearch(p, m);
+                if (Globals.DynamoVersion.CompareTo(Globals.SidebarMinVersion) >= 0)
+                {
+                    CloseSimpleSearch(p, m);
+                }
+                else
+                {
+                    CloseSimpleSearch();
+                }
+
             };
 
             menuItem.Items.Add(ssMenuItem);
@@ -79,22 +88,31 @@ namespace MonocleViewExtension.SimpleSearch
             }
         }
 
+        private static void CloseSimpleSearch()
+        {
+            try
+            {
+                ssWindow?.Close();
+            }
+            catch (Exception e)
+            {
+                //
+            }
+        }
         private static void CloseSimpleSearch(ViewLoadedParams p, MonocleViewExtension m)
         {
-            if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
+            try
             {
+
+                var dynMethod = p.GetType().GetMethod("CloseExtensioninInSideBar",
+                    BindingFlags.NonPublic | BindingFlags.Instance);
+                var obj = dynMethod.Invoke(m, new object[] { });
+
                 p.CloseExtensioninInSideBar(m);
             }
-            else
+            catch (Exception)
             {
-                try
-                {
-                    ssWindow?.Close();
-                }
-                catch (Exception e)
-                {
-                    //
-                }
+                //suppress this for now. this run is in a pretty old dynamo.
             }
         }
 
