@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MonocleSettings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <GroupSettings>
+    <GroupSetting>
+      <GroupId>1</GroupId>
+      <Text>Background</Text>
+      <Color>#FFD3D3D3</Color>
+      <FontSize>24</FontSize>
+    </GroupSetting>
+    <GroupSetting>
+      <GroupId>2</GroupId>
+      <Text>Input</Text>
+      <Color>#FFB0C4DE</Color>
+      <FontSize>24</FontSize>
+    </GroupSetting>
+    <GroupSetting>
+      <GroupId>3</GroupId>
+      <Text>Control</Text>
+      <Color>#FF90EE90</Color>
+      <FontSize>24</FontSize>
+    </GroupSetting>
+    <GroupSetting>
+      <GroupId>4</GroupId>
+      <Text>To Revit</Text>
+      <Color>#FFFFA07A</Color>
+      <FontSize>24</FontSize>
+    </GroupSetting>
+    <GroupSetting>
+      <GroupId>5</GroupId>
+      <Text>Annotation</Text>
+      <Color>#FF87CEFA</Color>
+      <FontSize>24</FontSize>
+    </GroupSetting>
+    <GroupSetting>
+      <GroupId>6</GroupId>
+      <Text>Info</Text>
+      <Color>#FFFFE4C4</Color>
+      <FontSize>24</FontSize>
+    </GroupSetting>
+  </GroupSettings>
+  <CustomNodeIdentifierSettings>
+    <Color>#FFFF0800</Color>
+    <BorderThickness>4</BorderThickness>
+  </CustomNodeIdentifierSettings>
+  <CustomNodeNotePrefix>Custom Node: </CustomNodeNotePrefix>
+  <IsFocaEnabled>true</IsFocaEnabled>
+</MonocleSettings>
