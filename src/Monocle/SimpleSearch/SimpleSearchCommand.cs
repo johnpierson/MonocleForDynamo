@@ -103,11 +103,6 @@ namespace MonocleViewExtension.SimpleSearch
         {
             try
             {
-
-                var dynMethod = p.GetType().GetMethod("CloseExtensioninInSideBar",
-                    BindingFlags.NonPublic | BindingFlags.Instance);
-                var obj = dynMethod.Invoke(m, new object[] { });
-
                 p.CloseExtensioninInSideBar(m);
             }
             catch (Exception)
