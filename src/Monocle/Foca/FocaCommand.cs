@@ -47,8 +47,8 @@ namespace MonocleViewExtension.Foca
             var focaMenuItem = new MenuItem
             {
                 IsCheckable = true,
-                Header = "enable foca   | ᶘ ᵒᴥᵒᶅ",
-                ToolTip = "foca, formerly known as the \"in-canvas align widget\", is the cleaner of your dynamo graphs. this feature includes alignment tools, grouping tools and more.",
+                Header = "enable FOCA   | ᶘ ᵒᴥᵒᶅ",
+                ToolTip = "FOCA, formerly known as the \"in-canvas align widget\", is the cleaner of your dynamo graphs. this feature includes alignment tools, grouping tools and more.",
                 IsChecked = Globals.IsFocaEnabled
             };
 
