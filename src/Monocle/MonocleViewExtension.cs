@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Dynamo.Wpf.Extensions;
@@ -36,6 +37,11 @@ namespace MonocleViewExtension
 
         public void Loaded(ViewLoadedParams p)
         {
+            /*if the user is holding down the left shift key, don't load monocle. I added this because I needed it for when I record videos that shouldn't have packages loaded.
+            And yes. this is a deep reference to my roots in AutoCAD, https://knowledge.autodesk.com/support/autocad/learn-explore/caas/sfdcarticles/sfdcarticles/How-to-reset-AutoCAD-to-defaults.html
+            */
+            if (Keyboard.IsKeyDown(Key.LeftShift)) return;
+
             //add the top-level menu
             var monocleMenuItem = new MenuItem { Header = "🧐 monocle" };
             //add the top level menu to the dynamo ribbon

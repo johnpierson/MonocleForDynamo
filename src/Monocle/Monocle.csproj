@@ -334,6 +334,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy "$(ProjectDir)bin\Release\*.dll" "C:\Users\JohnPierson\AppData\Roaming\Dynamo\Dynamo Core\2.12\packages\Monocle\bin"
+copy "$(ProjectDir)bin\Release\*.dll" "C:\Users\JohnPierson\AppData\Roaming\Dynamo\Dynamo Core\2.13\packages\Monocle\bin"
 copy "$(ProjectDir)bin\Release\*.dll" "C:\Users\johnpierson\AppData\Roaming\Dynamo\Dynamo Revit\2.0\packages\Monocle\bin"
 copy "$(ProjectDir)bin\Release\*.dll" "C:\Users\johnpierson\AppData\Roaming\Dynamo\Dynamo Revit\2.3\packages\Monocle\bin"
 copy "$(ProjectDir)bin\Release\*.dll" "C:\Users\johnpierson\AppData\Roaming\Dynamo\Dynamo Revit\2.6\packages\Monocle\bin"
