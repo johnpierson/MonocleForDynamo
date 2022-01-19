@@ -58,7 +58,5 @@ namespace MonocleViewExtension
             //save monocle settings
             Settings.SaveMonocleSettings();
         }
-
-        
     }
 }
