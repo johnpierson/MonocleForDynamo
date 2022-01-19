@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Dynamo.Graph.Workspaces;
 using Dynamo.Wpf.Extensions;
 
 namespace MonocleViewExtension.StandardViews
 {
     internal class StandardViewsCommand
     {
+        /// <summary>
+        /// Enable Standard Views in canvas
+        /// </summary>
+        /// <param name="p">our view loaded parameters for dynamo</param>
         public static void EnableStandardViews(ViewLoadedParams p)
         {
             var m = new StandardViewsModel(p);

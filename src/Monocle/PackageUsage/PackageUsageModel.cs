@@ -8,7 +8,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using Dynamo.Controls;
-using Dynamo.Extensions;
 using Dynamo.Graph.Nodes;
 using Dynamo.Graph.Notes;
 using Dynamo.Logging;
@@ -18,7 +17,6 @@ using Dynamo.Utilities;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.Utilities;
-using ProtoCore.AST.ImperativeAST;
 using Path = System.IO.Path;
 using Thickness = System.Windows.Thickness;
 

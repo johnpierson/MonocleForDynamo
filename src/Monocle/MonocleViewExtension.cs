@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Linq;
-using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.About;
 using MonocleViewExtension.Foca;
@@ -47,20 +44,13 @@ namespace MonocleViewExtension
             //add the top level menu to the dynamo ribbon
             p.dynamoMenu.Items.Insert(6, monocleMenuItem);
 
+            //add all of our various tools
             AboutCommand.AddMenuItem(monocleMenuItem,p);
-
             PackageUsageCommand.AddMenuItem(monocleMenuItem,p);
-
-            
-
             FocaCommand.EnableFoca(p, monocleMenuItem);
-
             SimpleSearchCommand.AddMenuItem(p, monocleMenuItem, this);
-
             StandardViewsCommand.EnableStandardViews(p);
-
             MonocleSettingsCommand.AddMenuItem(monocleMenuItem);
-
         }
 
         public void Shutdown()

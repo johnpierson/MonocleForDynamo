@@ -11,7 +11,11 @@ namespace MonocleViewExtension.PackageUsage
 {
     public class PackageUsageCommand
     {
-
+        /// <summary>
+        /// Create the package usage menu
+        /// </summary>
+        /// <param name="menuItem">monocle menu item</param>
+        /// <param name="p">our view loaded parameters for dynamo</param>
         public static void AddMenuItem(MenuItem menuItem, ViewLoadedParams p)
         {
             //add the flyout first
@@ -79,7 +83,11 @@ namespace MonocleViewExtension.PackageUsage
             RegisterKeyboardShortcuts(p,m);
             AddCustomNodeHighlighter(menuItem, m);
         }
-
+        /// <summary>
+        /// Create the custom node highlighter flyout menu
+        /// </summary>
+        /// <param name="menuItem">monocle menu item</param>
+        /// <param name="p">our view loaded parameters for dynamo</param>
         private static void AddCustomNodeHighlighter(MenuItem menuItem, PackageUsageModel m)
         {
             //add the flyout first

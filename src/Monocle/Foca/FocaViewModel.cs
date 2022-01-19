@@ -8,7 +8,6 @@ using System.Windows.Media;
 using Dynamo.Logging;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
-using HelixToolkit.Wpf;
 using MonocleViewExtension.Utilities;
 
 namespace MonocleViewExtension.Foca

@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
-using System.Net.Http;
 using System.Windows.Controls;
 using System.Windows.Media;
-using CoreNodeModels;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.Utilities;
 using Newtonsoft.Json;
@@ -13,6 +10,11 @@ namespace MonocleViewExtension.About
 {
     public class AboutCommand
     {
+        /// <summary>
+        /// Create the about menu
+        /// </summary>
+        /// <param name="menuItem">monocle menu item</param>
+        /// <param name="p">our view loaded parameters for dynamo</param>
         public static void AddMenuItem(MenuItem menuItem, ViewLoadedParams p)
         {
 

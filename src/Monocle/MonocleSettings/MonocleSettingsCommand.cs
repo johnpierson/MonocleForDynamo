@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using Dynamo.Wpf.Extensions;
-using Microsoft.Win32;
+﻿using System.Windows.Controls;
 using MonocleViewExtension.Utilities;
 
 namespace MonocleViewExtension.MonocleSettings
 {
     internal class MonocleSettingsCommand
     {
+        /// <summary>
+        /// Create the monocle settings menu with flyouts.
+        /// </summary>
+        /// <param name="menuItem">monocle menu item</param>
         public static void AddMenuItem(MenuItem menuItem)
         {
             menuItem.Items.Add(new Separator());

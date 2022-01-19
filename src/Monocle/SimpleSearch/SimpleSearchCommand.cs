@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -13,7 +8,6 @@ using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using Dynamo.Wpf.Interfaces;
 using MonocleViewExtension.Utilities;
-using ProtoCore.AST.AssociativeAST;
 
 namespace MonocleViewExtension.SimpleSearch
 {
@@ -24,6 +18,11 @@ namespace MonocleViewExtension.SimpleSearch
         internal static ViewLoadedParams vp;
 
         internal static MenuItem ssMenuItem;
+        /// <summary>
+        /// Create the simple search menu
+        /// </summary>
+        /// <param name="menuItem">monocle menu item</param>
+        /// <param name="p">our view loaded parameters for dynamo</param>
         public static void AddMenuItem(ViewLoadedParams p, MenuItem menuItem, MonocleViewExtension m)
         {
             vp = p;

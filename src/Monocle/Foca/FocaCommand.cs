@@ -33,6 +33,11 @@ namespace MonocleViewExtension.Foca
 
     public class FocaCommand
     {
+        /// <summary>
+        /// Enable FOCA - the cleaner of your dynamo graphs
+        /// </summary>
+        /// <param name="menuItem">monocle menu item</param>
+        /// <param name="p">our view loaded parameters for dynamo</param>
         public static void EnableFoca(ViewLoadedParams p, MenuItem menuItem)
         {
             var m = new FocaModel(p);
