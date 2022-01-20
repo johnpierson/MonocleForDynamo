@@ -1,0 +1,39 @@
+﻿<UserControl x:Class="MonocleViewExtension.SimpleSearch.SimpleSearchView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MonocleViewExtension.SimpleSearch"
+             mc:Ignorable="d" 
+             Height="Auto"
+             Width="Auto"
+             d:DesignWidth="200"
+             d:DesignHeight="200">
+    <Grid Name="MainGrid" Background="#353535">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="34"/>
+            <RowDefinition Height="2"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <TextBox VerticalAlignment="Center" Padding="30 4 4 4" Grid.Row="0" Name="Filter" Text="{Binding Path=Filter, UpdateSourceTrigger=PropertyChanged}" FontSize="14" FontFamily="Open Sans" KeyDown="Filter_OnKeyDown" PreviewKeyDown="Filter_OnPreviewKeyDown"/>
+        <Image Grid.Row="0" Height="18" Width="18" Margin="4 0 0 0" HorizontalAlignment="Left" Source="/MonocleViewExtension;component/SimpleSearch/Resources/magnifyingGlass.png"/>
+
+
+
+        <ListBox Grid.Row="2"  Height="Auto" Name="Nodes" ItemsSource="{Binding Path=Nodes}"  SelectedItem="{Binding Path=SelectedNode}" Background="Transparent" Foreground="#F1F2F2">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <WrapPanel>
+                            <TextBlock Text="{Binding Path=Name}" FontSize="12" FontFamily="Open Sans" MouseDown="UIElement_OnMouseDown" ToolTip="{Binding Path=Description}" VerticalAlignment="Center"/>
+                            <Label Content=" | " FontSize="12" FontFamily="Open Sans" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Path=FullCategoryName}" FontSize="12" FontFamily="Open Sans" MouseDown="UIElement_OnMouseDown" VerticalAlignment="Center"/>
+                        </WrapPanel>
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+    </Grid>
+</UserControl>

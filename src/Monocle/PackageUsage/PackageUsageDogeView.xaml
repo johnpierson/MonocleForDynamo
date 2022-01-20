@@ -1,0 +1,39 @@
+﻿<Window x:Class="MonocleViewExtension.PackageUsage.PackageUsageDogeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d" 
+             Width="600"
+             Height="500"
+             MinWidth="600"
+             MinHeight="500">
+    <Grid Name="MainGrid" Background="#2d2d2d">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="300"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="300"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Row="0" Grid.RowSpan="4" Name="ActiveNodesDisplay" HorizontalAlignment="Stretch" Text="{Binding PackagesInUse}"
+                   FontFamily="Comic Sans MS" 
+                   Padding="10" 
+                   FontWeight="Medium" 
+                   FontSize="18"
+                   Background="#2d2d2d"
+                   Foreground="White"/>
+
+        <Image Grid.Row="0" Grid.Column="1" Name="DogeLogo" Cursor="Hand" Margin="6 0 0 0" Stretch="UniformToFill" Source="{Binding DisplayImage}"/>
+        <Button Grid.Row="2" Grid.Column="1" Content="Send Package Usage to Clipboard" FontSize="16" FontFamily="Comic Sans MS" Margin="6" Command="{Binding SendToClipboard}"/>
+        <Button Grid.Row="3" Grid.Column="1"  Content="Annotate Custom Nodes (add note)" FontSize="16" FontFamily="Comic Sans MS" Margin="6" Command="{Binding AnnotateNodes}"/>
+        <Button Grid.Row="4" Grid.Column="1"  Content="Clear Custom Node Notes"  FontSize="16" FontFamily="Comic Sans MS" Margin="6" Command="{Binding ClearNotes}"/>
+        <TextBox Grid.Row="0" Grid.Column="1" Name="NotesAddedLabel" Text="{Binding Result, Mode=OneWay}" FontFamily="Comic Sans MS" Foreground="#FF005DFF" Background="#7FFFFFFF" FontWeight="Bold" FontSize="20" Height="38" Visibility="Hidden" IsHitTestVisible="False" HorizontalContentAlignment="Center" TextChanged="ResultTextBox_OnTextChanged"/>
+
+
+    </Grid>
+</Window>

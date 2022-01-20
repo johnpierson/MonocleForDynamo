@@ -1,0 +1,118 @@
+﻿<UserControl x:Class="MonocleViewExtension.Foca.FocaView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             Width="{Binding Width}" 
+             Height= "{Binding Height}">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="b2v"/>
+    </UserControl.Resources>
+    <Grid Name="MainGrid" Margin="{Binding Thickness}" Visibility="{Binding FocaVisible, Converter={StaticResource b2v}}">
+        <Grid Name="AlignmentGrid" Opacity="{Binding MultiSelect}">
+            <Rectangle Stroke="#7F000000" StrokeThickness="2" StrokeDashArray="10.0 10.0" RadiusX="24" RadiusY="24"  Opacity="0.5" Width="{Binding Width}" Height= "{Binding Height}"/>
+
+            <Image Tag="VerticalTop" Source="Resources/button-alignTopBlack.png" Height="22" Width="22" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0 -24 0 0" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
+            <Image Tag="VerticalDistribute" Source="Resources/button-distributeVerticalBlack.png" Height="20" Width="20" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="60 -24 0 0" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
+            <Image Tag="VerticalCenter" Source="Resources/button-alignHorizontalCenterBlack.png" Height="20" Width="20" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0 -24 60 0" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
+
+            <Image Tag="HorizontalLeft" Source="Resources/button-alignLeftBlack.png" Height="22" Width="22" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-24 0 0 0" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
+            <Image Tag="HorizontalDistribute" Source="Resources/button-distributeHorizontalBlack.png" Height="20" Width="20" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-24 60 0 0" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
+            <Image Tag="HorizontalCenter" Source="Resources/button-alignVerticalCenterBlack.png" Height="20" Width="20" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-24 0 0 60" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
+
+            <Image Tag="VerticalBottom" Source="Resources/button-alignBottomBlack.png" Height="22" Width="22" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0 0 0 -24" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
+            <Image Tag="VerticalDistribute" Source="Resources/button-distributeVerticalBlack.png" Height="20" Width="20" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="60 0 0 -24" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
+            <Image Tag="VerticalCenter" Source="Resources/button-alignHorizontalCenterBlack.png" Height="20" Width="20" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0 0 60 -24" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
+
+            <Image Tag="HorizontalRight" Source="Resources/button-alignRightBlack.png" Height="22" Width="22" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 -24 0" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
+            <Image Tag="HorizontalDistribute" Source="Resources/button-distributeHorizontalBlack.png" Height="20" Width="20" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="-24 60 -24 0" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
+            <Image Tag="HorizontalCenter" Source="Resources/button-alignVerticalCenterBlack.png" Height="20" Width="20" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="-24 0 -24 60" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
+        </Grid>
+
+        <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Name="ToolboxGrid"  Margin="-36 -52 -48 0" Opacity="0.5" MouseEnter="ToolboxGrid_OnMouseEnter" Unloaded="ToolboxGrid_OnUnloaded">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="24"/>
+                <RowDefinition Height="4"/>
+                <RowDefinition Height="28"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="24"/>
+                <ColumnDefinition Width="24"/>
+                <ColumnDefinition Width="24"/>
+            </Grid.ColumnDefinitions>
+            <Path Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="path2" Fill="#000000" Stretch="Uniform">
+                <Path.Data>
+                    <PathGeometry Figures="M 22.503906 0 C 22.426838 -0.00050976563 22.347766 0.016734375 22.275391 0.052734375 L 18.275391 2.0527344 C 18.106391 2.1377344 18 2.311 18 2.5 L 18 3.7929688 L 12.998047 8.796875 L 15.234375 10.972656 L 20.207031 6 L 21.5 6 C 21.689 6 21.862266 5.8936094 21.947266 5.7246094 L 23.947266 1.7246094 C 24.044266 1.5326094 24.006516 1.2984844 23.853516 1.1464844 L 22.853516 0.14648438 C 22.758516 0.050859375 22.632354 0.00084960938 22.503906 0 z M 4.8945312 0.001953125 C 3.7985312 0.025953125 2.7530469 0.41204688 1.8730469 1.1230469 C 1.7460469 1.2260469 1.6784531 1.383875 1.6894531 1.546875 C 1.7014531 1.709875 1.7916406 1.8574062 1.9316406 1.9414062 L 4.9863281 3.7734375 C 4.8953281 4.6924375 4.3534844 5.4996875 3.5214844 5.9296875 L 0.78515625 4.2890625 C 0.63215625 4.1980625 0.42553125 4.2040625 0.26953125 4.2890625 C 0.11853125 4.3720625 0.019765625 4.5262187 0.009765625 4.6992188 C -0.073234375 6.0932188 0.40732812 7.4176875 1.3613281 8.4296875 C 2.3033281 9.4286875 3.629 10 5 10 C 5.223 10 5.5484375 9.9395 6.0234375 9.8125 C 6.5444375 9.6715 7.106375 9.8258437 7.484375 10.214844 L 20.146484 23.232422 C 20.642484 23.728422 21.301 24 22 24 C 23.103 24 24 23.102047 24 21.998047 C 24 21.299047 23.728516 20.642578 23.228516 20.142578 L 10.150391 7.421875 C 9.8033906 7.083875 9.6437031 6.5905625 9.7207031 6.1015625 C 10.009703 4.2785625 9.5121094 2.6654063 8.2871094 1.4414062 C 7.3311094 0.48540625 6.1045312 -0.013046875 4.8945312 0.001953125 z M 8.3671875 12.558594 C 8.2751875 12.575594 8.1819375 12.585937 8.0859375 12.585938 C 7.9619375 12.585938 7.8439531 12.631844 7.7519531 12.714844 L 0.85351562 18.939453 C 0.31151562 19.480453 1.4802974e-16 20.23 0 21 C 0 21.766 0.31070313 22.515781 0.84570312 23.050781 L 0.93945312 23.148438 C 1.4804531 23.689437 2.23 24 3 24 C 3.777 24 4.5073125 23.697766 5.0703125 23.134766 C 5.0703125 23.134766 11.243609 16.471422 11.349609 16.357422 C 11.445609 16.263422 11.5 16.135953 11.5 16.001953 C 11.5 15.933953 11.510531 15.865828 11.519531 15.798828 L 8.3671875 12.558594 z " FillRule="NonZero"/>
+                </Path.Data>
+            </Path>
+
+            <Path Tag="{Binding DropdownVisibility}" Grid.Column="0" Grid.Row="0" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="dropdownConverter" Fill="Green" Stretch="Uniform" Margin="2"  Cursor="Hand" MouseLeftButtonDown="ToolboxItems_OnMouseDown" >
+                <Path.Data>
+                    <PathGeometry Figures="m 57.000785 9.6139999 h -18.62 a 1.3 1.3 0 0 0 -1.12 0.6500001 l -12.89 22.3 a 1.3 1.3 0 0 0 0.48 1.77 l 14 8.07 a 1.29 1.29 0 0 0 1.75 -0.42 l 17.54 -30.43 a 1.3 1.3 0 0 0 -1.14 -1.9400001 m -2.56 29.2700001 -0.51 0.29 a 1.3 1.3 0 0 0 0.35 2.38 l 15 3.55 a 1.3 1.3 0 0 0 1.54 -0.89 l 4.45 -14.8 a 1.3 1.3 0 0 0 -1.89 -1.49 l -1.63 0.94 -8.67 -15 a 1.29 1.29 0 0 0 -2.24 0 l -9.29 16.12 a 1.29 1.29 0 0 0 0 1.29 l 3.36 5.82 a 1.3 1.3 0 0 1 -0.48 1.77 m 29.95 45.12 9.33 -16.1 a 1.3 1.3 0 0 0 0 -1.3 l -12.88 -22.31 a 1.3 1.3 0 0 0 -1.77 -0.48 l -14 8.08 a 1.29 1.29 0 0 0 -0.47 1.77 l 17.55 30.34 a 1.3 1.3 0 0 0 2.24 0 m -24.06 -16.84 v -0.59 a 1.3 1.3 0 0 0 -2.24 -0.89 l -10.59 11.26 a 1.29 1.29 0 0 0 0 1.78 l 10.59 11.28 a 1.3 1.3 0 0 0 2.24 -0.89 v -1.91 h 17.34 a 1.3 1.3 0 0 0 1.12 -1.94 l -9.32 -16.15 a 1.29 1.29 0 0 0 -1.12 -0.65 h -6.72 a 1.3 1.3 0 0 1 -1.3 -1.3 m -16.53 18.77 v -16.14 a 1.3 1.3 0 0 0 -1.3 -1.3 H 7.4107847 a 1.29 1.29 0 0 0 -1.12 1.94 l 9.3100003 16.15 a 1.3 1.3 0 0 0 1.12 0.65 h 25.77 a 1.3 1.3 0 0 0 1.3 -1.29 M 8.0007847 64.984 H 26.680785 a 1.3 1.3 0 0 0 1.12 -0.65 l 3.36 -5.82 a 1.3 1.3 0 0 1 1.77 -0.53 l 0.51 0.29 a 1.3 1.3 0 0 0 1.89 -1.49 l -4.45 -14.8 a 1.3 1.3 0 0 0 -1.54 -0.89 l -15 3.55 a 1.3 1.3 0 0 0 -0.35 2.38 l 1.63 0.94 -8.7100003 15.02 a 1.3 1.3 0 0 0 1.09 2" FillRule="NonZero"/>
+                </Path.Data>
+            </Path>
+
+            <Path Tag="{Binding CombineVisibility}" Grid.Column="1" Grid.Row="0" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="combinifier" Fill="SlateGray" StrokeThickness="1.51118016" Stretch="Uniform" Margin="2" Cursor="Hand" MouseLeftButtonDown="ToolboxItems_OnMouseDown">
+                <Path.Data>
+                    <PathGeometry Figures="M 0.46229968 1.9209838 V 3.432164 H 4.2870965 l 1.1802316 5.4780277 0.75559 5.0533863 -0.8976409 4.628744 c -1.0548038 0.193431 -1.8421286 1.109206 -1.8421286 2.219924 0 1.251257 1.0155131 2.26677 2.2667702 2.26677 1.0427142 0 1.9086205 -0.693632 2.1730769 -1.653231 H 18.690154 c 0.264456 0.959599 1.128852 1.653231 2.173078 1.653231 1.251256 0 2.26677 -1.015513 2.26677 -2.26677 0 -1.251257 -1.015514 -2.266771 -2.26677 -2.266771 -0.938444 0 -1.733324 0.556115 -2.077873 1.36913 H 7.8293026 C 7.6283156 19.440095 7.2867889 19.072877 6.8379684 18.828066 L 7.4998653 15.521604 H 22.375922 c 0.453355 0 0.755591 -0.302236 0.755591 -0.75559 L 24.500641 5.6989341 C 24.65176 5.24558 24.340457 4.9433441 23.887103 4.9433441 H 6.2244293 L 5.75143 2.8186249 H 5.7045834 C 5.6637815 2.6327496 5.5942672 2.484654 5.5156859 2.3939832 5.4114145 2.2730888 5.3298107 2.1688174 5.231584 2.1098813 5.0351306 1.9920093 4.8507666 1.9209838 4.5228405 1.9209838 h -4.062052 z" FillRule="NonZero"/>
+                </Path.Data>
+            </Path>
+
+            <Path Tag="{Binding ListPowVisibility}" Grid.Column="2" Grid.Row="0" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Name="powList" Fill="Red" StrokeThickness="1.51118016" Stretch="Uniform" Margin="2 1 2 4" Cursor="Hand" MouseLeftButtonDown="ToolboxItems_OnMouseDown">
+                <Path.Data>
+                    <PathGeometry Figures="M 64.810547 8.8945312 A 1.6409991 1.6409991 0 0 0 63.169922 10.533203 L 63.169922 17.097656 A 1.6409991 1.6409991 0 0 0 64.810547 18.738281 A 1.6409991 1.6409991 0 0 0 66.451172 17.097656 L 66.451172 10.533203 A 1.6409991 1.6409991 0 0 0 64.810547 8.8945312 z M 75.310547 13.3125 A 1.6409991 1.6409991 0 0 0 74.097656 13.701172 L 69.453125 18.345703 A 1.6409991 1.6409991 0 0 0 69.453125 20.658203 A 1.6409991 1.6409991 0 0 0 70.619141 21.134766 A 1.6409991 1.6409991 0 0 0 71.767578 20.658203 L 76.412109 16.015625 A 1.6409991 1.6409991 0 0 0 75.310547 13.3125 z M 68.175781 22.021484 A 21.332988 21.332988 0 0 0 50.125 31.949219 C 49.56706 31.949219 49.009495 31.867187 48.484375 31.867188 A 29.620034 29.620034 0 1 0 53.867188 32.375 A 18.05099 18.05099 0 0 1 68.175781 25.302734 A 1.6409991 1.6409991 0 0 0 68.175781 22.021484 z M 73.015625 23.662109 A 1.6409991 1.6409991 0 0 0 73.015625 26.943359 L 79.578125 26.943359 A 1.6409991 1.6409991 0 0 0 79.578125 23.662109 L 73.015625 23.662109 z " FillRule="NonZero"/>
+                </Path.Data>
+            </Path>
+
+        </Grid>
+
+
+        <Grid HorizontalAlignment="Left" VerticalAlignment="Top" Name="ColorWheel" Margin="{Binding ColorWheelMargin}" Height="{Binding ColorWheelHeight}" MouseEnter="ColorWheel_OnMouseEnter">
+            <Path Fill="#FF000000" StrokeThickness="0.15800302" Opacity="0.5"  Cursor="Hand">
+                <Path.Data>
+                    <PathGeometry Figures="M 5.3413486 0.92071779 C 5.9901498 0.30705985 6.8467161 -3.5000894e-7 7.6949986 -3.5000894e-7 8.5432799 -3.5000894e-7 9.4000093 0.30690611 10.044587 0.92071779 L 14.41108 5.0517312 15.74182 3.7927557 c 0.648801 -0.6136586 1.700788 -0.6176539 2.341304 -0.011832 0.640516 0.6058204 0.636293 1.6012288 -0.01251 2.2150405 l -1.417973 1.3376612 10.433934 9.8712466 2.258133 4.725 -1.992049 1.884468 -4.956976 -2.179694 -10.429712 -9.867251 -1.418135 1.341657 C 9.8990386 13.72271 8.8470516 13.726706 8.2065353 13.120885 7.5660191 12.515064 7.5702421 11.519657 8.2190487 10.905844 L 9.5497826 9.6468712 5.1873522 5.5197007 C 4.5385509 4.9060402 4.2143131 4.0955137 4.2143131 3.2929778 c 0 -0.8025352 0.3244003 -1.6130617 0.9730391 -2.2267203 L 5.3411861 0.92071903 Z M 23.3645 20.3248 26.99902 21.922033 27.352498 21.587618 25.693133 18.117598 15.47135 8.4510569 13.138331 10.65826 23.364338 20.3248 Z" FillRule="NonZero"/>
+                </Path.Data>
+            </Path>
+            <Path Fill="#FF000000" StrokeThickness="0.24154428" Opacity="0.5">
+                <Path.Data>
+                    <PathGeometry Figures="m 33.178666 32.745741 c 0 1.660093 -1.423944 3.007244 -3.178665 3.007244 -1.754723 0 -3.178666 -1.347151 -3.178666 -3.007244 0 -1.660092 3.178666 -6.110813 3.178666 -6.110813 0 0 3.178665 4.450721 3.178665 6.110813 z" FillRule="NonZero"/>
+                </Path.Data>
+            </Path>
+
+            <!--Color Wheel-->
+            <Path Name="Group1" Fill="{Binding Color1}" StrokeThickness="0.63134706" Cursor="Hand" Visibility="{Binding ColorWheelVisibility,Converter={StaticResource b2v}}" MouseLeftButtonDown="GroupMouseDown">
+                <Path.Data>
+                    <PathGeometry Figures="M 1.2195325 31.137606 H 12.627696 c 0.600431 0 1.067432 -0.358482 1.20086 -0.896205 0.400286 -1.911907 1.267574 -3.70432 2.468432 -5.257743 0.333573 -0.41823 0.266858 -1.015701 -0.133428 -1.374184 L 8.0911165 16.32033 C 7.5574012 15.842353 6.6901144 15.9021 6.289828 16.380076 c -3.3357208 3.823812 -5.60401073 8.42434 -6.2711549 13.502841 -0.13342879 0.716965 0.46700095 1.254689 1.2008594 1.254689 z" FillRule="NonZero"/>
+                </Path.Data>
+            </Path>
+            <Path Name="Group2" Fill="{Binding Color2}" StrokeThickness="0.63134706" Cursor="Hand" Visibility="{Binding ColorWheelVisibility,Converter={StaticResource b2v}}" MouseLeftButtonDown="GroupMouseDown">
+                <Path.Data>
+                    <PathGeometry Figures="M 16.296988 41.294611 C 15.09613 39.741188 14.295557 37.948775 13.828556 36.036869 13.695128 35.499144 13.228127 35.140662 12.627696 35.140662 H 1.2195325 c -0.73385845 0 -1.33428819 0.59747 -1.2008594 1.194941 0.66714417 5.078502 2.8687197 9.679029 6.2711549 13.502842 0.4670005 0.537723 1.3342886 0.537723 1.8012885 0.05975 L 16.16356 42.668793 c 0.400286 -0.358483 0.467001 -0.896206 0.133428 -1.374182 z" FillRule="NonZero"/>
+                </Path.Data>
+            </Path>
+            <Path Name="Group3" Fill="{Binding Color3}" StrokeThickness="0.63134706" Cursor="Hand" Visibility="{Binding ColorWheelVisibility,Converter={StaticResource b2v}}" MouseLeftButtonDown="GroupMouseDown">
+                <Path.Data>
+                    <PathGeometry Figures="m 26.704437 47.568056 c -2.134861 -0.358483 -4.136294 -1.135195 -5.870869 -2.150896 -0.466999 -0.298735 -1.134145 -0.238989 -1.534431 0.119495 l -8.072443 7.229397 c -0.533715 0.477977 -0.467 1.254688 0.06672 1.613172 4.269723 2.987353 9.406731 5.018755 15.077457 5.616226 0.733858 0.05974 1.334288 -0.477977 1.334288 -1.075448 V 48.643504 c 0.06671 -0.537725 -0.400287 -0.955955 -1.000717 -1.075448 z" FillRule="NonZero"/>
+                </Path.Data>
+            </Path>
+            <Path Name="Group4" Fill="{Binding Color4}" StrokeThickness="0.63134706" Cursor="Hand" Visibility="{Binding ColorWheelVisibility,Converter={StaticResource b2v}}" MouseLeftButtonDown="GroupMouseDown">
+                <Path.Data>
+                    <PathGeometry Figures="m 40.647749 45.536655 c -0.400287 -0.358484 -1.06743 -0.41823 -1.534432 -0.119495 -1.734575 1.075448 -3.736007 1.792413 -5.870869 2.150896 -0.600427 0.119493 -1.000714 0.537723 -1.000714 1.075448 v 10.216751 c 0 0.657218 0.667143 1.194943 1.334288 1.075448 5.670725 -0.597471 10.807734 -2.569126 15.077456 -5.616226 0.60043 -0.41823 0.60043 -1.194943 0.06671 -1.613171 z" FillRule="NonZero"/>
+                </Path.Data>
+            </Path>
+            <Path Name="Group5" Fill="{Binding Color5}" StrokeThickness="0.63134706" Cursor="Hand" Visibility="{Binding ColorWheelVisibility,Converter={StaticResource b2v}}" MouseLeftButtonDown="GroupMouseDown">
+                <Path.Data>
+                    <PathGeometry Figures="M 58.727354 35.140662 H 47.31919 c -0.600429 0 -1.067432 0.358482 -1.20086 0.896207 -0.400287 1.911906 -1.267574 3.704319 -2.401718 5.257742 -0.333571 0.41823 -0.266858 1.0157 0.133428 1.374183 l 8.072444 7.229398 c 0.533716 0.477976 1.401003 0.418229 1.80129 -0.05975 3.33572 -3.823813 5.60401 -8.42434 6.271154 -13.502841 0.06671 -0.657218 -0.533715 -1.194942 -1.267574 -1.194942 z" FillRule="NonZero"/>
+                </Path.Data>
+            </Path>
+            <Path Name="Group6" Fill="{Binding Color6}" StrokeThickness="0.63134706" Cursor="Hand" Visibility="{Binding ColorWheelVisibility,Converter={StaticResource b2v}}" MouseLeftButtonDown="GroupMouseDown">
+                <Path.Data>
+                    <PathGeometry Figures="m 46.11833 30.241401 c 0.133428 0.537723 0.600431 0.896205 1.20086 0.896205 h 11.408164 c 0.733859 0 1.334291 -0.597471 1.200861 -1.194941 C 59.261068 24.864163 57.059494 20.263637 53.657058 16.439824 53.190057 15.9021 52.32277 15.9021 51.85577 16.380077 l -8.072444 7.229396 c -0.400285 0.358483 -0.467 0.955954 -0.133428 1.374183 1.200858 1.553424 2.001432 3.345837 2.468432 5.257744 z" FillRule="NonZero"/>
+                </Path.Data>
+            </Path>
+        </Grid>
+
+
+    </Grid>
+</UserControl>
