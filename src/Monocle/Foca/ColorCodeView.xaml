@@ -6,7 +6,8 @@
              xmlns:local="clr-namespace:MonocleViewExtension.Foca"
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
-             Width="270" Height="300">
+             Width="270" Height="300"
+             WindowStartupLocation="CenterOwner">
     <Grid Name="MainGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="48"/>

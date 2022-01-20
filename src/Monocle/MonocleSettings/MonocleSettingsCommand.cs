@@ -47,6 +47,7 @@ namespace MonocleViewExtension.MonocleSettings
             {
                 Globals.MonocleGroupSettings = Globals.DefaultGroupSettings;
                 Settings.SaveMonocleSettings();
+                Settings.LoadMonocleSettings();
             };
             settingsFlyout.Items.Add(restoreSettings);
 
