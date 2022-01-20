@@ -215,9 +215,6 @@
       <DependentUpon>FocaView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Foca\SuperNode.cs" />
-    <Compile Include="MiniMap%28Future%29\MiniMapView.xaml.cs">
-      <DependentUpon>MiniMapView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="MonocleSettings\MonocleSettingsCommand.cs" />
     <Compile Include="MonocleViewExtension.cs" />
     <Compile Include="PackageUsage\PackageUsageCommand.cs" />
@@ -274,10 +271,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Foca\FocaView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MiniMap%28Future%29\MiniMapView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
