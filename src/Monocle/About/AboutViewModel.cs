@@ -1,18 +1,19 @@
 ﻿using System;
 using Dynamo.Core;
 using Dynamo.Extensions;
+using Dynamo.Wpf.Extensions;
 
 namespace MonocleViewExtension.About
 {
     public class AboutViewModel : NotificationObject, IDisposable
     {
-        private ReadyParams readyParams;
+        public ViewLoadedParams vlp;
 
         public string MonocleVersion => $"v.{System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}";
 
-        public AboutViewModel(ReadyParams p)
+        public AboutViewModel(ViewLoadedParams p)
         {
-            readyParams = p;
+            vlp = p;
         }
 
         public void Dispose()
