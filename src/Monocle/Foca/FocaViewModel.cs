@@ -4,8 +4,10 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using Dynamo.Logging;
+using Dynamo.Models;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
 using MonocleViewExtension.Utilities;
@@ -158,6 +160,19 @@ namespace MonocleViewExtension.Foca
                     ExpansionBay?.Children.Remove(View);
                     return;
                 }
+
+                if (Keyboard.IsKeyDown(Key.LeftShift))
+                {
+                    var node = Model.LoadedParams.CurrentWorkspaceModel.CurrentSelection.First();
+                    var nvm = Model.DynamoViewModel.CurrentSpaceViewModel.Annotations.First(a =>
+                        a.Nodes.Any(n => n.GUID.Equals(node.GUID)));
+
+                    var cmd = new DynamoModel.UngroupModelCommand(node.GUID);
+
+                    Model.DynamoViewModel.ExecuteCommand(cmd);
+                    
+                }
+
                 var count = Model.LoadedParams.CurrentWorkspaceModel.CurrentSelection.Count();
 
                 FocaVisible = Model.ShowWidget();
