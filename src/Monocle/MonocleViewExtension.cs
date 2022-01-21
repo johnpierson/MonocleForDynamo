@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Dynamo.Wpf.Extensions;
@@ -24,12 +25,7 @@ namespace MonocleViewExtension
 
         public void Startup(ViewStartupParams viewStartupParams)
         {
-            //resolve the dynamo version by checking which core is loaded
-            var dsCore = AppDomain.CurrentDomain.GetAssemblies().First(a => a.FullName.Contains("DSCoreNodes"));
-            Globals.DynamoVersion = dsCore.GetName().Version;
 
-            //load monocle settings from xml
-            Settings.LoadMonocleSettings();
         }
 
         public void Loaded(ViewLoadedParams p)
@@ -38,6 +34,13 @@ namespace MonocleViewExtension
             And yes. this is a deep reference to my roots in AutoCAD, https://knowledge.autodesk.com/support/autocad/learn-explore/caas/sfdcarticles/sfdcarticles/How-to-reset-AutoCAD-to-defaults.html
             */
             if (Keyboard.IsKeyDown(Key.LeftShift)) return;
+
+            //load monocle settings from xml
+            Settings.LoadMonocleSettings();
+
+            //resolve the dynamo version by checking which core is loaded
+            var dynamoCore = Assembly.Load("DynamoCore");
+            Globals.DynamoVersion = dynamoCore.GetName().Version;
 
             //add the top-level menu
             var monocleMenuItem = new MenuItem { Header = "🧐 monocle" };

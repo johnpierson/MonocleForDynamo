@@ -179,7 +179,7 @@ namespace MonocleViewExtension.Foca
                 DropdownVisibility = Model.LoadedParams.CurrentWorkspaceModel.CurrentSelection.First().NodeType == "ExtensionNode" ? 1 : 0;
                 UpdateColors();
             }
-            catch (Exception)
+            catch (Exception exception)
             {
                 ResetColorWheel();
                 UpdateColors();
