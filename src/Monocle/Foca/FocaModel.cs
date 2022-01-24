@@ -48,12 +48,28 @@ namespace MonocleViewExtension.Foca
                 case "dropdownConverter":
                     foreach (var n in nodes)
                     {
-                        ReplaceDropdown(n);
+                        try
+                        {
+                            ReplaceDropdown(n);
+                        }
+                        catch (Exception)
+                        {
+                            //this error is silenced
+                        }
+
                     }
 
                     break;
                 case "powList":
-                    PowList(nodes);
+                    try
+                    {
+                        PowList(nodes);
+                    }
+                    catch (Exception)
+                    {
+                        //this error is silenced
+                    }
+
                     break;
             }
         }
