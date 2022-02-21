@@ -22,7 +22,8 @@ namespace MonocleViewExtension.Utilities
         internal static Version DynamoVersion { get; set; }
         internal static Version SidebarMinVersion => new Version(2, 5, 0, 7460);
         internal static Version NewUiVersion => new Version(2, 13, 0, 1875);
-
+        public static bool IsDevExpressLoaded { get; set; }
+        internal static Assembly DevExpress { get; set; }
 
         public static Dictionary<string, Settings.GroupSetting> MonocleGroupSettings =
             new Dictionary<string, Settings.GroupSetting>

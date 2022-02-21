@@ -7,6 +7,7 @@ using Dynamo.Graph.Nodes;
 using Dynamo.Models;
 using Dynamo.Search.SearchElements;
 using Dynamo.ViewModels;
+using MonocleViewExtension.Utilities;
 
 namespace MonocleViewExtension.SimpleSearch
 {
@@ -17,6 +18,9 @@ namespace MonocleViewExtension.SimpleSearch
     {
         public SimpleSearchView(DynamoViewModel dvm)
         {
+             //Compatibility.FixThemesForDevExpress(this);
+
+
             InitializeComponent();
             this.Loaded+= OnLoaded;
 

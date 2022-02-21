@@ -54,6 +54,15 @@ namespace MonocleViewExtension
             SimpleSearchCommand.AddMenuItem(p, monocleMenuItem, this);
             StandardViewsCommand.EnableStandardViews(p);
             MonocleSettingsCommand.AddMenuItem(monocleMenuItem);
+
+
+            /*if the user has plugins loaded in Revit (or otherwise) that use a toolkit called "DevExpress",
+            we fix the overrides that toolkit forces on the app.
+            A popular example of this is KiwiCodes Family Browser R3.
+            This code will fix it for all of the Dynamo UI.
+            */
+            Compatibility.CheckForDevExpress();
+            Compatibility.FixThemesForDevExpress(p.DynamoWindow);
         }
 
         public void Shutdown()

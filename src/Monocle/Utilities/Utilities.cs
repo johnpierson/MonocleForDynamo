@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.NetworkInformation;
+using System.Reflection;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace MonocleViewExtension.Utilities
@@ -125,6 +128,64 @@ namespace MonocleViewExtension.Utilities
                 }
             }
             return sb.ToString().ToLower();
+        }
+    }
+    public static class Compatibility
+    {
+        /// <summary>
+        /// Check if DevExpress is loaded (typically for KiwiCodes)
+        /// </summary>
+        public static void CheckForDevExpress()
+        {
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+            try
+            {
+                Globals.DevExpress = assemblies.First(a => a.FullName.Contains("DevExpress.Xpf.Core"));
+            }
+            catch (Exception)
+            {
+                Globals.DevExpress = null;
+            }
+
+            Globals.IsDevExpressLoaded = Globals.DevExpress != null;
+        }
+
+        /// <summary>
+        /// This allows us to fix our UI when a user has KiwiCodes Family Browser loaded
+        /// </summary>
+        /// <param name="window"></param>
+        public static void FixThemesForDevExpress(Window window)
+        {
+            if (Globals.DevExpress is null) return;
+
+            try
+            {
+                var objType = Enumerable.First<Type>(GetTypesSafely(Globals.DevExpress),
+                    t => t.Name.Equals("ThemeManager"));
+
+                object baseObject = System.Runtime.Serialization.FormatterServices
+                    .GetUninitializedObject(objType);
+
+                objType.InvokeMember("SetThemeName",
+                    BindingFlags.Default | BindingFlags.InvokeMethod, null, baseObject, new object[] { window, "None" });
+            }
+            catch (Exception)
+            {
+                //do nothing
+            }
+        }
+
+        private static IEnumerable<Type> GetTypesSafely(Assembly assembly)
+        {
+            try
+            {
+                return assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                return ex.Types.Where(x => x != null);
+            }
         }
     }
 }

@@ -109,6 +109,16 @@ namespace MonocleViewExtension.PackageUsage
 
                         //newNote.PinToNodeCommand.Execute(null);
 
+                        var annotation = dynamoViewModel.CurrentSpaceViewModel.Annotations.FirstOrDefault(a =>
+                            a.Nodes.Any(n => n.GUID.ToString().Equals(node.NodeModel.GUID.ToString())));
+
+                        if (annotation != null)
+                        {
+                            annotation.AnnotationModel.Select();
+                            dynamoViewModel.Model.ExecuteCommand(new DynamoModel.AddModelToGroupCommand(newNote.Model.GUID.ToString()));
+                            annotation.AnnotationModel.Deselect();
+                        }
+
                     }
                     catch (Exception e)
                     {

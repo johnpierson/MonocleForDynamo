@@ -161,10 +161,6 @@ namespace MonocleViewExtension.Foca
                     return;
                 }
 
-                //if (Keyboard.IsKeyDown(Key.LeftShift))
-                //{
-                //   ShiftRemoveFromGroup();
-                //}
 
                 var count = Model.LoadedParams.CurrentWorkspaceModel.CurrentSelection.Count();
 
@@ -194,35 +190,7 @@ namespace MonocleViewExtension.Foca
             }
         }
 
-        private void ShiftRemoveFromGroup()
-        {
-            if (Model.DynamoViewModel.CurrentSpaceViewModel.Annotations.Any(a => a.AnnotationModel.IsSelected)) return;
 
-            var nodes = Model.LoadedParams.CurrentWorkspaceModel.Nodes;
-            var notes = Model.DynamoViewModel.CurrentSpaceViewModel.Notes;
-
-            foreach (var node in nodes)
-            {
-                if (node.IsSelected)
-                {
-                    var cmd = new DynamoModel.UngroupModelCommand(node.GUID);
-
-                    Model.DynamoViewModel.ExecuteCommand(cmd);
-                }
-            }
-
-            foreach (var note in notes)
-            {
-                if (note.IsSelected)
-                {
-                    var cmd = new DynamoModel.UngroupModelCommand(note.Model.GUID);
-
-                    Model.DynamoViewModel.ExecuteCommand(cmd);
-                }
-              
-            }
-
-        }
         private void ResetColorWheel()
         {
             try
