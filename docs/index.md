@@ -28,5 +28,7 @@ _branding guidelines for this?!_
 
 Yep, with monocle being fully open-source and people actively contributing to it's development, I figured it was worth documenting these.
 
+ <img src="https://github.com/johnpierson/MonocleForDynamo/raw/master/!Documentation/monocleStyleGuide.png" alt="style guide" width="1200">
+
 ### Logos and Usage:
 Monocle currently has two logos.
