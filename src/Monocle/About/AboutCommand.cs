@@ -20,7 +20,7 @@ namespace MonocleViewExtension.About
 
             var viewModel = new AboutViewModel(p);
 
-            var aboutMenu = new MenuItem{Header = $"About Monocle"};
+            var aboutMenu = new MenuItem{Header = $"about monocle"};
 
             aboutMenu.Click += (sender, args) =>
             {
