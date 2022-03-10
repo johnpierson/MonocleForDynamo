@@ -19,7 +19,7 @@ namespace MonocleViewExtension.PackageUsage
         public static void AddMenuItem(MenuItem menuItem, ViewLoadedParams p)
         {
             //add the flyout first
-            var packageFlyout = new MenuItem {Header = "Package Usage"};
+            var packageFlyout = new MenuItem {Header = "package usage"};
             menuItem.Items.Add(packageFlyout);
 
             var dvm = p.DynamoWindow.DataContext as DynamoViewModel;
@@ -27,7 +27,7 @@ namespace MonocleViewExtension.PackageUsage
 
             #region DogeWindow
 
-            var packageUsageDoge = new MenuItem { Header = "Package Usage Doge" };
+            var packageUsageDoge = new MenuItem { Header = "package usage doge" };
 
             packageUsageDoge.Click += (sender, args) =>
             {
@@ -52,7 +52,7 @@ namespace MonocleViewExtension.PackageUsage
 
             #region BoringWindow
             
-            var packageUsageBoring = new MenuItem { Header = "Package Usage Boring Mode" };
+            var packageUsageBoring = new MenuItem { Header = "package usage boring mode" };
 
             packageUsageBoring.Click += (sender, args) =>
             {
@@ -91,12 +91,12 @@ namespace MonocleViewExtension.PackageUsage
         private static void AddCustomNodeHighlighter(MenuItem menuItem, PackageUsageModel m)
         {
             //add the flyout first
-            var highlightFlyout = new MenuItem { Header = "Custom Node Highlighting" };
+            var highlightFlyout = new MenuItem { Header = "custom node highlighting" };
             menuItem.Items.Add(highlightFlyout);
 
 
             //add highlight
-            var highlightCustomNodes = new MenuItem { Header = "Enable Highlighting" };
+            var highlightCustomNodes = new MenuItem { Header = "enable highlighting" };
             highlightCustomNodes.Click += (sender, args) =>
             {
                 m.HighlightCustomNodes();
@@ -105,7 +105,7 @@ namespace MonocleViewExtension.PackageUsage
 
             highlightFlyout.Items.Add(highlightCustomNodes);
             //remove highlight
-            var removeHighlightCustomNodes = new MenuItem { Header = "Remove Highlighting" };
+            var removeHighlightCustomNodes = new MenuItem { Header = "remove highlighting" };
             removeHighlightCustomNodes.Click += (sender, args) =>
             {
                 m.ResetCustomNodeHighlights();
