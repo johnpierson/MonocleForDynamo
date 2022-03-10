@@ -28,15 +28,15 @@
      inkscape:document-units="mm"
      showgrid="false"
      units="in"
-     inkscape:zoom="1.0998546"
-     inkscape:cx="256.85213"
-     inkscape:cy="606.8984"
+     inkscape:zoom="2.1997092"
+     inkscape:cx="487.10984"
+     inkscape:cy="539.38948"
      inkscape:window-width="3440"
      inkscape:window-height="1373"
      inkscape:window-x="-9"
      inkscape:window-y="422"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g119778" />
+     inkscape:current-layer="layer1" />
   <defs
      id="defs2">
     <rect
@@ -196,7 +196,7 @@
        style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:40px;line-height:1.25;font-family:Gotham;-inkscape-font-specification:'Gotham, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3868);fill:#000000;fill-opacity:1;stroke:none"><tspan
          x="124.72461"
          y="262.01758"
-         id="tspan147236">logo overview</tspan></text>
+         id="tspan165669">logo overview</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.21738785,0,0,0.21738785,-24.444057,-47.175479)"
@@ -204,9 +204,9 @@
        style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:40px;line-height:1.25;font-family:Gotham;-inkscape-font-specification:'Gotham, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3868-9);fill:#000000;fill-opacity:1;stroke:none"><tspan
          x="124.72461"
          y="262.01758"
-         id="tspan147240"><tspan
+         id="tspan165673"><tspan
    style="font-weight:normal;-inkscape-font-specification:'Gotham, Normal'"
-   id="tspan147238">monocle for dynamo</tspan> - style guide</tspan></text>
+   id="tspan165671">monocle for dynamo</tspan> - style guide</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.21738785,0,0,0.21738785,-20.605982,32.092563)"
@@ -214,7 +214,7 @@
        style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:40px;line-height:1.25;font-family:Gotham;-inkscape-font-specification:'Gotham, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3868-5);fill:#000000;fill-opacity:1;stroke:none"><tspan
          x="124.72461"
          y="262.01758"
-         id="tspan147242">color</tspan></text>
+         id="tspan165675">color</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.21738785,0,0,0.21738785,-20.501636,90.447774)"
@@ -222,21 +222,24 @@
        style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:40px;line-height:1.25;font-family:Gotham;-inkscape-font-specification:'Gotham, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3868-5-6);fill:#000000;fill-opacity:1;stroke:none"><tspan
          x="124.72461"
          y="262.01758"
-         id="tspan147244">typography</tspan></text>
+         id="tspan165677">typography</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.21738785,0,0,0.21738785,-15.527979,105.23255)"
        id="text3866-1-4-1"
-       style="font-style:italic;font-variant:normal;font-weight:300;font-stretch:normal;font-size:22.7192px;line-height:0.95;font-family:Gotham;-inkscape-font-specification:'Gotham,  weight=325 Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;fill:#000000;fill-opacity:1;stroke:none;shape-inside:url(#rect3868-5-6-4)"><tspan
+       style="font-style:italic;font-variant:normal;font-weight:300;font-stretch:normal;font-size:22.7192px;line-height:0.95;font-family:Gotham;-inkscape-font-specification:'Gotham,  weight=325 Italic';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3868-5-6-4);fill:#000000;fill-opacity:1;stroke:none"><tspan
          x="124.72461"
          y="242.62496"
-         id="tspan147246">Style Choice: Monocle menu items and other text primarily consist of lower case typography. This is a style </tspan><tspan
+         id="tspan165679">Style Choice: Monocle menu items and other text primarily consist of lower case typography. This is a style </tspan><tspan
          x="124.72461"
          y="264.20819"
-         id="tspan147248">choice. Lowercase text is often more &quot;approachable&quot; and gives a brand a whimsical feel. Monocle is meant </tspan><tspan
+         id="tspan165681">choice. Lowercase text is often more &quot;approachable&quot; and gives a brand a whimsical feel. Monocle is meant </tspan><tspan
          x="124.72461"
          y="285.79143"
-         id="tspan147250">to be very accessible and approachable to all, so lower case is the primary font case utilized.</tspan></text>
+         id="tspan165683">to be very accessible and approachable to all, so lower case is the primary font case utilized. Note: </tspan><tspan
+         x="124.72461"
+         y="307.37468"
+         id="tspan165685">sentence casing is used as needed for documentation or other UIs for clarity.</tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.13343815,0,0,0.13343815,-3.0653633,153.18731)"
@@ -244,21 +247,21 @@
        style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:40px;line-height:1.25;font-family:Gotham;-inkscape-font-specification:'Gotham, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3868-5-6-5);fill:#b8321a;fill-opacity:1;stroke:none"><tspan
          x="124.72461"
          y="262.01758"
-         id="tspan147254"><tspan
+         id="tspan165689"><tspan
            style="font-weight:normal;-inkscape-font-specification:'Gotham, Normal'"
-           id="tspan147252">Gotham Bold
+           id="tspan165687">Gotham Bold
 </tspan></tspan><tspan
          x="124.72461"
          y="312.01758"
-         id="tspan147258"><tspan
+         id="tspan165693"><tspan
            style="fill:#000000"
-           id="tspan147256">abcdefghijklmnopqrstuvwxyz
+           id="tspan165691">abcdefghijklmnopqrstuvwxyz
 </tspan></tspan><tspan
          x="124.72461"
          y="362.01758"
-         id="tspan147262"><tspan
+         id="tspan165697"><tspan
            style="fill:#000000"
-           id="tspan147260">0123456789</tspan></tspan></text>
+           id="tspan165695">0123456789</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.13343815,0,0,0.13343815,86.113064,153.18731)"
@@ -266,21 +269,21 @@
        style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:40px;line-height:1.25;font-family:Gotham;-inkscape-font-specification:'Gotham, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3868-5-6-5-2);fill:#b8321a;fill-opacity:1;stroke:none"><tspan
          x="124.72461"
          y="262.01758"
-         id="tspan147266"><tspan
+         id="tspan165701"><tspan
            style="-inkscape-font-specification:'Gotham,  weight=325'"
-           id="tspan147264">Gotham Book
+           id="tspan165699">Gotham Book
 </tspan></tspan><tspan
          x="124.72461"
          y="312.01758"
-         id="tspan147270"><tspan
+         id="tspan165705"><tspan
            style="-inkscape-font-specification:'Gotham,  weight=325';fill:#000000"
-           id="tspan147268">abcdefghijklmnopqrstuvwxyz
+           id="tspan165703">abcdefghijklmnopqrstuvwxyz
 </tspan></tspan><tspan
          x="124.72461"
          y="362.01758"
-         id="tspan147274"><tspan
+         id="tspan165709"><tspan
            style="-inkscape-font-specification:'Gotham,  weight=325';fill:#000000"
-           id="tspan147272">0123456789</tspan></tspan></text>
+           id="tspan165707">0123456789</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.13343815,0,0,0.13343815,176.66458,153.28885)"
@@ -288,23 +291,23 @@
        style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:40px;line-height:1.25;font-family:Gotham;-inkscape-font-specification:'Gotham, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3868-5-6-5-2-3);fill:#b8321a;fill-opacity:1;stroke:none"><tspan
          x="124.72461"
          y="262.01758"
-         id="tspan147280"><tspan
+         id="tspan165715"><tspan
            style="font-weight:normal;font-family:'Comic Sans MS';-inkscape-font-specification:'Comic Sans MS, Normal'"
-           id="tspan147276">Comic Sans MS</tspan><tspan
+           id="tspan165711">Comic Sans MS</tspan><tspan
            style="-inkscape-font-specification:'Gotham,  weight=325'"
-           id="tspan147278">
+           id="tspan165713">
 </tspan></tspan><tspan
          x="124.72461"
          y="314.26282"
-         id="tspan147284"><tspan
+         id="tspan165719"><tspan
            style="font-weight:normal;font-family:'Comic Sans MS';-inkscape-font-specification:'Comic Sans MS, Normal';fill:#000000"
-           id="tspan147282">abcdefghijklmnopqrstuvwxyz
+           id="tspan165717">abcdefghijklmnopqrstuvwxyz
 </tspan></tspan><tspan
          x="124.72461"
          y="366.50806"
-         id="tspan147288"><tspan
+         id="tspan165723"><tspan
            style="font-weight:normal;font-family:'Comic Sans MS';-inkscape-font-specification:'Comic Sans MS, Normal';fill:#000000"
-           id="tspan147286">0123456789</tspan></tspan></text>
+           id="tspan165721">0123456789</tspan></tspan></text>
     <text
        xml:space="preserve"
        transform="matrix(0.08512867,0,0,0.08512867,-4.4864757,37.745574)"
@@ -312,15 +315,15 @@
        style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:40px;line-height:1.25;font-family:Gotham;-inkscape-font-specification:'Gotham, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3868-6);fill:#000000;fill-opacity:1;stroke:none"><tspan
          x="124.72461"
          y="262.01758"
-         id="tspan147290">1.  primary logo
+         id="tspan165725">1.  primary logo
 </tspan><tspan
          x="124.72461"
          y="312.01758"
-         id="tspan147292">2. secondary logo
+         id="tspan165727">2. secondary logo
 </tspan><tspan
          x="124.72461"
          y="362.01758"
-         id="tspan147294">3. doge mark</tspan></text>
+         id="tspan165729">3. doge mark</tspan></text>
     <g
        id="g119785"
        transform="matrix(0.85602994,0,0,0.85602994,33.960855,12.57582)">
@@ -334,7 +337,7 @@
            style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:40px;line-height:1.25;font-family:Gotham;-inkscape-font-specification:'Gotham, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3868-6-6-1);fill:#000000;fill-opacity:1;stroke:none"><tspan
              x="124.72461"
              y="262.01758"
-             id="tspan147296">2</tspan></text>
+             id="tspan165731">2</tspan></text>
         <image
            width="22.052576"
            height="22.052576"
@@ -1100,7 +1103,7 @@ xkQjKwAAAABJRU5ErkJggg==
            style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:40px;line-height:1.25;font-family:Gotham;-inkscape-font-specification:'Gotham, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3868-6-6);fill:#000000;fill-opacity:1;stroke:none"><tspan
              x="124.72461"
              y="262.01758"
-             id="tspan147298">1</tspan></text>
+             id="tspan165733">1</tspan></text>
         <g
            inkscape:label="Layer 1"
            id="layer1-3"
@@ -1203,7 +1206,7 @@ xkQjKwAAAABJRU5ErkJggg==
            style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:40px;line-height:1.25;font-family:Gotham;-inkscape-font-specification:'Gotham, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3868-6-6-1-1);fill:#000000;fill-opacity:1;stroke:none"><tspan
              x="124.72461"
              y="262.01758"
-             id="tspan147300">3</tspan></text>
+             id="tspan165735">3</tspan></text>
         <g
            inkscape:label="Layer 1"
            id="layer1-7"
@@ -1280,15 +1283,15 @@ xkQjKwAAAABJRU5ErkJggg==
            style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:40px;line-height:1.25;font-family:Gotham;-inkscape-font-specification:'Gotham, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3868-6-1);fill:#000000;fill-opacity:1;stroke:none"><tspan
              x="124.72461"
              y="262.01758"
-             id="tspan147302">CMYK: 0/73/86/28 
+             id="tspan165737">CMYK: 0/73/86/28 
 </tspan><tspan
              x="124.72461"
              y="312.01758"
-             id="tspan147304">RGB: 184/50/26
+             id="tspan165739">RGB: 184/50/26
 </tspan><tspan
              x="124.72461"
              y="362.01758"
-             id="tspan147306">HEX: #b8321a
+             id="tspan165741">HEX: #b8321a
 </tspan></text>
         <circle
            style="fill:none;fill-rule:evenodd;stroke:#b8321a;stroke-width:3.69398;stroke-linecap:round;stroke-opacity:1"
@@ -1307,15 +1310,15 @@ xkQjKwAAAABJRU5ErkJggg==
            style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:40px;line-height:1.25;font-family:Gotham;-inkscape-font-specification:'Gotham, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3868-6-1-0);fill:#000000;fill-opacity:1;stroke:none"><tspan
              x="124.72461"
              y="262.01758"
-             id="tspan147308">CMYK: 0/0/0/50 
+             id="tspan165743">CMYK: 0/0/0/50 
 </tspan><tspan
              x="124.72461"
              y="312.01758"
-             id="tspan147310">RGB: 128/128/128
+             id="tspan165745">RGB: 128/128/128
 </tspan><tspan
              x="124.72461"
              y="362.01758"
-             id="tspan147312">HEX: #808080
+             id="tspan165747">HEX: #808080
 </tspan></text>
         <circle
            style="fill:none;fill-rule:evenodd;stroke:#808080;stroke-width:3.69398;stroke-linecap:round;stroke-opacity:1"
@@ -1334,15 +1337,15 @@ xkQjKwAAAABJRU5ErkJggg==
            style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:40px;line-height:1.25;font-family:Gotham;-inkscape-font-specification:'Gotham, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3868-6-1-0-4);fill:#000000;fill-opacity:1;stroke:none"><tspan
              x="124.72461"
              y="262.01758"
-             id="tspan147314">CMYK: 0/0/0/0 
+             id="tspan165749">CMYK: 0/0/0/0 
 </tspan><tspan
              x="124.72461"
              y="312.01758"
-             id="tspan147316">RGB: 255/255/255
+             id="tspan165751">RGB: 255/255/255
 </tspan><tspan
              x="124.72461"
              y="362.01758"
-             id="tspan147318">HEX: #ffffff
+             id="tspan165753">HEX: #ffffff
 </tspan></text>
         <circle
            style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:4.72591;stroke-linecap:round;stroke-opacity:1"
@@ -1373,15 +1376,15 @@ xkQjKwAAAABJRU5ErkJggg==
            style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:40px;line-height:1.25;font-family:Gotham;-inkscape-font-specification:'Gotham, Light';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect3868-6-1-0-4-2);fill:#000000;fill-opacity:1;stroke:none"><tspan
              x="124.72461"
              y="262.01758"
-             id="tspan147320">CMYK: 0/0/0/100 
+             id="tspan165755">CMYK: 0/0/0/100 
 </tspan><tspan
              x="124.72461"
              y="312.01758"
-             id="tspan147322">RGB: 0/0/0
+             id="tspan165757">RGB: 0/0/0
 </tspan><tspan
              x="124.72461"
              y="362.01758"
-             id="tspan147324">HEX: #000000
+             id="tspan165759">HEX: #000000
 </tspan></text>
         <circle
            style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:3.69398;stroke-linecap:round;stroke-opacity:1"
