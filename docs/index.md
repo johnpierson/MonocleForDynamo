@@ -5,6 +5,7 @@ layout: default
 # Monocle is a fully open source view-extension for the [Dynamo Visual Programming environment](https://dynamobim.org/).
 
 ## License
+monocle is available under the BSD 3-Clause license. A simplified version of this is available on [TLDR Legal(https://tldrlegal.com/license/bsd-3-clause-license-(revised))
 
 ## Available Tools
 - Package Usage
