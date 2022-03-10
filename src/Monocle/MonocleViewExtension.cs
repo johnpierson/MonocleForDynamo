@@ -43,7 +43,7 @@ namespace MonocleViewExtension
             Globals.DynamoVersion = dynamoCore.GetName().Version;
 
             //add the top-level menu
-            var monocleMenuItem = new MenuItem { Header = "🧐 monocle" };
+            var monocleMenuItem = new MenuItem { Header = "🧐 Monocle" };
             //add the top level menu to the dynamo ribbon
             p.dynamoMenu.Items.Insert(6, monocleMenuItem);
 

@@ -18,6 +18,7 @@ namespace MonocleViewExtension.SimpleSearch
         internal static ViewLoadedParams vp;
 
         internal static MenuItem ssMenuItem;
+        internal static string Header = "Simple Search";
         /// <summary>
         /// Create the simple search menu
         /// </summary>
@@ -30,7 +31,7 @@ namespace MonocleViewExtension.SimpleSearch
 
             ssMenuItem = new MenuItem
             {
-                Header = "simple search 🔍",
+                Header = $"{Header} 🔍",
                 IsCheckable = true
             };
 
@@ -69,7 +70,7 @@ namespace MonocleViewExtension.SimpleSearch
             var view = p.DynamoWindow as DynamoView;
             try
             {
-                var bindingSearch = new CommandBinding(new RoutedUICommand("SimpleSearch", "SimpleSearchCommand",
+                var bindingSearch = new CommandBinding(new RoutedUICommand(Header, "SimpleSearchCommand",
                     typeof(ResourceNames.MainWindow), new InputGestureCollection
                     {
                         new KeyGesture(Key.F, ModifierKeys.Control)
@@ -129,7 +130,7 @@ namespace MonocleViewExtension.SimpleSearch
 
             ssWindow = new Window
             {
-                Title = "Simple Search",
+                Title = Header,
                 Content = ssView,
                 Width = 500,
                 Owner = p.DynamoWindow,

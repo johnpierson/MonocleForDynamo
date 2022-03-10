@@ -13,9 +13,9 @@ namespace MonocleViewExtension.MonocleSettings
         {
             menuItem.Items.Add(new Separator());
 
-            var settingsFlyout = new MenuItem { Header = "monocle settings" };
+            var settingsFlyout = new MenuItem { Header = "Monocle Settings" };
 
-            var saveSettings = new MenuItem { Header = "save current settings to default path" };
+            var saveSettings = new MenuItem { Header = "Save Current Settings To Default Path" };
 
             saveSettings.Click += (sender, args) =>
             {
@@ -25,7 +25,7 @@ namespace MonocleViewExtension.MonocleSettings
 
 
 
-            var loadSettings = new MenuItem{ Header = "load settings from path" };
+            var loadSettings = new MenuItem{ Header = "Load Settings From Path" };
 
             loadSettings.Click += (sender, args) =>
             {
@@ -41,7 +41,7 @@ namespace MonocleViewExtension.MonocleSettings
             settingsFlyout.Items.Add(loadSettings);
 
             settingsFlyout.Items.Add(new Separator());
-            var restoreSettings = new MenuItem { Header = "restore default settings" };
+            var restoreSettings = new MenuItem { Header = "Restore Default Settings" };
 
             restoreSettings.Click += (sender, args) =>
             {

@@ -44,8 +44,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="Cyotek.Drawing.BitmapFont, Version=1.0.0.0, Culture=neutral, PublicKeyToken=58daa28b0b2de221, processorArchitecture=MSIL">
-      <HintPath>..\packages\Cyotek.Drawing.BitmapFont.2.0.0\lib\net48\Cyotek.Drawing.BitmapFont.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\packages\Cyotek.Drawing.BitmapFont.2.0.4\lib\net48\Cyotek.Drawing.BitmapFont.dll</HintPath>
     </Reference>
     <Reference Include="DesignScriptBuiltin, Version=2.12.0.5650, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\DynamoVisualProgramming.Core.2.12.0.5650\lib\net48\DesignScriptBuiltin.dll</HintPath>
@@ -194,9 +193,20 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="WindowsBase" />
-    <Reference Include="Xceed.Wpf.Toolkit">
-      <HintPath>C:\Users\johnpierson\Desktop\DynamoCoreRuntime2.13.0\nodes\Xceed.Wpf.Toolkit.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="Xceed.Wpf.AvalonDock, Version=4.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.2.0\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero, Version=4.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.2.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.Metro, Version=4.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.2.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Metro.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.AvalonDock.Themes.VS2010, Version=4.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.2.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.VS2010.dll</HintPath>
+    </Reference>
+    <Reference Include="Xceed.Wpf.Toolkit, Version=4.2.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Extended.Wpf.Toolkit.4.2.0\lib\net40\Xceed.Wpf.Toolkit.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -334,15 +344,14 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug copy "$(ProjectDir)bin\Debug\*.dll" "C:\Users\JohnPierson\AppData\Roaming\Dynamo\Dynamo Revit\2.12\packages\Monocle\bin"
+    <PostBuildEvent>if $(ConfigurationName) == Debug copy "$(ProjectDir)bin\Debug\*.dll" "$(AppData)\Dynamo\Dynamo Core\2.14\packages\Monocle\bin"
 
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\*.dll" "C:\Users\JohnPierson\AppData\Roaming\Dynamo\Dynamo Core\2.12\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\*.dll" "C:\Users\JohnPierson\AppData\Roaming\Dynamo\Dynamo Core\2.13\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\*.dll" "C:\Users\JohnPierson\AppData\Roaming\Dynamo\Dynamo Core\2.14\packages\Monocle\bin"
+if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\*.dll" "$(AppData)\Dynamo\Dynamo Core\2.12\packages\Monocle\bin"
+if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\*.dll" "$(AppData)\Dynamo\Dynamo Core\2.13\packages\Monocle\bin"
+if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\*.dll" "$(AppData)\Dynamo\Dynamo Core\2.14\packages\Monocle\bin"
 
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\*.dll" "C:\Users\JohnPierson\AppData\Roaming\Dynamo\Dynamo Revit\2.0\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\*.dll" "C:\Users\JohnPierson\AppData\Roaming\Dynamo\Dynamo Revit\2.6\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\*.dll" "C:\Users\JohnPierson\AppData\Roaming\Dynamo\Dynamo Revit\2.12\packages\Monocle\bin"
-</PostBuildEvent>
+if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\*.dll" "$(AppData)\Dynamo\Dynamo Revit\2.12\packages\Monocle\bin"
+if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\*.dll" "$(AppData)\Dynamo\Dynamo Revit\2.13\packages\Monocle\bin"
+if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\*.dll" "$(AppData)\Dynamo\Dynamo Revit\2.14\packages\Monocle\bin"</PostBuildEvent>
   </PropertyGroup>
 </Project>
