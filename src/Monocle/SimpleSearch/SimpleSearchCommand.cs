@@ -18,7 +18,7 @@ namespace MonocleViewExtension.SimpleSearch
         internal static ViewLoadedParams vp;
 
         internal static MenuItem ssMenuItem;
-        internal static string Header = "Simple Search";
+        internal static string Header = "simple search";
         /// <summary>
         /// Create the simple search menu
         /// </summary>
