@@ -37,7 +37,7 @@
 
         <Image Grid.Column="1" Grid.Row="4" Source="/MonocleViewExtension;component/Resources/about_github.png"/>
         <TextBlock Grid.Column="2" Grid.Row="4" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8 0" Foreground="White" FontSize="16">           
-            <Run Text="Check out Monocle"></Run>
+            <Run Text="check out monocle"></Run>
             <Hyperlink NavigateUri="https://github.com/johnpierson/MonocleForDynamo" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#FFB8321A">
                  on github.
             </Hyperlink>
