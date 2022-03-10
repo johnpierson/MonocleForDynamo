@@ -24,7 +24,7 @@ monocle is available under the BSD 3-Clause license. A simplified version of thi
 - UI Conformity for Revit
 
 
-## Branding Guidelines
+## Style Guide
 _branding guidelines for this?!_
 
 Yep, with monocle being fully open-source and people actively contributing to it's development, I figured it was worth documenting these.
