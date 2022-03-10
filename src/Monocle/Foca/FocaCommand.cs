@@ -71,7 +71,7 @@ namespace MonocleViewExtension.Foca
 
             RegisterKeyboardShortcuts(p, m);
 
-            var colorCodeMenuItem = new MenuItem { Header = "Standard Group Creation" };
+            var colorCodeMenuItem = new MenuItem { Header = "standard group creation" };
 
             colorCodeMenuItem.Click += (sender, args) =>
             {
