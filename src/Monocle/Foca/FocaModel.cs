@@ -435,7 +435,7 @@ namespace MonocleViewExtension.Foca
                     break;
                 case "HorizontalLeft":
                     {
-                        if (superNodes.Any())
+                        if (superNodes.Any(s => s.ObjectType.ToString().Contains("Annotation") || s.ObjectType.ToString().Contains("Note")))
                         {
                             var xAll = GetSelectionMinX();
 
@@ -450,7 +450,7 @@ namespace MonocleViewExtension.Foca
                     break;
                 case "HorizontalRight":
                     {
-                        if (superNodes.Any())
+                        if (superNodes.Any(s => s.ObjectType.ToString().Contains("Annotation") || s.ObjectType.ToString().Contains("Note")))
                         {
                             var xAll = GetSelectionMaxX();
 
@@ -495,7 +495,7 @@ namespace MonocleViewExtension.Foca
                     break;
                 case "VerticalTop":
                     {
-                        if (superNodes.Any())
+                        if (superNodes.Any(s => s.ObjectType.ToString().Contains("Annotation") || s.ObjectType.ToString().Contains("Note")))
                         {
                             var yAll = GetSelectionMinY();
                             superNodes.ForEach((x) => { x.Y = yAll; });
@@ -508,7 +508,7 @@ namespace MonocleViewExtension.Foca
                     break;
                 case "VerticalBottom":
                     {
-                        if (superNodes.Any())
+                        if (superNodes.Any(s => s.ObjectType.ToString().Contains("Annotation") || s.ObjectType.ToString().Contains("Note")))
                         {
                             var yAll = GetSelectionMaxY();
 
