@@ -10,6 +10,7 @@ using Dynamo.Logging;
 using Dynamo.Models;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
+using MonocleViewExtension.SimpleSearch;
 using MonocleViewExtension.Utilities;
 
 namespace MonocleViewExtension.Foca
@@ -153,6 +154,19 @@ namespace MonocleViewExtension.Foca
 
         private void LoadedParamsOnSelectionCollectionChanged(NotifyCollectionChangedEventArgs obj)
         {
+#if DEBUG
+            try
+            {
+                //test TODO: Verify implementation for release
+                SimpleSearchCommand.SimpleSearchPopup.IsOpen = false;
+            }
+            catch (Exception)
+            {
+                //suppress for now
+            }
+#endif
+
+
             try
             {
                 if (!Globals.IsFocaEnabled)
@@ -182,6 +196,8 @@ namespace MonocleViewExtension.Foca
 
                 DropdownVisibility = Model.LoadedParams.CurrentWorkspaceModel.CurrentSelection.First().NodeType == "ExtensionNode" ? 1 : 0;
                 UpdateColors();
+
+                
             }
             catch (Exception exception)
             {
