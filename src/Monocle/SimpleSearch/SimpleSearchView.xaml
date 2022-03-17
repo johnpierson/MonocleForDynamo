@@ -26,9 +26,9 @@
                 <DataTemplate>
                     <StackPanel>
                         <WrapPanel>
-                            <TextBlock Text="{Binding Path=Name}" FontSize="12" FontFamily="Open Sans" MouseDown="UIElement_OnMouseDown" ToolTip="{Binding Path=Description}" VerticalAlignment="Center"/>
-                            <Label Content=" | " FontSize="12" FontFamily="Open Sans" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding Path=FullCategoryName}" FontSize="12" FontFamily="Open Sans" MouseDown="UIElement_OnMouseDown" VerticalAlignment="Center"/>
+                            <TextBlock  MouseDown="UIElement_OnMouseDown" Text="{Binding Path=Name}" FontSize="12" FontFamily="Open Sans"  ToolTip="{Binding Path=Description}" VerticalAlignment="Center"/>
+                            <Label  MouseDown="UIElement_OnMouseDown" Content=" | " FontSize="12" FontFamily="Open Sans" VerticalAlignment="Center"/>
+                            <TextBlock  MouseDown="UIElement_OnMouseDown" Text="{Binding Path=FullCategoryName}" FontSize="12" FontFamily="Open Sans"  VerticalAlignment="Center" Width="600"/>
                         </WrapPanel>
                     </StackPanel>
                 </DataTemplate>
