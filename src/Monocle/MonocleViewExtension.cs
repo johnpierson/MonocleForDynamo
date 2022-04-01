@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.About;
+using MonocleViewExtension.FancyPaste;
 using MonocleViewExtension.Foca;
 using MonocleViewExtension.MonocleSettings;
 using MonocleViewExtension.PackageUsage;
@@ -54,7 +55,7 @@ namespace MonocleViewExtension
             SimpleSearchCommand.AddMenuItem(p, monocleMenuItem, this);
             StandardViewsCommand.EnableStandardViews(p);
             MonocleSettingsCommand.AddMenuItem(monocleMenuItem);
-
+            FancyPasteCommand.AddMenuItem(p);
 
             /*if the user has plugins loaded in Revit (or otherwise) that use a toolkit called "DevExpress",
             we fix the overrides that toolkit forces on the app.

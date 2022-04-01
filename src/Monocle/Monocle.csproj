@@ -227,6 +227,8 @@
       <DependentUpon>PackageUsageView.xaml</DependentUpon>
     </Compile>
     <Compile Include="PackageUsage\PackageUsageViewModel.cs" />
+    <Compile Include="FancyPaste\FancyPasteCommands.cs" />
+    <Compile Include="FancyPaste\FancyPasteModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SimpleSearch\SimpleSearchCommand.cs" />
     <Compile Include="SimpleSearch\SimpleSearchView.xaml.cs">

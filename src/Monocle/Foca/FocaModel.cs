@@ -33,27 +33,6 @@ namespace MonocleViewExtension.Foca
         }
 
 
-        #region MiscCommands
-
-        public void PasteExtravagant(string command)
-        {
-            var clipBoard = DynamoViewModel.Model.ClipBoard;
-
-            if (!clipBoard.Any())
-            {
-                return;
-            }
-            switch (command)
-            {
-                case "PasteWithoutWires":
-                    clipBoard.RemoveAll(n => n is ConnectorModel);
-                    DynamoViewModel.Model.Paste();
-                    break;
-            }
-        }
-
-
-        #endregion
 
         #region ToolboxCommands
 
