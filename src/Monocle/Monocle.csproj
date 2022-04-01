@@ -334,7 +334,7 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug copy "$(ProjectDir)bin\Debug\*.dll" "C:\Users\JohnPierson\AppData\Roaming\Dynamo\Dynamo Core\2.12\packages\Monocle\bin"
+    <PostBuildEvent>if $(ConfigurationName) == Debug copy "$(ProjectDir)bin\Debug\*.dll" "C:\Users\JohnPierson\AppData\Roaming\Dynamo\Dynamo Revit\2.12\packages\Monocle\bin"
 
 if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\*.dll" "$(AppData)\Dynamo\Dynamo Core\2.12\packages\Monocle\bin"
 if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\*.dll" "$(AppData)\Dynamo\Dynamo Core\2.13\packages\Monocle\bin"

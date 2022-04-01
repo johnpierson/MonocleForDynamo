@@ -79,6 +79,18 @@ namespace MonocleViewExtension.Foca
             {
                 return;
             }
+
+            var nodeViews = MiscUtils.FindVisualChildren<NodeView>(dynamoView);
+
+            var nodeView = nodeViews.FirstOrDefault(n => n.ViewModel.Id.Equals(nodeModel.GUID));
+
+            if (nodeView == null)
+            {
+                return;
+            }
+           
+            string creationName = nodeView.ViewModel.OriginalName;
+
             //to build our code block and connect it
             CodeBlockNodeModel codeBlock = null;
             List<ConnectorModel> outports;
@@ -91,7 +103,7 @@ namespace MonocleViewExtension.Foca
                 outports = null;
             }
 
-            if (nodeModel.GetType().ToString().Contains("Revit") && !nodeModel.Name.Equals("Categories") && !nodeModel.Name.Equals("Element Types") && !nodeModel.Name.Equals("Family Types"))
+            if (nodeModel.GetType().ToString().Contains("Revit") && !creationName.Equals("Categories") && !creationName.Equals("Element Types") && !creationName.Equals("Family Types"))
             {
                 var data = nodeModel.CachedValue.Data;
 
@@ -123,7 +135,7 @@ namespace MonocleViewExtension.Foca
 
             else
             {
-                string creationName = nodeModel.Name;
+
                 var stringData = nodeModel.CachedValue.StringData;
                 if (stringData.Equals("null"))
                 {
