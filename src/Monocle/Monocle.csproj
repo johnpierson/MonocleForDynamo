@@ -205,6 +205,9 @@
       <DependentUpon>AboutView.xaml</DependentUpon>
     </Compile>
     <Compile Include="About\AboutViewModel.cs" />
+    <Compile Include="FancyPaste\ExamineClipboardView.xaml.cs">
+      <DependentUpon>ExamineClipboardView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Foca\ColorCodeView.xaml.cs">
       <DependentUpon>ColorCodeView.xaml</DependentUpon>
     </Compile>
@@ -265,6 +268,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="About\AboutView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FancyPaste\ExamineClipboardView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
