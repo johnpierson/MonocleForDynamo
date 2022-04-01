@@ -10,6 +10,7 @@ using Dynamo.Controls;
 using Dynamo.Graph;
 using Dynamo.Graph.Connectors;
 using Dynamo.Graph.Nodes;
+using Dynamo.Graph.Notes;
 using Dynamo.Models;
 using Dynamo.Utilities;
 using Dynamo.ViewModels;
@@ -31,6 +32,28 @@ namespace MonocleViewExtension.Foca
             DynamoViewModel = p.DynamoWindow.DataContext as DynamoViewModel;
         }
 
+
+        #region MiscCommands
+
+        public void PasteExtravagant(string command)
+        {
+            var clipBoard = DynamoViewModel.Model.ClipBoard;
+
+            if (!clipBoard.Any())
+            {
+                return;
+            }
+            switch (command)
+            {
+                case "PasteWithoutWires":
+                    clipBoard.RemoveAll(n => n is ConnectorModel);
+                    DynamoViewModel.Model.Paste();
+                    break;
+            }
+        }
+
+
+        #endregion
 
         #region ToolboxCommands
 
@@ -88,7 +111,7 @@ namespace MonocleViewExtension.Foca
             {
                 return;
             }
-           
+
             string creationName = nodeView.ViewModel.OriginalName;
 
             //to build our code block and connect it

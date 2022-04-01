@@ -70,6 +70,7 @@ namespace MonocleViewExtension.Foca
             menuItem.Items.Add(focaMenuItem);
 
             RegisterKeyboardShortcuts(p, m);
+            AddPasteExtravagant(p, m);
 
             var colorCodeMenuItem = new MenuItem { Header = "standard group creation" };
 
@@ -140,6 +141,18 @@ namespace MonocleViewExtension.Foca
                     m.AlignSelected("VerticalBottom");
                 };
                 view.CommandBindings.Add(bindingBottom);
+
+                //Paste without wires
+                var pasteWithoutWires = new CommandBinding(new RoutedUICommand("AlignBottom", "AlignBottomCommand",
+                    typeof(ResourceNames.MainWindow), new InputGestureCollection
+                    {
+                        new KeyGesture(Key.V, ModifierKeys.Control | ModifierKeys.Shift)
+                    }));
+                pasteWithoutWires.Executed += (sender, args) =>
+                {
+                    m.PasteExtravagant("PasteWithoutWires");
+                };
+                view.CommandBindings.Add(pasteWithoutWires);
             }
             catch (Exception e)
             {
@@ -147,7 +160,35 @@ namespace MonocleViewExtension.Foca
             }
            
         }
-            
+
+        private static void AddPasteExtravagant(ViewLoadedParams p, FocaModel m)
+        {
+            var flyout = new MenuItem
+            {
+                Header = "Paste Extravagant",
+                ToolTip = "More paste options. Inspired by Grasshopper v2's \"Paste Exotic\". Brought to you by Monocle."
+            };
+            var pasteWithoutWires = new MenuItem
+            {
+                Header = "Paste Without Wires",
+                InputGestureText = "Ctrl + Shift + V"
+            };
+
+            pasteWithoutWires.Click += (sender, args) =>
+            {
+                m.PasteExtravagant("PasteWithoutWires");
+            };
+
+            flyout.Items.Add(pasteWithoutWires);
+
+            foreach (MenuItem menu in p.dynamoMenu.Items)
+            {
+                if (menu.Name.Equals("editMenu"))
+                {
+                    menu.Items.Insert(5, flyout);
+                }
+            }
+        } 
 
     }
 }
