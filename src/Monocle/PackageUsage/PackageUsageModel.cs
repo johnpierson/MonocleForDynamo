@@ -174,6 +174,10 @@ namespace MonocleViewExtension.PackageUsage
                             rect.RadiusY = 4;
                             rect.StrokeDashArray = new DoubleCollection { 6, 2 };
                         }
+                        //TODO: Enable this for 2.15+
+                        //nvm.ImgGlyphOneSource = "/MonocleViewExtension;component/Foca/Resources/customnode-64.png";
+                        var nodeBorder = nv.FindName("nodeColorOverlayZoomOut") as Border;
+                        nodeBorder.Background = new SolidColorBrush(Globals.CustomNodeIdentificationColor);
                     }
                     catch (Exception e)
                     {

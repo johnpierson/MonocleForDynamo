@@ -3,11 +3,13 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Dynamo.Graph.Workspaces;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.About;
 using MonocleViewExtension.FancyPaste;
 using MonocleViewExtension.Foca;
 using MonocleViewExtension.MonocleSettings;
+using MonocleViewExtension.NodeDocumentation;
 using MonocleViewExtension.PackageUsage;
 using MonocleViewExtension.SimpleSearch;
 using MonocleViewExtension.StandardViews;
@@ -26,7 +28,7 @@ namespace MonocleViewExtension
 
         public void Startup(ViewStartupParams viewStartupParams)
         {
-
+            
         }
 
         public void Loaded(ViewLoadedParams p)
@@ -57,6 +59,9 @@ namespace MonocleViewExtension
             MonocleSettingsCommand.AddMenuItem(monocleMenuItem);
             FancyPasteCommand.AddMenuItem(p);
 
+#if DEBUG
+            NodeDocumentationCommand.AddMenuItem(monocleMenuItem,p);
+#endif
             /*if the user has plugins loaded in Revit (or otherwise) that use a toolkit called "DevExpress",
             we fix the overrides that toolkit forces on the app.
             A popular example of this is KiwiCodes Family Browser R3.
@@ -65,6 +70,8 @@ namespace MonocleViewExtension
             Compatibility.CheckForDevExpress();
             Compatibility.FixThemesForDevExpress(p.DynamoWindow);
         }
+
+        
 
         public void Shutdown()
         {

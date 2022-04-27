@@ -12,10 +12,13 @@ using Dynamo.Graph.Connectors;
 using Dynamo.Graph.Nodes;
 using Dynamo.Graph.Notes;
 using Dynamo.Models;
+using Dynamo.Search.SearchElements;
 using Dynamo.Utilities;
 using Dynamo.ViewModels;
+using Dynamo.Views;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.Utilities;
+using ProtoCore.AST.ImperativeAST;
 using Thickness = System.Windows.Thickness;
 
 namespace MonocleViewExtension.Foca
@@ -32,8 +35,8 @@ namespace MonocleViewExtension.Foca
             DynamoViewModel = p.DynamoWindow.DataContext as DynamoViewModel;
         }
 
-
-
+        
+       
         #region ToolboxCommands
 
         public void ToolBoxCommand(string command)
