@@ -16,7 +16,7 @@ namespace MonocleViewExtension.Utilities
 
         public static bool IsFocaEnabled { get; set; } = true;
         public static string CustomNodeNotePrefix { get; set; } = "Custom Node: ";
-        public static Color CustomNodeIdentificationColor = Colors.Red;
+        public static Color CustomNodeIdentificationColor = (Color)ColorConverter.ConvertFromString("#ADE4DE");
         public static double CustomNodeBorderThickness = 4;
 
         internal static Version DynamoVersion { get; set; }

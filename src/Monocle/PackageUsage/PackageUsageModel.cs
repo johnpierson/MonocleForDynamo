@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -107,8 +108,6 @@ namespace MonocleViewExtension.PackageUsage
                         DynamoModel.SelectModelCommand select = new DynamoModel.SelectModelCommand(node.NodeModel.GUID, ModifierKeys.None);
                         dynamoViewModel.Model.ExecuteCommand(select);
 
-                        //newNote.PinToNodeCommand.Execute(null);
-
                         var annotation = dynamoViewModel.CurrentSpaceViewModel.Annotations.FirstOrDefault(a =>
                             a.Nodes.Any(n => n.GUID.ToString().Equals(node.NodeModel.GUID.ToString())));
 
@@ -119,6 +118,10 @@ namespace MonocleViewExtension.PackageUsage
                             annotation.AnnotationModel.Deselect();
                         }
 
+                        //Try to pin note to node (fails if user is on version without this option)
+                        MethodInfo pinToNode = typeof(NoteViewModel).GetMethod("PinToNode",
+                            BindingFlags.NonPublic | BindingFlags.Instance);
+                        pinToNode.Invoke(newNote, new object[] { node.NodeModel });
                     }
                     catch (Exception e)
                     {

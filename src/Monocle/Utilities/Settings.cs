@@ -25,7 +25,7 @@ namespace MonocleViewExtension.Utilities
         public class CustomNodeIdentifierSettings
         {
             [XmlElement("Color")] 
-            public string CustomNodeColor { get; set; } = Colors.Red.ToString();
+            public string CustomNodeColor { get; set; } = "#ADE4DE";
 
             [XmlElement("BorderThickness")]
             public double BorderThickness { get; set; } = 4;
