@@ -159,7 +159,9 @@ namespace MonocleViewExtension.Foca
                         codeBlock = new CodeBlockNodeModel($"DSCore.Types.FindTypeByNameInAssembly(\"{stringData.Split('.').Last()}\", \"RevitAPI\")", 0, 0, DynamoViewModel.Model.LibraryServices, DynamoViewModel.Model.CurrentWorkspace.ElementResolver);
                         break;
                     case "Categories":
-                        codeBlock = new CodeBlockNodeModel($"Category.ByName(\"{stringData}\")", 0, 0, DynamoViewModel.Model.LibraryServices, DynamoViewModel.Model.CurrentWorkspace.ElementResolver);
+                        dynamic thingy = nodeModel.CachedValue.Data;
+                        var id = thingy.Id;
+                        codeBlock = new CodeBlockNodeModel($"\"{stringData}\";\nRevit.Elements.Category.ById({id})", 0, 0, DynamoViewModel.Model.LibraryServices, DynamoViewModel.Model.CurrentWorkspace.ElementResolver);
                         break;
                     case "Unit Types":
                         codeBlock = new CodeBlockNodeModel($"DSCore.Types.FindTypeByNameInAssembly(\"{stringData.Split('.').Last()}\", \"DynamoUnits\")", 0, 0, DynamoViewModel.Model.LibraryServices, DynamoViewModel.Model.CurrentWorkspace.ElementResolver);
