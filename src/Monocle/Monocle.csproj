@@ -368,6 +368,7 @@ if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\*.dll" "$(AppD
 if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\*.dll" "$(AppData)\Dynamo\Dynamo Revit\2.0\packages\Monocle\bin"
 if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\*.dll" "$(AppData)\Dynamo\Dynamo Revit\2.6\packages\Monocle\bin"
 if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\*.dll" "$(AppData)\Dynamo\Dynamo Revit\2.12\packages\Monocle\bin"
+if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\*.dll" "$(AppData)\Dynamo\Dynamo Revit\2.13\packages\Monocle\bin"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>
