@@ -28,11 +28,13 @@ namespace MonocleViewExtension
 
         public void Startup(ViewStartupParams viewStartupParams)
         {
-            Globals.PmExtension = viewStartupParams.ExtensionManager.Extensions.OfType<PackageManagerExtension>().FirstOrDefault();
         }
 
         public void Loaded(ViewLoadedParams p)
         {
+            //store the package manager extension for getting package versions
+            Globals.PmExtension = p.ViewStartupParams.ExtensionManager.Extensions.OfType<PackageManagerExtension>().FirstOrDefault();
+
             /*if the user is holding down the left shift key, don't load monocle. I added this because I needed it for when I record videos that shouldn't have packages loaded.
             And yes. this is a deep reference to my roots in AutoCAD, https://knowledge.autodesk.com/support/autocad/learn-explore/caas/sfdcarticles/sfdcarticles/How-to-reset-AutoCAD-to-defaults.html
             */

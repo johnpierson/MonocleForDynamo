@@ -133,10 +133,6 @@
       <HintPath>..\packages\DynamoVisualProgramming.ZeroTouchLibrary.2.12.1.8246\lib\net48\ProtoGeometry.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="RestSharp, Version=106.12.0.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
-      <HintPath>..\packages\RestSharp.106.12.0\lib\net452\RestSharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="SharpDX, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpDX.4.2.0\lib\net45\SharpDX.dll</HintPath>
       <Private>False</Private>
@@ -371,7 +367,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug copy "$(ProjectDir)bin\Debug\*.dll" "C:\Users\JohnPierson\AppData\Roaming\Dynamo\Dynamo Core\2.13\packages\Monocle\bin"
+    <PostBuildEvent>if $(ConfigurationName) == Debug copy "$(ProjectDir)bin\Debug\*.dll" "C:\Users\JohnPierson\AppData\Roaming\Dynamo\Dynamo Revit\2.12\packages\Monocle\bin"
 
 if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\*.dll" "$(AppData)\Dynamo\Dynamo Core\2.12\packages\Monocle\bin"
 if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\*.dll" "$(AppData)\Dynamo\Dynamo Core\2.13\packages\Monocle\bin"
