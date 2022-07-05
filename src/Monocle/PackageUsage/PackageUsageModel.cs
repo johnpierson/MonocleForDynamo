@@ -315,23 +315,14 @@ namespace MonocleViewExtension.PackageUsage
         }
         public string GetPackageVersion(NodeModel node)
         {
-            string jsonPath = null;
             string version = null;
-            DirectoryInfo packageFolder = null;
-
             //event handlers for when changes are made
             try
             {
-                string packagePath = dynamoViewModel.Model.PathManager.PackagesDirectories.First(p => p.ToLower().Contains("appdata"));
-                DirectoryInfo packageDirectory = new DirectoryInfo(packagePath);
-                packageFolder = packageDirectory
-                    .GetDirectories().First(d => d.Name.CleanupString().Contains(GetPackageName(node).CleanupString()));
-                jsonPath = Path.Combine(packageFolder.FullName, "pkg.json");
-                // read the json for the file version
-                StreamReader sr = new StreamReader(jsonPath);
-                string[] splitDoc = sr.ReadToEnd().Split(Char.Parse(","));
-                string clean = splitDoc.First(s => s.Contains("version")).Replace("\"", "").Trim();
-                version = clean.Replace("version:", " v.");
+                var packageName = GetPackageName(node).SimplifyString();
+                var targetInfo = Globals.PmExtension.PackageLoader.LocalPackages.FirstOrDefault(x => x.Name.SimplifyString() == packageName);
+
+                version = $"v.{targetInfo.VersionName}";
             }
             catch (Exception)
             {

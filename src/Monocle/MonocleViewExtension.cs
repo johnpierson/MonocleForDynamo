@@ -1,9 +1,8 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Dynamo.Graph.Workspaces;
+using Dynamo.PackageManager;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.About;
 using MonocleViewExtension.FancyPaste;
@@ -22,13 +21,14 @@ namespace MonocleViewExtension
         public string UniqueId => "5A256B35-BD09-423C-82A1-372957143927";
         public string Name => "Monocle View Extension";
 
+      
         public void Dispose()
         {
         }
 
         public void Startup(ViewStartupParams viewStartupParams)
         {
-            
+            Globals.PmExtension = viewStartupParams.ExtensionManager.Extensions.OfType<PackageManagerExtension>().FirstOrDefault();
         }
 
         public void Loaded(ViewLoadedParams p)

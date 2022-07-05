@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Windows.Media;
+using Dynamo.PackageManager;
 
 namespace MonocleViewExtension.Utilities
 {
     public class Globals
     {
+        public static PackageManagerExtension PmExtension { get; set; }
         public static Assembly ExecutingAssembly = Assembly.GetExecutingAssembly();
         public static readonly string Version = ExecutingAssembly.GetName().Version.ToString();
         public static string ExecutingPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
