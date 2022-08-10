@@ -20,13 +20,14 @@ namespace MonocleViewExtension.GraphResizerer
         public static void AddMenuItem(MenuItem menuItem, ViewLoadedParams p)
         {
             var dvm = p.DynamoWindow.DataContext as DynamoViewModel;
-            var m = new GrapherResizererModel(dvm, p);
-            var viewModel = new GrapherResizererViewModel(m);
-
+            
             var graphResizererMenu = new MenuItem { Header = $"graph resizerer" };
 
             graphResizererMenu.Click += (sender, args) =>
             {
+                var m = new GraphResizererModel(dvm, p);
+                var viewModel = new GraphResizererViewModel(m);
+
                 var window = new GraphResizererView()
                 {
                     // Set the data context for the main grid in the window.

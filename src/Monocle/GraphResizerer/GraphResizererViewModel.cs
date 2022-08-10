@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Dynamo.Extensions;
+using Dynamo.Models;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
 
 namespace MonocleViewExtension.GraphResizerer
 {
-    internal class GrapherResizererViewModel : ViewModelBase
+    internal class GraphResizererViewModel : ViewModelBase
     {
-        public GrapherResizererModel Model { get; set; }
+        public GraphResizererModel Model { get; set; }
         private ReadyParams _readyParams;
         public DelegateCommand ResizeGraph { get; set; }
         public DelegateCommand Link { get; set; }
@@ -43,7 +45,13 @@ namespace MonocleViewExtension.GraphResizerer
             get { return _resultsVisibility; }
             set { _resultsVisibility = value; RaisePropertyChanged(() => ResultsVisibility); }
         }
-        public GrapherResizererViewModel(GrapherResizererModel m)
+        private int _runCount;
+        public int RunCount
+        {
+            get { return _runCount; }
+            set { _runCount = value; RaisePropertyChanged(() => RunCount); }
+        }
+        public GraphResizererViewModel(GraphResizererModel m)
         {
             Model = m;
             _readyParams = m.LoadedParams;
@@ -51,15 +59,25 @@ namespace MonocleViewExtension.GraphResizerer
             XScaleFactor = 1.5;
             YScaleFactor = 2.25;
 
+            RunCount = 0;
+
             ResizeGraph = new DelegateCommand(OnResizeGraph);
             Link = new DelegateCommand(OnLink);
             Close = new DelegateCommand(OnClose);
 
             ResultsVisibility = false;
+
+            Model.SetRunStatus();
         }
         private void OnResizeGraph(object o)
         {
+            //if it is the first run, then store the original locations
+            if (RunCount == 0)
+            {
+                Model.GetNodes();
+            }
             var changeCount = Model.ResizeGraph(XScaleFactor,YScaleFactor);
+            RunCount++;
 
             Results = $"{changeCount} nodes and notes changed, please review your results before saving.";
             ResultsVisibility = true;
@@ -71,7 +89,9 @@ namespace MonocleViewExtension.GraphResizerer
         }
         private void OnClose(object o)
         {
-           GraphResizererView win = o as GraphResizererView;
+            ResultsVisibility = false;
+            RunCount = 0;
+            GraphResizererView win = o as GraphResizererView;
            win.Close();
         }
     }

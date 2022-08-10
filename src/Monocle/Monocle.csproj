@@ -248,8 +248,8 @@
       <DependentUpon>FocaView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Foca\SuperNode.cs" />
-    <Compile Include="GraphResizerer\GrapherResizererViewModel.cs" />
-    <Compile Include="GraphResizerer\GrapherResizererModel.cs" />
+    <Compile Include="GraphResizerer\GraphResizererViewModel.cs" />
+    <Compile Include="GraphResizerer\GraphResizererModel.cs" />
     <Compile Include="GraphResizerer\GraphResizererCommand.cs" />
     <Compile Include="GraphResizerer\GraphResizererView.xaml.cs">
       <DependentUpon>GraphResizererView.xaml</DependentUpon>

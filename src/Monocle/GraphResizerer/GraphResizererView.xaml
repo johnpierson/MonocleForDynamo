@@ -6,9 +6,9 @@
         xmlns:local="clr-namespace:MonocleViewExtension.GraphResizerer"
         mc:Ignorable="d" 
         Width="380" 
-        Height="380"
+        Height="420"
         MinWidth="380" 
-        MinHeight="380"
+        MinHeight="420"
         FontFamily="Comic Sans MS"
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
@@ -19,7 +19,7 @@
     <Grid Name="MainGrid" Margin="8">
         <Grid.RowDefinitions>
             <RowDefinition Height="48"/>
-            <RowDefinition Height="42"/>
+            <RowDefinition Height="48"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="42"/>
         </Grid.RowDefinitions>
@@ -27,8 +27,11 @@
             <Label Content="graph" FontSize="18" VerticalContentAlignment="Bottom" VerticalAlignment="Bottom" Foreground="#FFB8321A"/>
             <Label Content="resizerer" FontSize="36" VerticalContentAlignment="Bottom" VerticalAlignment="Center" Height="56" Foreground="#FFB8321A"/>
         </WrapPanel>
-        <TextBox Grid.Row="1" TextWrapping="Wrap" IsHitTestVisible="False" Text="New Dynamo node sizes got you down? Well this will help you fix that in your current file."  FontSize="10" BorderBrush="{x:Null}" ToolTip="kudos to jacob small from the dynamo forum for this idea."/>
+        <TextBox Grid.Row="1" TextWrapping="Wrap" IsHitTestVisible="False" Text="New Dynamo node sizes got you down? Well this will help you fix that in your current file.  [note: 1.5 and 2.25 for x and y scale (respectively) seems to work well as a starting point]"  FontSize="9" BorderBrush="{x:Null}" ToolTip="kudos to jacob small from the dynamo forum for this idea."/>
         <StackPanel Grid.Row="2">
+            <GroupBox Header="Auto Run?">
+                <CheckBox Name="AutoRunCheckbox" Margin="8" Content="check this box to enable dynamic updates" Checked="AutoRunCheckbox_OnChecked"/>
+            </GroupBox>
             <GroupBox Header="X Scale Factor">
                 <Grid Margin="8">
                     <Grid.ColumnDefinitions>
@@ -36,7 +39,7 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0" Content="{Binding XScaleFactor, FallbackValue=1.5}"/>
-                    <Slider IsSnapToTickEnabled="True" Grid.Column="1" TickPlacement="BottomRight" TickFrequency="0.25" Minimum="1" Maximum="10" Value="{Binding XScaleFactor, Mode=TwoWay, FallbackValue=1.5}"/>
+                    <Slider IsSnapToTickEnabled="True" Grid.Column="1" TickPlacement="BottomRight" TickFrequency="0.125" Minimum="1" Maximum="5" Value="{Binding XScaleFactor, Mode=TwoWay, FallbackValue=1.5}" ValueChanged="RangeBase_OnValueChanged"/>
                 </Grid>
             </GroupBox>
             <GroupBox Header="Y Scale Factor">
@@ -46,7 +49,7 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Label Grid.Column="0" Content="{Binding YScaleFactor, FallbackValue=2.25}"/>
-                    <Slider IsSnapToTickEnabled="True" Grid.Column="1" TickPlacement="BottomRight" TickFrequency="0.25" Minimum="1" Maximum="10" Value="{Binding YScaleFactor, Mode=TwoWay, FallbackValue=2.25}"/>
+                    <Slider IsSnapToTickEnabled="True" Grid.Column="1" TickPlacement="BottomRight" TickFrequency="0.125" Minimum="1" Maximum="5" Value="{Binding YScaleFactor, Mode=TwoWay, FallbackValue=2.25}" ValueChanged="RangeBase_OnValueChanged"/>
                 </Grid>
             </GroupBox>
             <TextBox TextWrapping="Wrap" IsHitTestVisible="False" Text="{Binding Results, FallbackValue=results will be here}" Foreground="#FFAEA5A5" Visibility="{Binding ResultsVisibility, Converter={StaticResource b2v}}" BorderBrush="{x:Null}"/>
