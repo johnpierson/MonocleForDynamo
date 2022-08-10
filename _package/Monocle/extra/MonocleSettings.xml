@@ -39,7 +39,7 @@
     </GroupSetting>
   </GroupSettings>
   <CustomNodeIdentifierSettings>
-    <Color>#FFFF0800</Color>
+    <Color>#FFFF0000</Color>
     <BorderThickness>4</BorderThickness>
   </CustomNodeIdentifierSettings>
   <CustomNodeNotePrefix>Custom Node: </CustomNodeNotePrefix>

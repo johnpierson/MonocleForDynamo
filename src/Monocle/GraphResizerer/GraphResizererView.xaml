@@ -1,0 +1,68 @@
+﻿<Window x:Class="MonocleViewExtension.GraphResizerer.GraphResizererView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:local="clr-namespace:MonocleViewExtension.GraphResizerer"
+        mc:Ignorable="d" 
+        Width="380" 
+        Height="380"
+        MinWidth="380" 
+        MinHeight="380"
+        FontFamily="Comic Sans MS"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <ResourceDictionary>
+            <BooleanToVisibilityConverter x:Key="b2v" />
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid Name="MainGrid" Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48"/>
+            <RowDefinition Height="42"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="42"/>
+        </Grid.RowDefinitions>
+        <WrapPanel>
+            <Label Content="graph" FontSize="18" VerticalContentAlignment="Bottom" VerticalAlignment="Bottom" Foreground="#FFB8321A"/>
+            <Label Content="resizerer" FontSize="36" VerticalContentAlignment="Bottom" VerticalAlignment="Center" Height="56" Foreground="#FFB8321A"/>
+        </WrapPanel>
+        <TextBox Grid.Row="1" TextWrapping="Wrap" IsHitTestVisible="False" Text="New Dynamo node sizes got you down? Well this will help you fix that in your current file."  FontSize="10" BorderBrush="{x:Null}" ToolTip="kudos to jacob small from the dynamo forum for this idea."/>
+        <StackPanel Grid.Row="2">
+            <GroupBox Header="X Scale Factor">
+                <Grid Margin="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="48"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Content="{Binding XScaleFactor, FallbackValue=1.5}"/>
+                    <Slider IsSnapToTickEnabled="True" Grid.Column="1" TickPlacement="BottomRight" TickFrequency="0.25" Minimum="1" Maximum="10" Value="{Binding XScaleFactor, Mode=TwoWay, FallbackValue=1.5}"/>
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="Y Scale Factor">
+                <Grid Margin="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="48"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Content="{Binding YScaleFactor, FallbackValue=2.25}"/>
+                    <Slider IsSnapToTickEnabled="True" Grid.Column="1" TickPlacement="BottomRight" TickFrequency="0.25" Minimum="1" Maximum="10" Value="{Binding YScaleFactor, Mode=TwoWay, FallbackValue=2.25}"/>
+                </Grid>
+            </GroupBox>
+            <TextBox TextWrapping="Wrap" IsHitTestVisible="False" Text="{Binding Results, FallbackValue=results will be here}" Foreground="#FFAEA5A5" Visibility="{Binding ResultsVisibility, Converter={StaticResource b2v}}" BorderBrush="{x:Null}"/>
+        </StackPanel>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="48"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="48"/>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="100"/>
+            </Grid.ColumnDefinitions>
+            <Image Source="/MonocleViewExtension;component/Resources/monocleLogoRoundedSquare.png" Margin="0 0 0 8"></Image>
+            <Button Grid.Column="2" Content="?" Background="White" Command="{Binding Link}" Margin="8 0 0 8" ToolTip="why this exists" Cursor="Hand"/>
+            <Button Grid.Column="3" Content="close" Margin="8 0 0 8" Background="White" Command="{Binding Close}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}"/>
+            <Button Grid.Column="4" Content="resize" Margin="8 0 0 8" Background="White" Command="{Binding ResizeGraph}"/>
+        </Grid>
+    </Grid>
+</Window>

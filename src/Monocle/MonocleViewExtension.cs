@@ -7,6 +7,7 @@ using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.About;
 using MonocleViewExtension.FancyPaste;
 using MonocleViewExtension.Foca;
+using MonocleViewExtension.GraphResizerer;
 using MonocleViewExtension.MonocleSettings;
 using MonocleViewExtension.NodeDocumentation;
 using MonocleViewExtension.PackageUsage;
@@ -55,11 +56,13 @@ namespace MonocleViewExtension
             //add all of our various tools
             AboutCommand.AddMenuItem(monocleMenuItem,p);
             PackageUsageCommand.AddMenuItem(monocleMenuItem,p);
+            GraphResizererCommand.AddMenuItem(monocleMenuItem, p);
             FocaCommand.EnableFoca(p, monocleMenuItem);
             SimpleSearchCommand.AddMenuItem(p, monocleMenuItem, this);
             StandardViewsCommand.EnableStandardViews(p);
             MonocleSettingsCommand.AddMenuItem(monocleMenuItem);
             FancyPasteCommand.AddMenuItem(p);
+            
 
 #if DEBUG
             NodeDocumentationCommand.AddMenuItem(monocleMenuItem,p);
