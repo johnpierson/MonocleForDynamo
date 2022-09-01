@@ -208,6 +208,9 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="WindowsBase" />
+    <Reference Include="WpfAnimatedGif, Version=2.0.0.0, Culture=neutral, PublicKeyToken=9e7cd3b544a090dc, processorArchitecture=MSIL">
+      <HintPath>..\packages\WpfAnimatedGif.2.0.2\lib\net40\WpfAnimatedGif.dll</HintPath>
+    </Reference>
     <Reference Include="Xceed.Wpf.AvalonDock, Version=4.3.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <HintPath>..\packages\Extended.Wpf.Toolkit.4.3.0\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
       <Private>True</Private>
@@ -274,7 +277,13 @@
     <Compile Include="PackageUsage\PackageUsageViewModel.cs" />
     <Compile Include="FancyPaste\FancyPasteCommands.cs" />
     <Compile Include="FancyPaste\FancyPasteModel.cs" />
+    <Compile Include="Photocopier\PhotocopierCommand.cs" />
+    <Compile Include="Photocopier\PhotocopierView.xaml.cs">
+      <DependentUpon>PhotocopierView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Photocopier\PhotocopierViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Photocopier\PhotocopierModel.cs" />
     <Compile Include="SimpleSearch\SimpleSearchCommand.cs" />
     <Compile Include="SimpleSearch\SimpleSearchView.xaml.cs">
       <DependentUpon>SimpleSearchView.xaml</DependentUpon>
@@ -342,6 +351,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Photocopier\PhotocopierView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="SimpleSearch\SimpleSearchView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -396,8 +409,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
+    <Resource Include="PackageUsage\DogeImages\dwight-pumpkin.gif" />
+    <Resource Include="PackageUsage\DogeImages\david-s-pumpkins.gif" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="GraphInformation\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Debug copy "$(ProjectDir)bin\Debug\MonocleViewExtension.dll" "C:\Users\JohnPierson\AppData\Roaming\Dynamo\Dynamo Core\2.13\packages\Monocle\bin"

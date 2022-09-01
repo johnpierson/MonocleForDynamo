@@ -67,12 +67,24 @@ namespace MonocleViewExtension.PackageUsage
                     switcher = 2;
                 }
 
+                int day = DateTime.Now.Day;
+
                 switch (switcher)
                 {
                     case 2:
                         return "/MonocleViewExtension;component/PackageUsage/DogeImages/doge_newyear.png";
-                    case 10:                    
-                        return "/MonocleViewExtension;component/PackageUsage/DogeImages/doge_halloween.gif";
+                    case 10:
+                        var randomHalloween = new Random();
+                        List<string> possibleHalloween = new List<string>
+                        {
+                            "/MonocleViewExtension;component/PackageUsage/DogeImages/dogePreview.png",
+                            "/MonocleViewExtension;component/PackageUsage/DogeImages/dogePreview.png",
+                            "/MonocleViewExtension;component/PackageUsage/DogeImages/dogePreview.png",
+                            "/MonocleViewExtension;component/PackageUsage/DogeImages/doge_halloween.gif",
+                        };
+                        var selector = randomHalloween.Next(4);
+                        return day == 1 ? "/MonocleViewExtension;component/PackageUsage/DogeImages/dwight-pumpkin.gif" : possibleHalloween[selector];
+                      
                     case 12:                       
                         return "/MonocleViewExtension;component/PackageUsage/DogeImages/doge_christmas.jpg";
                     case 7:                       
@@ -87,7 +99,7 @@ namespace MonocleViewExtension.PackageUsage
                             "/MonocleViewExtension;component/PackageUsage/DogeImages/doge_dapper.jpg",
                             "/MonocleViewExtension;component/PackageUsage/DogeImages/doge_business.jpg"
                         };
-                        return possibleOthers[rand.Next(0,4)];
+                        return possibleOthers[rand.Next(5)];
                 }
             }
         }

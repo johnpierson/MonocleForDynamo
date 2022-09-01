@@ -11,6 +11,7 @@ using MonocleViewExtension.GraphResizerer;
 using MonocleViewExtension.MonocleSettings;
 using MonocleViewExtension.NodeDocumentation;
 using MonocleViewExtension.PackageUsage;
+using MonocleViewExtension.Photocopier;
 using MonocleViewExtension.SimpleSearch;
 using MonocleViewExtension.StandardViews;
 using MonocleViewExtension.Utilities;
@@ -65,6 +66,7 @@ namespace MonocleViewExtension
             
 
 #if DEBUG
+            PhotocopierCommand.AddMenuItem(monocleMenuItem,p);
             NodeDocumentationCommand.AddMenuItem(monocleMenuItem,p);
 #endif
             /*if the user has plugins loaded in Revit (or otherwise) that use a toolkit called "DevExpress",
