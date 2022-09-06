@@ -165,13 +165,13 @@ namespace MonocleViewExtension.SimpleSearch
                 Child = newSSView,
                 Placement = PlacementMode.MousePoint,
                 IsOpen = false,
-                StaysOpen = true,
+                StaysOpen = false,
                 MaxWidth = 250,
                 MaxHeight = 400,
                 MinWidth = 250,
                 MinHeight = 400
             };
-
+          
             try
             {
                 var bindingInCanvs = new CommandBinding(new RoutedUICommand(Header, "SimpleSearchCanvasCommand",
@@ -190,6 +190,8 @@ namespace MonocleViewExtension.SimpleSearch
                 dvm.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
             }
         }
+
+        
 
 
         private static void SimpleSearchInCanvas(ViewLoadedParams p, DynamoViewModel viewModel)
