@@ -42,7 +42,7 @@ namespace MonocleViewExtension.SimpleSearch
 
             try
             {
-                var nse = svm.SelectedNode;
+                var nse = this.Nodes.SelectedItems[0] as NodeSearchElement;
 
                 PlaceNode(svm.dynamoViewModel,nse);
             }
@@ -79,6 +79,11 @@ namespace MonocleViewExtension.SimpleSearch
             var obj = dynMethod.Invoke(nse, new object[] { });
             var nM = obj as NodeModel;
             dvm.ExecuteCommand(new DynamoModel.CreateNodeCommand(nM, 0, 0, true, false));
+
+            if (SimpleSearchCommand.SimpleSearchPopup != null)
+            {
+                SimpleSearchCommand.SimpleSearchPopup.IsOpen = false;
+            }
         }
 
         private void Filter_OnPreviewKeyDown(object sender, KeyEventArgs e)
@@ -98,5 +103,20 @@ namespace MonocleViewExtension.SimpleSearch
                 
             }
         }
+
+        private void Nodes_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                var svm = this.DataContext as SimpleSearchViewModel;
+                svm.SelectedNode = e.AddedItems as NodeSearchElement;
+            }
+            catch (Exception exception)
+            {
+                // suppress for now
+            }
+        }
+
+       
     }
 }

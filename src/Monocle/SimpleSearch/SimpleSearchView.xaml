@@ -15,25 +15,21 @@
             <RowDefinition Height="2"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
         <TextBox VerticalAlignment="Center" Padding="30 4 4 4" Grid.Row="0" Name="Filter" Text="{Binding Path=Filter, UpdateSourceTrigger=PropertyChanged}" FontSize="14" FontFamily="Open Sans" KeyDown="Filter_OnKeyDown" PreviewKeyDown="Filter_OnPreviewKeyDown"/>
         <Image Grid.Row="0" Height="18" Width="18" Margin="4 0 0 0" HorizontalAlignment="Left" Source="/MonocleViewExtension;component/SimpleSearch/Resources/magnifyingGlass.png"/>
 
-
-
-        <ListBox Grid.Row="2"  Height="Auto" Name="Nodes" ItemsSource="{Binding Path=Nodes}"  SelectedItem="{Binding Path=SelectedNode}" Background="Transparent" Foreground="#F1F2F2">
+        <ListBox Grid.Row="2"  Height="Auto" Name="Nodes" ItemsSource="{Binding Path=Nodes}"  SelectedItem="{Binding Path=SelectedNode}" Background="Transparent" Foreground="#F1F2F2" SelectionChanged="Nodes_OnSelectionChanged">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
                         <WrapPanel>
-                            <TextBlock  MouseDown="UIElement_OnMouseDown" Text="{Binding Path=Name}" FontSize="12" FontFamily="Open Sans"  ToolTip="{Binding Path=Description}" VerticalAlignment="Center"/>
-                            <Label  MouseDown="UIElement_OnMouseDown" Content=" | " FontSize="12" FontFamily="Open Sans" VerticalAlignment="Center"/>
-                            <TextBlock  MouseDown="UIElement_OnMouseDown" Text="{Binding Path=FullCategoryName}" FontSize="12" FontFamily="Open Sans"  VerticalAlignment="Center" Width="600"/>
+                            <TextBlock  MouseLeftButtonUp="UIElement_OnMouseDown" Text="{Binding Path=Name}" FontSize="12" FontFamily="Open Sans"  ToolTip="{Binding Path=Description}" VerticalAlignment="Center"/>
+                            <Label MouseLeftButtonUp="UIElement_OnMouseDown" Content=" | " FontSize="12" FontFamily="Open Sans" VerticalAlignment="Center"/>
+                            <TextBlock MouseLeftButtonUp="UIElement_OnMouseDown" Text="{Binding Path=FullCategoryName}" FontSize="12" FontFamily="Open Sans"  VerticalAlignment="Center" Width="600"/>
                         </WrapPanel>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-
     </Grid>
 </UserControl>

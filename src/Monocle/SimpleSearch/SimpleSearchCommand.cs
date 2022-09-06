@@ -1,16 +1,21 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Dynamo.Controls;
+using Dynamo.Graph.Nodes;
 using Dynamo.Logging;
+using Dynamo.Models;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using Dynamo.Wpf.Interfaces;
 using HelixToolkit.Wpf.SharpDX.Utilities;
 using MonocleViewExtension.Utilities;
+using ProtoCore.AST;
+using static Dynamo.ViewModels.SearchViewModel;
 
 namespace MonocleViewExtension.SimpleSearch
 {
@@ -68,9 +73,7 @@ namespace MonocleViewExtension.SimpleSearch
 
             RegisterKeyboardShortcuts(p);
 
-#if DEBUG
             BuildPopup(p);
-#endif
         }
 
         public static void RegisterKeyboardShortcuts(ViewLoadedParams p)
@@ -155,6 +158,7 @@ namespace MonocleViewExtension.SimpleSearch
             var view = p.DynamoWindow as DynamoView;
 
             var dvm = p.DynamoWindow.DataContext as DynamoViewModel;
+
             var newSSView = new SimpleSearchView(dvm);
             SimpleSearchPopup = new Popup
             {
@@ -162,9 +166,9 @@ namespace MonocleViewExtension.SimpleSearch
                 Placement = PlacementMode.MousePoint,
                 IsOpen = false,
                 StaysOpen = true,
-                MaxWidth = 200,
+                MaxWidth = 250,
                 MaxHeight = 400,
-                MinWidth = 200,
+                MinWidth = 250,
                 MinHeight = 400
             };
 
@@ -177,7 +181,7 @@ namespace MonocleViewExtension.SimpleSearch
                     }));
                 bindingInCanvs.Executed += (sender, args) =>
                 {
-                    SimpleSearchInCanvas(p);
+                    SimpleSearchInCanvas(p, dvm);
                 };
                 view.CommandBindings.Add(bindingInCanvs);
             }
@@ -187,10 +191,17 @@ namespace MonocleViewExtension.SimpleSearch
             }
         }
 
-        
-        private static void SimpleSearchInCanvas(ViewLoadedParams p)
+
+        private static void SimpleSearchInCanvas(ViewLoadedParams p, DynamoViewModel viewModel)
         {
-            Dispatcher.CurrentDispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, new Action(() => {
+            //you at least need one node placed for this to work (for now)
+            if (!viewModel.CurrentSpaceViewModel.Nodes.Any())
+            {
+                return;
+            }
+
+            Dispatcher.CurrentDispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, new Action(() =>
+            {
                 SimpleSearchPopup.Child.Visibility = Visibility.Visible;
                 SimpleSearchPopup.Child.UpdateLayout();
                 SimpleSearchPopup.IsOpen = true;
