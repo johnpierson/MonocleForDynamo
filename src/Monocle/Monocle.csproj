@@ -409,6 +409,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
+    <EmbeddedResource Include="Resources\WpfAnimatedGif.dll" />
     <Resource Include="PackageUsage\DogeImages\dwight-pumpkin.gif" />
     <Resource Include="PackageUsage\DogeImages\david-s-pumpkins.gif" />
   </ItemGroup>
