@@ -31,7 +31,7 @@ This package is primarily managed by the author of http://sixtysecondrevit.com, 
 
 ## Updates
 Since there is not currently an update notification process on Dynamo's package manager, I post notifications for updates on twitter.
-[![](https://img.shields.io/twitter/follow/60secondrevit.svg?label=Follow&style=social)](https://twitter.com/60secondrevit)
+[![](https://img.shields.io/twitter/follow/johntpierson.svg?label=Follow&style=social)](https://twitter.com/johntpierson)
 
 Additionally,  updates come through in the extension menu now!
 
