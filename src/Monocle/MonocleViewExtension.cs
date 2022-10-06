@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Dynamo.Controls;
 using Dynamo.PackageManager;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.About;

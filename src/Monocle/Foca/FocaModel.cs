@@ -8,10 +8,12 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Dynamo.Controls;
 using Dynamo.Graph;
+using Dynamo.Graph.Annotations;
 using Dynamo.Graph.Connectors;
 using Dynamo.Graph.Nodes;
 using Dynamo.Graph.Notes;
 using Dynamo.Models;
+using Dynamo.Nodes;
 using Dynamo.Search.SearchElements;
 using Dynamo.Utilities;
 using Dynamo.ViewModels;
@@ -35,8 +37,8 @@ namespace MonocleViewExtension.Foca
             DynamoViewModel = p.DynamoWindow.DataContext as DynamoViewModel;
         }
 
-        
-       
+
+
         #region ToolboxCommands
 
         public void ToolBoxCommand(string command)
@@ -425,8 +427,42 @@ namespace MonocleViewExtension.Foca
                     //silent fail
                 }
             }
-
         }
+
+        public void FixHeaderColors()
+        {
+            //cleanup darker group colors
+            var annotations = MiscUtils.FindVisualChildren<AnnotationView>(dynamoView);
+
+            foreach (var annotation in annotations)
+            {
+                try
+                {
+                    var originalColor = annotation.ViewModel.Background;
+
+                    System.Drawing.Color color = System.Drawing.Color.FromArgb(originalColor.A, originalColor.R, originalColor.G, originalColor.B);
+
+                    var brightness = color.GetBrightness();
+
+                    if (brightness <= 0.5)
+                    {
+                        TextBlock textBlock = annotation.FindName("GroupTextBlock") as TextBlock;
+
+                        textBlock.Foreground = new SolidColorBrush(Colors.White);
+
+                        TextBlock textBlock2 = annotation.FindName("GroupDescriptionTextBlock") as TextBlock;
+
+                        textBlock2.Foreground = new SolidColorBrush(Colors.White);
+                    }
+                }
+                catch (Exception e)
+                {
+
+                }
+              
+            }
+        }
+
 
         public void AlignSelected(string alignment)
         {

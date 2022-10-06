@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Dynamo.Controls;
+using Dynamo.Graph.Annotations;
+using Dynamo.Graph.Workspaces;
 using Dynamo.Logging;
 using Dynamo.Models;
 using Dynamo.UI.Commands;
@@ -114,6 +120,8 @@ namespace MonocleViewExtension.Foca
             Model = model;
             model.LoadedParams.SelectionCollectionChanged += LoadedParamsOnSelectionCollectionChanged;
 
+            model.DynamoViewModel.CurrentSpace.AnnotationAdded += WorkspaceOnAnnotationAdded;
+
             //set color wheel size
             ColorWheelHeight = 48;
             ColorWheelMargin = new Thickness(-36);
@@ -128,6 +136,13 @@ namespace MonocleViewExtension.Foca
             AlignClick = new DelegateCommand(OnAlignClick);
 
             ToolboxClick = new DelegateCommand(OnToolboxClick);
+        }
+
+      
+
+        private void WorkspaceOnAnnotationAdded(AnnotationModel obj)
+        {
+            Model.FixHeaderColors();
         }
 
         public void OnMouseEnter(object o)
