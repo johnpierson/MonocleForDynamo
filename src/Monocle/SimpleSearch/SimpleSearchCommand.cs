@@ -73,8 +73,11 @@ namespace MonocleViewExtension.SimpleSearch
 
             RegisterKeyboardShortcuts(p);
 
-
-            BuildPopup(p);
+            if (Globals.InCanvasSearchEnabled)
+            {
+                BuildPopup(p);
+            }
+            
 
         }
 
