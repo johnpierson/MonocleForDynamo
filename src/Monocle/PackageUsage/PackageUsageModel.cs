@@ -143,7 +143,7 @@ namespace MonocleViewExtension.PackageUsage
             foreach (var nv in nodeViews)
             {
                 var nvm = nv.ViewModel;
-                
+
                 if (IsCustomNode(nvm.NodeModel) && !nvm.NodeModel.Name.ToLower().Contains("relay") && !nvm.NodeModel.Name.ToLower().Contains("remember") && !nvm.NodeModel.Name.ToLower().Contains("gate"))
                 {
                     //try and fail if user is in older dynamo
@@ -167,7 +167,7 @@ namespace MonocleViewExtension.PackageUsage
                             };
                             vb.Visual = rec;
                             border.BorderBrush = vb;
-                            border.BorderThickness = new Thickness(Globals.CustomNodeBorderThickness) ;
+                            border.BorderThickness = new Thickness(Globals.CustomNodeBorderThickness);
                             border.Margin = new Thickness(-Globals.CustomNodeBorderThickness);
                         }
                         else
@@ -239,46 +239,35 @@ namespace MonocleViewExtension.PackageUsage
 
             foreach (var nv in nodeViews)
             {
-                
+
                 var nvm = nv.ViewModel;
 
                 if (nvm.IsSetAsInput)
                 {
                     try
                     {
-                        if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
+
+                        nv.RenderTransform = new RotateTransform(0, nv.RenderSize.Width, (nv.RenderSize.Height / 2) + 14);
+
+                        Storyboard storyboard = new Storyboard();
+                        storyboard.FillBehavior = FillBehavior.Stop;
+
+                        DoubleAnimation doubleAnimation = new DoubleAnimation
                         {
-                            nv.RenderTransform = new RotateTransform(0, nv.RenderSize.Width, (nv.RenderSize.Height/2) + 14);
- 
-                            Storyboard storyboard = new Storyboard();
-                            storyboard.FillBehavior = FillBehavior.Stop;
-                           
-                            DoubleAnimation doubleAnimation = new DoubleAnimation
-                            {
-                                From = 45,
-                                
-                                Duration = new Duration(TimeSpan.FromSeconds(10)),
-                                RepeatBehavior = new RepeatBehavior(1),
-                                EasingFunction = new ElasticEase()
-                                    { EasingMode = EasingMode.EaseOut, Oscillations = 24, Springiness = 8 },
-                               
-                            };
-                            storyboard.Children.Add(doubleAnimation);
-                            Storyboard.SetTarget(doubleAnimation,nv);
-                            Storyboard.SetTargetProperty(doubleAnimation, new PropertyPath("RenderTransform.Angle"));
-                           
-                            storyboard.Begin(nv);
-                        }
-                        else
-                        {
-                            var rect = nv.FindName("nameBackground") as System.Windows.Shapes.Rectangle;
-                            rect.Stroke = new SolidColorBrush(Colors.Aquamarine);
-                            rect.StrokeThickness = 1;
-                            rect.Margin = new Thickness(-1);
-                            rect.RadiusX = 0;
-                            rect.RadiusY = 0;
-                            rect.StrokeDashArray.Clear();
-                        }
+                            From = 45,
+
+                            Duration = new Duration(TimeSpan.FromSeconds(10)),
+                            RepeatBehavior = new RepeatBehavior(1),
+                            EasingFunction = new ElasticEase()
+                            { EasingMode = EasingMode.EaseOut, Oscillations = 24, Springiness = 8 },
+
+                        };
+                        storyboard.Children.Add(doubleAnimation);
+                        Storyboard.SetTarget(doubleAnimation, nv);
+                        Storyboard.SetTargetProperty(doubleAnimation, new PropertyPath("RenderTransform.Angle"));
+
+                        storyboard.Begin(nv);
+
                     }
                     catch (Exception e)
                     {
