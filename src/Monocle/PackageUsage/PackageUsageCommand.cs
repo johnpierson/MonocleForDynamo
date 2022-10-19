@@ -91,7 +91,7 @@ namespace MonocleViewExtension.PackageUsage
         private static void AddCustomNodeHighlighter(MenuItem menuItem, PackageUsageModel m)
         {
             //add the flyout first
-            var highlightFlyout = new MenuItem { Header = "custom node highlighting" };
+            var highlightFlyout = new MenuItem { Header = "node identifiers" };
             menuItem.Items.Add(highlightFlyout);
 
 
@@ -113,6 +113,16 @@ namespace MonocleViewExtension.PackageUsage
             removeHighlightCustomNodes.InputGestureText = "Ctrl + Alt + R";
 
             highlightFlyout.Items.Add(removeHighlightCustomNodes);
+
+            //mega input identifier
+            var inputIdentifier = new MenuItem { Header = "mega input identifier" };
+            inputIdentifier.Click += (sender, args) =>
+            {
+                m.RevealInputs();
+            };
+            inputIdentifier.InputGestureText = "Ctrl + Alt + I";
+
+            highlightFlyout.Items.Add(inputIdentifier);
         }
 
         public static void RegisterKeyboardShortcuts(ViewLoadedParams p, PackageUsageModel m)
@@ -172,7 +182,17 @@ namespace MonocleViewExtension.PackageUsage
                     m.ResetCustomNodeHighlights();
                 };
                 view.CommandBindings.Add(resetHighlight);
-
+                //add the input identifier shortie
+                var identifyInput = new CommandBinding(new RoutedUICommand("IdentifyInput", "IdentifyInputCommand",
+                    typeof(ResourceNames.MainWindow), new InputGestureCollection
+                    {
+                        new KeyGesture(Key.I, ModifierKeys.Control | ModifierKeys.Alt)
+                    }));
+                identifyInput.Executed += (sender, args) =>
+                {
+                    m.RevealInputs();
+                };
+                view.CommandBindings.Add(identifyInput);
             }
             catch (Exception e)
             {

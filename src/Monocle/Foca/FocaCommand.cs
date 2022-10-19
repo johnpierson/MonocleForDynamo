@@ -2,7 +2,6 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 using Dynamo.Controls;
-using Dynamo.Graph.Annotations;
 using Dynamo.Logging;
 using Dynamo.Wpf.Extensions;
 using Dynamo.Wpf.Interfaces;

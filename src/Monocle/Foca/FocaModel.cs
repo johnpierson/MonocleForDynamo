@@ -8,19 +8,14 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Dynamo.Controls;
 using Dynamo.Graph;
-using Dynamo.Graph.Annotations;
 using Dynamo.Graph.Connectors;
 using Dynamo.Graph.Nodes;
-using Dynamo.Graph.Notes;
 using Dynamo.Models;
 using Dynamo.Nodes;
-using Dynamo.Search.SearchElements;
 using Dynamo.Utilities;
 using Dynamo.ViewModels;
-using Dynamo.Views;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.Utilities;
-using ProtoCore.AST.ImperativeAST;
 using Thickness = System.Windows.Thickness;
 
 namespace MonocleViewExtension.Foca
@@ -142,12 +137,17 @@ namespace MonocleViewExtension.Foca
 
             else
             {
+                nodeModel.ClearErrorsAndWarnings();
 
-                var stringData = nodeModel.CachedValue.StringData;
-                if (stringData.Equals("null"))
+                var cachedValue = nodeModel.CachedValue;
+
+                if (cachedValue is null)
                 {
+                    nodeModel.Warning("this node has no data. please run the graph to convert the node.");
                     return;
                 }
+
+                var stringData = cachedValue.StringData;
 
                 switch (creationName)
                 {
@@ -203,8 +203,6 @@ namespace MonocleViewExtension.Foca
         }
         public void Combinify(List<NodeModel> nodeModel)
         {
-
-
             var listCreateSize = nodeModel.Select(n => n.OutPorts.Count).ToList().Sum();
 
             if (listCreateSize.Equals(0)) return;
