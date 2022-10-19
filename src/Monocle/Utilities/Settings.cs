@@ -45,6 +45,9 @@ namespace MonocleViewExtension.Utilities
 
             [XmlElement("IsFocaEnabled")] 
             public bool IsFocaEnabled { get; set; } = true;
+
+            [XmlElement("InCanvasSearchEnabled")]
+            public bool InCanvasSearchEnabled { get; set; } = true;
         }
 
 
@@ -86,6 +89,8 @@ namespace MonocleViewExtension.Utilities
                 Globals.CustomNodeNotePrefix = Utilities.StringUtils.SetCustomNodeNotePrefix(newSettings.CustomNodeNotePrefix);
 
                 Globals.IsFocaEnabled = newSettings.IsFocaEnabled;
+
+                Globals.InCanvasSearchEnabled = newSettings.InCanvasSearchEnabled;
             }
             catch (Exception)
             {
@@ -97,7 +102,7 @@ namespace MonocleViewExtension.Utilities
         {
             try
             {
-                Utilities.Settings.MonocleSettings settings = new Utilities.Settings.MonocleSettings { Settings = Globals.MonocleGroupSettings.Values.ToList(), CustomNodeIdentifierSettings = new CustomNodeIdentifierSettings(){CustomNodeColor = Globals.CustomNodeIdentificationColor.ToString(),BorderThickness = Globals.CustomNodeBorderThickness }, CustomNodeNotePrefix = Globals.CustomNodeNotePrefix, IsFocaEnabled = Globals.IsFocaEnabled};
+                Utilities.Settings.MonocleSettings settings = new Utilities.Settings.MonocleSettings { Settings = Globals.MonocleGroupSettings.Values.ToList(), CustomNodeIdentifierSettings = new CustomNodeIdentifierSettings(){CustomNodeColor = Globals.CustomNodeIdentificationColor.ToString(),BorderThickness = Globals.CustomNodeBorderThickness }, CustomNodeNotePrefix = Globals.CustomNodeNotePrefix, IsFocaEnabled = Globals.IsFocaEnabled, InCanvasSearchEnabled = Globals.InCanvasSearchEnabled };
                 Utilities.Settings.SerializeModels(Globals.SettingsFile, settings);
             }
             catch (Exception e)

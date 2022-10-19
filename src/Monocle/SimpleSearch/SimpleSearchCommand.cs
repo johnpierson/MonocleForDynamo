@@ -73,7 +73,9 @@ namespace MonocleViewExtension.SimpleSearch
 
             RegisterKeyboardShortcuts(p);
 
+
             BuildPopup(p);
+
         }
 
         public static void RegisterKeyboardShortcuts(ViewLoadedParams p)
