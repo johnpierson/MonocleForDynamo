@@ -4,10 +4,12 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Effects;
 using System.Windows.Shapes;
 using Dynamo.Controls;
 using Dynamo.Graph.Nodes;
@@ -18,8 +20,9 @@ using Dynamo.Search.SearchElements;
 using Dynamo.Utilities;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
-using HelixToolkit.Wpf.SharpDX.Animations;
 using MonocleViewExtension.Utilities;
+using SharpDX.Direct2D1.Effects;
+using Border = System.Windows.Controls.Border;
 using Path = System.IO.Path;
 using Thickness = System.Windows.Thickness;
 
@@ -205,31 +208,36 @@ namespace MonocleViewExtension.PackageUsage
                     //try and fail if user is in older dynamo
                     try
                     {
-                        if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
-                        {
-                            var border = (Border)nv.FindName("nodeBorder");
-
-                            border.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF9F9F9"));
-                            border.BorderThickness = new Thickness(1);
-                            border.CornerRadius = new CornerRadius(8, 8, 0, 0);
-                            border.Margin = new Thickness(-1);
-                        }
-                        else
-                        {
-                            var rect = nv.FindName("nodeBorder") as System.Windows.Shapes.Rectangle;
-                            rect.Stroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF5E5C5A"));
-                            rect.StrokeThickness = 1;
-                            rect.Margin = new Thickness(-1);
-                            rect.RadiusX = 0;
-                            rect.RadiusY = 0;
-                            rect.StrokeDashArray.Clear();
-                        }
+                        ResetNodeColor(nv);
                     }
                     catch (Exception e)
                     {
                         dynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
                     }
                 }
+            }
+        }
+
+        public void ResetNodeColor(NodeView nv)
+        {
+            if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
+            {
+                var border = (Border)nv.FindName("nodeBorder");
+
+                border.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF9F9F9"));
+                border.BorderThickness = new Thickness(1);
+                border.CornerRadius = new CornerRadius(8, 8, 0, 0);
+                border.Margin = new Thickness(-1);
+            }
+            else
+            {
+                var rect = nv.FindName("nodeBorder") as System.Windows.Shapes.Rectangle;
+                rect.Stroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF5E5C5A"));
+                rect.StrokeThickness = 1;
+                rect.Margin = new Thickness(-1);
+                rect.RadiusX = 0;
+                rect.RadiusY = 0;
+                rect.StrokeDashArray.Clear();
             }
         }
 
@@ -237,46 +245,79 @@ namespace MonocleViewExtension.PackageUsage
         {
             var nodeViews = MiscUtils.FindVisualChildren<NodeView>(dynamoView);
 
-            foreach (var nv in nodeViews)
+            var inputNodeViews = nodeViews.Where(n => n.ViewModel.IsInput).ToList();
+
+            if (!inputNodeViews.Any()) return;
+
+            foreach (var inv in inputNodeViews)
             {
+                ResetNodeColor(inv);
+            }
 
-                var nvm = nv.ViewModel;
 
-                if (nvm.IsSetAsInput)
+            var markedAsinputNodeViews = inputNodeViews.Where(n => n.ViewModel.IsSetAsInput).ToList();
+
+            Storyboard storyboard = new Storyboard
+            {
+                FillBehavior = FillBehavior.Stop
+            };
+
+            ColorAnimation colorAnimation = new ColorAnimation(Colors.Transparent, Colors.Aquamarine, TimeSpan.FromSeconds(5), FillBehavior.Stop);
+
+            colorAnimation.RepeatBehavior = new RepeatBehavior(1);
+
+            DoubleAnimation doubleAnimation = new DoubleAnimation
+            {
+                From = 45,
+                Duration = new Duration(TimeSpan.FromSeconds(10)),
+                RepeatBehavior = new RepeatBehavior(1),
+                EasingFunction = new ElasticEase()
+                    { EasingMode = EasingMode.EaseOut, Oscillations = 24, Springiness = 8 },
+
+            };
+            storyboard.Children.Add(doubleAnimation);
+            storyboard.Children.Add(colorAnimation);
+
+            foreach (var nv in markedAsinputNodeViews)
+            {
+                try
                 {
-                    try
+                    nv.RenderTransform = new RotateTransform(0, nv.RenderSize.Width, (nv.RenderSize.Height / 2) + 14);
+                    Storyboard.SetTarget(doubleAnimation, nv);
+                    Storyboard.SetTargetProperty(doubleAnimation, new PropertyPath("RenderTransform.Angle"));
+
+                    if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
                     {
-
-                        nv.RenderTransform = new RotateTransform(0, nv.RenderSize.Width, (nv.RenderSize.Height / 2) + 14);
-
-                        Storyboard storyboard = new Storyboard();
-                        storyboard.FillBehavior = FillBehavior.Stop;
-
-                        DoubleAnimation doubleAnimation = new DoubleAnimation
-                        {
-                            From = 45,
-
-                            Duration = new Duration(TimeSpan.FromSeconds(10)),
-                            RepeatBehavior = new RepeatBehavior(1),
-                            EasingFunction = new ElasticEase()
-                            { EasingMode = EasingMode.EaseOut, Oscillations = 24, Springiness = 8 },
-
-                        };
-                        storyboard.Children.Add(doubleAnimation);
-                        Storyboard.SetTarget(doubleAnimation, nv);
-                        Storyboard.SetTargetProperty(doubleAnimation, new PropertyPath("RenderTransform.Angle"));
-
-                        storyboard.Begin(nv);
-
+                        var border = (Border)nv.FindName("nodeBorder");
+                        border.BorderBrush = new SolidColorBrush(Colors.Aquamarine);
+                        border.BorderThickness = new Thickness(Globals.CustomNodeBorderThickness + 2);
+                        border.CornerRadius = new CornerRadius(8, 8, 0, 0);
+                        border.Margin = new Thickness(-1);
+                        
+                        Storyboard.SetTarget(colorAnimation, border);
+                        Storyboard.SetTargetProperty(colorAnimation, new PropertyPath("(Border.BorderBrush).(SolidColorBrush.Color)"));
                     }
-                    catch (Exception e)
+                    else
                     {
-                        dynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
+                        var rect = nv.FindName("nodeBorder") as System.Windows.Shapes.Rectangle;
+                        rect.Stroke = new SolidColorBrush(Colors.Aquamarine);
+                        rect.StrokeThickness = Globals.CustomNodeBorderThickness + 2;
+                        rect.Margin = new Thickness(-Globals.CustomNodeBorderThickness + 2);
+                        rect.RadiusX = 4;
+                        rect.RadiusY = 4;
                     }
+
+                    storyboard.Begin();
+                }
+                catch (Exception e)
+                {
+                    dynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
                 }
             }
+            
         }
 
+       
 
         public List<string> GetCustomPackageList()
         {
