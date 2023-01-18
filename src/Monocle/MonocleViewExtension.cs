@@ -91,7 +91,7 @@ namespace MonocleViewExtension
             
 
 #if DEBUG
-            SnippetsCommand.AddMenuItem(monocleMenuItem,p);
+            SnippetsCommand.AddMenuItem(monocleMenuItem,p,this);
             PhotocopierCommand.AddMenuItem(monocleMenuItem,p);
             NodeDocumentationCommand.AddMenuItem(monocleMenuItem,p);
 #endif

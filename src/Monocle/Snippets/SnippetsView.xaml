@@ -6,15 +6,11 @@
              xmlns:local="clr-namespace:MonocleViewExtension.Snippets"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" FontSize="18">
-    <Window.Resources>
-        <local:Base64ImageConverter x:Key="Base64ImageConverter"/>
-        <local:ImageData x:Key="ImageData"/>
-    </Window.Resources>
     <Grid Name="MainGrid" Margin="8">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="42"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="42"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="120"/>
@@ -24,21 +20,14 @@
             <Button Grid.Column="0" Content="Pick Path" Command="{Binding LoadSnippets}"/>
             <TextBox Grid.Column="2" VerticalContentAlignment="Center" Padding="8" Text="{Binding DirectoryPath, FallbackValue=path to your dyns}"/>
         </Grid>
-        <ListBox Grid.Row="1" ItemsSource="{Binding Path=WorkspaceSnippets}" Name="Snippets" SelectionMode="Single">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <WrapPanel Width="Auto">
-                        <Button Margin="8" Width="200" Height="200" Click="ButtonBase_OnClick">
-                            <Button.Background>
-                                <ImageBrush ImageSource="{Binding Thumbnail, Converter={StaticResource Base64ImageConverter}}" Stretch="Uniform"/>
-                            </Button.Background>
-                            <TextBlock Text="{Binding Path=Name}" FontSize="12" FontFamily="Open Sans"  VerticalAlignment="Center"/>
-                        </Button>
-                    </WrapPanel>
-                </DataTemplate>
-                </ListBox.ItemTemplate>
-        </ListBox>
-     <!--<WrapPanel Grid.Row="1">
+        <ItemsControl Grid.Row="1" ItemsSource="{Binding Path=WorkspaceButtons}" Name="Snippets">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel IsItemsHost="True"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+        <!--<WrapPanel Grid.Row="1">
          <Button Content="A" Padding="12" Margin="8"/>
          <Button Content="A" Padding="12" Margin="8"/>
          <Button Content="A" Padding="12" Margin="8"/>

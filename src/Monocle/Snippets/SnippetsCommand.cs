@@ -12,18 +12,21 @@ namespace MonocleViewExtension.Snippets
 {
     internal class SnippetsCommand
     {
+        internal static DynamoViewModel dvm;
+        internal static ViewLoadedParams vp;
         /// <summary>
         /// Create the snippets menu
         /// </summary>
         /// <param name="menuItem">monocle menu item</param>
         /// <param name="p">our view loaded parameters for dynamo</param>
-        public static void AddMenuItem(MenuItem menuItem, ViewLoadedParams p)
+        public static void AddMenuItem(MenuItem menuItem, ViewLoadedParams p, MonocleViewExtension monocle)
         {
-            var dvm = p.DynamoWindow.DataContext as DynamoViewModel;
+            vp = p;
+            dvm = p.DynamoWindow.DataContext as DynamoViewModel;
 
-            var graphResizererMenu = new MenuItem { Header = $"snippets" };
+            var snippetsMenu = new MenuItem { Header = $"snippets", IsCheckable = true};
 
-            graphResizererMenu.Click += (sender, args) =>
+            snippetsMenu.Checked += (sender, args) =>
             {
                 var m = new SnippetsModel(dvm, p);
                 var viewModel = new SnippetsViewModel(m);
@@ -35,12 +38,16 @@ namespace MonocleViewExtension.Snippets
                     // Set the owner of the window to the Dynamo window.
                     Owner = p.DynamoWindow
                 };
-
-                window.Show();
+                p.AddToExtensionsSideBar(monocle, window);
+            };
+            snippetsMenu.Unchecked += (sender, args) =>
+            {
+                p.CloseExtensioninInSideBar(monocle);
             };
 
             //add the graph resizerer menu
-            menuItem.Items.Add(graphResizererMenu);
+                menuItem.Items.Add(snippetsMenu);
         }
+
     }
 }
