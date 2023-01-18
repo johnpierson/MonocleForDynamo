@@ -15,6 +15,7 @@ using MonocleViewExtension.NodeDocumentation;
 using MonocleViewExtension.PackageUsage;
 using MonocleViewExtension.Photocopier;
 using MonocleViewExtension.SimpleSearch;
+using MonocleViewExtension.Snippets;
 using MonocleViewExtension.StandardViews;
 using MonocleViewExtension.Utilities;
 
@@ -90,6 +91,7 @@ namespace MonocleViewExtension
             
 
 #if DEBUG
+            SnippetsCommand.AddMenuItem(monocleMenuItem,p);
             PhotocopierCommand.AddMenuItem(monocleMenuItem,p);
             NodeDocumentationCommand.AddMenuItem(monocleMenuItem,p);
 #endif

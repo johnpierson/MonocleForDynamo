@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Dynamo.Search.SearchElements;
+using MonocleViewExtension.SimpleSearch;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Dynamo.Graph.Workspaces;
 
 namespace MonocleViewExtension.Snippets
 {
@@ -23,6 +26,15 @@ namespace MonocleViewExtension.Snippets
         public SnippetsView()
         {
             InitializeComponent();
+        }
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            var button = (Button)sender;
+            var hwm = button.DataContext as HomeWorkspaceModel;
+
+ 
+
         }
     }
 }
