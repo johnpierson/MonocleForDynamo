@@ -289,6 +289,12 @@
       <DependentUpon>SimpleSearchView.xaml</DependentUpon>
     </Compile>
     <Compile Include="SimpleSearch\SimpleSearchViewModel.cs" />
+    <Compile Include="Snippets\SnippetsCommand.cs" />
+    <Compile Include="Snippets\SnippetsModel.cs" />
+    <Compile Include="Snippets\SnippetsView.xaml.cs">
+      <DependentUpon>SnippetsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Snippets\SnippetsViewModel.cs" />
     <Compile Include="StandardViews\CameraController.cs" />
     <Compile Include="StandardViews\StandardViews.xaml.cs">
       <DependentUpon>StandardViews.xaml</DependentUpon>
@@ -356,6 +362,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="SimpleSearch\SimpleSearchView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Snippets\SnippetsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
