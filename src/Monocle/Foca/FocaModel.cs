@@ -362,7 +362,20 @@ namespace MonocleViewExtension.Foca
             double yMax = yAxis.Max() + 14;
             return new Rect(xMin, yMin, xMax - xMin, yMax - yMin);
         }
+        private AnnotationViewModel GetGroup(NodeModel nodeModel)
+        {
+            var annotations = DynamoViewModel.CurrentSpaceViewModel.Annotations;
+            foreach (var annotation in annotations)
+            {
+                var nodes = annotation.Nodes.ToList();
+                if (nodes.Any(n => n.GUID.Equals(nodeModel.GUID)))
+                {
+                    return annotation;
+                }
+            }
 
+            return null;
+        }
         public void CreateGroup(string groupName)
         {
             Globals.MonocleGroupSettings.TryGetValue(groupName, out Settings.GroupSetting groupSetting);
@@ -377,37 +390,50 @@ namespace MonocleViewExtension.Foca
             {
                 DynamoModel.CreateAnnotationCommand annotationCommand;
                 var currentSelection = DynamoViewModel.CurrentSpace.CurrentSelection.First();
-                string caseSwitch = currentSelection.GetType().Name;
-                switch (caseSwitch)
+
+                string caseSwitch = currentSelection.GetType().ToString();
+
+                var group = GetGroup(currentSelection);
+
+
+                if (group != null)
                 {
-                    case "AnnotationModel":
-                        AnnotationViewModel am = DynamoViewModel.CurrentSpaceViewModel.Annotations.First(a => a.AnnotationModel.GUID == currentSelection.GUID);
-                        am.Background = colorToUse;
-                        am.FontSize = fontSize;
-                        break;
-                    case "NodeModel":
+                    group.Background = colorToUse;
+                    group.FontSize = fontSize;
+                    return;
+                }
+
+
+                if (caseSwitch.Contains("AnnotationModel"))
+                {
+                    AnnotationViewModel am = DynamoViewModel.CurrentSpaceViewModel.Annotations.First(a => a.AnnotationModel.GUID == currentSelection.GUID);
+                    am.Background = colorToUse;
+                    am.FontSize = fontSize;
+                }
+                if (caseSwitch.Contains("NodeModel"))
+                {
+                    annotationCommand =
+                        new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
+                            currentSelection.CenterX, currentSelection.CenterY, false);
+                    DynamoViewModel.Model.ExecuteCommand(annotationCommand);
+                    DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().FontSize = fontSize;
+                    DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().Background = colorToUse;
+                }
+                else
+                {
+                    try
+                    {
                         annotationCommand =
                             new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
                                 currentSelection.CenterX, currentSelection.CenterY, false);
                         DynamoViewModel.Model.ExecuteCommand(annotationCommand);
                         DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().FontSize = fontSize;
                         DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().Background = colorToUse;
-                        break;
-                    default:
-                        try
-                        {
-                            annotationCommand =
-                                new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
-                                    currentSelection.CenterX, currentSelection.CenterY, false);
-                            DynamoViewModel.Model.ExecuteCommand(annotationCommand);
-                            DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().FontSize = fontSize;
-                            DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().Background = colorToUse;
-                        }
-                        catch (Exception)
-                        {
-                            //silent fail
-                        }
-                        break;
+                    }
+                    catch (Exception)
+                    {
+                        //silent fail
+                    }
                 }
             }
             else //for notes
@@ -687,7 +713,7 @@ namespace MonocleViewExtension.Foca
                 if (anno.PreviewState.Equals(PreviewState.Selection))
                 {
                     //add the group
-                    wrappedNodes.Add(new SuperNode() { Object = anno, GUID = anno.AnnotationModel.GUID.ToString(), CenterX = anno.AnnotationModel.CenterX, CenterY = anno.AnnotationModel.CenterY, X = anno.AnnotationModel.X, Y = anno.AnnotationModel.Y });
+                    wrappedNodes.Add(new SuperNode() {GUID = anno.AnnotationModel.GUID.ToString(), CenterX = anno.AnnotationModel.CenterX, CenterY = anno.AnnotationModel.CenterY, X = anno.AnnotationModel.X, Y = anno.AnnotationModel.Y});
 
                     foreach (var node in anno.Nodes)
                     {

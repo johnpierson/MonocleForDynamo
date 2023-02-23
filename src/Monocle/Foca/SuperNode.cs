@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using Dynamo.Graph;
+using Dynamo.Graph.Annotations;
 using Dynamo.Graph.Nodes;
 using Dynamo.Graph.Notes;
 using Dynamo.ViewModels;
@@ -8,18 +10,18 @@ namespace MonocleViewExtension.Foca
 {
     public class SuperNode
     {
-        public string ObjectType => this.Object.GetType().ToString();
         public object Object { get; set; }
+        public string ObjectType => this.Object.GetType().ToString();
+        public string GUID { get; set; }
+        public DynamoViewModel DVM { get; set; }
         private double _x;
         private double _y;
         private double _centerX;
         private double _centerY;
-        public string GUID { get; set; }
-
         private double _width;
         private double _height;
 
-
+        
         public double Width
         {
             get
