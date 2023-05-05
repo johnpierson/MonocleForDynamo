@@ -7,9 +7,32 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace MonocleViewExtension.Utilities
 {
+    internal static class ImageUtils
+    {
+        public static BitmapImage LoadImage(Assembly a, string name)
+        {
+            var img = new BitmapImage();
+            try
+            {
+                var resourceName = a.GetManifestResourceNames().FirstOrDefault(x => x.Contains(name));
+                var stream = a.GetManifestResourceStream(resourceName);
+
+                img.BeginInit();
+                img.StreamSource = stream;
+                img.EndInit();
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
+
+            return img;
+        }
+    }
     public static class MiscUtils
     {
         public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject

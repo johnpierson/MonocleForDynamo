@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using Dynamo.Controls;
 using Dynamo.PackageManager;
 using Dynamo.Wpf.Extensions;
@@ -94,7 +97,40 @@ namespace MonocleViewExtension
             SnippetsCommand.AddMenuItem(monocleMenuItem,p,this);
             PhotocopierCommand.AddMenuItem(monocleMenuItem,p);
             NodeDocumentationCommand.AddMenuItem(monocleMenuItem,p);
+
+
+            MenuItem myDynamoNoWorkie = new MenuItem
+            {
+                Header = "My Dynamo is not loading correctly."
+            };
+
+            MenuItem jacobSmallSpecial = new MenuItem
+            {
+                Header = "Invoke the Jacob Small Special™️ ??"
+            };
+            var img = new System.Windows.Controls.Image
+            {
+                Source = ImageUtils.LoadImage(Assembly.GetExecutingAssembly(), "smalls.JPG"),
+                Height = 32,
+                Width = 32,
+                Stretch = Stretch.Uniform
+            };
+            WrapPanel wrapPanel = new WrapPanel();
+            wrapPanel.Children.Add(img);
+            wrapPanel.Children.Add(jacobSmallSpecial);
+
+            jacobSmallSpecial.Click+= (sender, args) =>
+            {
+                Process.Start(@"https://forum.dynamobim.com/t/2022-1-latest-revit-update-broke-dynamo/73412/3");
+            };
+
+            myDynamoNoWorkie.Items.Add(wrapPanel);
+
+            p.AddMenuItem(MenuBarType.Help, myDynamoNoWorkie);
 #endif
+
+
+
             /*if the user has plugins loaded in Revit (or otherwise) that use a toolkit called "DevExpress",
             we fix the overrides that toolkit forces on the app.
             A popular example of this is KiwiCodes Family Browser R3.

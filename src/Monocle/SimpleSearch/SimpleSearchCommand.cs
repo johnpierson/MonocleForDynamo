@@ -135,17 +135,20 @@ namespace MonocleViewExtension.SimpleSearch
             var dvm = p.DynamoWindow.DataContext as DynamoViewModel;
             ssView = new SimpleSearchView(dvm);
 
-            ssView.Unloaded += ViewOnUnloaded;
+            //ssView.Unloaded += ViewOnUnloaded;
             p.AddToExtensionsSideBar(m, ssView);
-        }
 
+
+        }
+        
+        
         private static Window ssWindow;
         private static void SimpleSearchWindow(ViewLoadedParams p, MonocleViewExtension m)
         {
             var dvm = p.DynamoWindow.DataContext as DynamoViewModel;
             ssView = new SimpleSearchView(dvm);
 
-            ssView.Unloaded += ViewOnUnloaded;
+            //ssView.Unloaded += ViewOnUnloaded;
 
             ssWindow = new Window
             {
