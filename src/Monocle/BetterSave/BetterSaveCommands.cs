@@ -34,6 +34,22 @@ namespace MonocleViewExtension.BetterSave
 
             flyout.Items.Add(quickSave);
 
+            //save with new guids
+            var saveWithNewGuids = new MenuItem
+            {
+                Header = "Save With New Guids",
+                ToolTip = "You may not know this, but Dynamo (before 2.18) saves workspace with duplicate GUIDs which sucks. This fixes that."
+            };
+
+            saveWithNewGuids.Click += (sender, args) =>
+            {
+                m.BetterSave("SaveWithNewGuids");
+            };
+
+            flyout.Items.Add(saveWithNewGuids);
+
+            
+
             foreach (MenuItem menu in p.dynamoMenu.Items)
             {
                 if (menu.Name.Equals("fileMenu"))

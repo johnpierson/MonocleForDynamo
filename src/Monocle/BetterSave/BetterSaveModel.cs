@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web.ModelBinding;
 using Dynamo.Controls;
 using Dynamo.Graph;
 using Dynamo.Graph.Connectors;
@@ -40,7 +43,51 @@ namespace MonocleViewExtension.BetterSave
                 case "QuickSave":
                     dynamoViewModel.SaveAs(nameWithTimestamp, SaveContext.Copy,true);
                     break;
+                case "SaveWithNewGuids":
+                    MakeWorkspaceUnique(originalName);
+                    break;
             }
+        }
+
+        private void MakeWorkspaceUnique(string path)
+        {
+            //first save it as is
+            dynamoViewModel.SaveAs(path, SaveContext.Save, false);
+
+            //close it
+            dynamoViewModel.CloseHomeWorkspaceCommand.Execute(null);
+
+
+            string jsonData = File.ReadAllText(path);
+
+            string pattern = @"([a-z0-9]{32})";
+            string updatedJsonData = jsonData;
+
+            // The unique collection of Guids
+            var mc = Regex.Matches(jsonData, pattern)
+                .Cast<Match>()
+                .Select(m => m.Value)
+                .Distinct();
+
+            foreach (var match in mc)
+            {
+                updatedJsonData = updatedJsonData.Replace(match, Guid.NewGuid().ToString("N"));
+            }
+
+            //file uuid match
+            string filePattern = @"([a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12})";
+            var fileMc = Regex.Matches(updatedJsonData, filePattern).Cast<Match>().Select(m => m.Value).Distinct();
+            foreach (var match in fileMc)
+            {
+                updatedJsonData = updatedJsonData.Replace(match, Guid.NewGuid().ToString());
+            }
+
+            File.WriteAllText(path,updatedJsonData);
+
+
+            //reopen it
+            dynamoViewModel.OpenCommand.Execute(path);
+            
         }
     }
 }
