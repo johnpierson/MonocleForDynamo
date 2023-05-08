@@ -10,6 +10,7 @@ using Dynamo.Controls;
 using Dynamo.PackageManager;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.About;
+using MonocleViewExtension.BetterSave;
 using MonocleViewExtension.FancyPaste;
 using MonocleViewExtension.Foca;
 using MonocleViewExtension.GraphResizerer;
@@ -91,7 +92,7 @@ namespace MonocleViewExtension
             StandardViewsCommand.EnableStandardViews(p);
             MonocleSettingsCommand.AddMenuItem(monocleMenuItem);
             FancyPasteCommand.AddMenuItem(p);
-            
+            BetterSaveCommand.AddMenuItem(p);
 
 #if DEBUG
             SnippetsCommand.AddMenuItem(monocleMenuItem,p,this);

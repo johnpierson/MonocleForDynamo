@@ -240,6 +240,8 @@
       <DependentUpon>AboutView.xaml</DependentUpon>
     </Compile>
     <Compile Include="About\AboutViewModel.cs" />
+    <Compile Include="BetterSave\BetterSaveModel.cs" />
+    <Compile Include="BetterSave\BetterSaveCommands.cs" />
     <Compile Include="FancyPaste\ExamineClipboardView.xaml.cs">
       <DependentUpon>ExamineClipboardView.xaml</DependentUpon>
     </Compile>

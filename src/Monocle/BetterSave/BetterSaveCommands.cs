@@ -6,59 +6,60 @@ using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using Dynamo.Wpf.Interfaces;
 
-namespace MonocleViewExtension.FancyPaste
+namespace MonocleViewExtension.BetterSave
 {
-    internal class FancyPasteCommand
+    internal class BetterSaveCommand
     {
         public static void AddMenuItem(ViewLoadedParams p)
         {
             var dvm = p.DynamoWindow.DataContext as DynamoViewModel;
-            var m = new FancyPasteModel(dvm, p);
+            var m = new BetterSaveModel(dvm, p);
 
             var flyout = new MenuItem
             {
-                Header = "Fancy Paste",
-                ToolTip = "More paste options. Inspired by Grasshopper v2's \"Paste Exotic\". Brought to you by monocle™️."
+                Header = "Better Save",
+                ToolTip = "Better save options. Because you deserve it. Brought to you by monocle™️"
             };
-            var pasteWithoutWires = new MenuItem
+            var quickSave = new MenuItem
             {
-                Header = "Paste Without Wires",
-                InputGestureText = "Ctrl + Shift + V"
+                Header = "Quick Save",
+                InputGestureText = "Ctrl + Alt + S",
+                ToolTip = "Provides a quick date/time stamped \"snapshot\" of the current file."
             };
 
-            pasteWithoutWires.Click += (sender, args) =>
+            quickSave.Click += (sender, args) =>
             {
-                m.FancyPaste("PasteWithoutWires");
+                m.BetterSave("QuickSave");
             };
 
-            flyout.Items.Add(pasteWithoutWires);
+            flyout.Items.Add(quickSave);
 
             foreach (MenuItem menu in p.dynamoMenu.Items)
             {
-                if (menu.Name.Equals("editMenu"))
+                if (menu.Name.Equals("fileMenu"))
                 {
-                    menu.Items.Insert(5, flyout);
+                    menu.Items.Insert(7, flyout);
                 }
             }
 
             RegisterKeyboardShortcuts(p, m);
         }
 
-        private static void RegisterKeyboardShortcuts(ViewLoadedParams p, FancyPasteModel m)
+        private static void RegisterKeyboardShortcuts(ViewLoadedParams p, BetterSaveModel m)
         {
             var view = p.DynamoWindow as DynamoView;
 
             try
             {
                 //Paste without wires
-                var pasteWithoutWires = new CommandBinding(new RoutedUICommand("AlignBottom", "AlignBottomCommand",
+                var pasteWithoutWires = new CommandBinding(new RoutedUICommand("QuickSave", "QuickSaveCommand",
                     typeof(ResourceNames.MainWindow), new InputGestureCollection
                     {
-                        new KeyGesture(Key.V, ModifierKeys.Control | ModifierKeys.Shift)
+                        new KeyGesture(Key.S, ModifierKeys.Alt | ModifierKeys.Control)
                     }));
                 pasteWithoutWires.Executed += (sender, args) =>
                 {
-                    m.FancyPaste("PasteWithoutWires");
+                    m.BetterSave("QuickSave");
                 };
                 view.CommandBindings.Add(pasteWithoutWires);
             }

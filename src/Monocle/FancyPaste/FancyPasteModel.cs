@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Dynamo.Controls;
 using Dynamo.Graph.Connectors;
 using Dynamo.Utilities;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 
-namespace MonocleViewExtension.PasteExtravagant
+namespace MonocleViewExtension.FancyPaste
 {
     internal class FancyPasteModel
     {

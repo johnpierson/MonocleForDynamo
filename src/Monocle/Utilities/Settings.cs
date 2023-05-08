@@ -48,6 +48,8 @@ namespace MonocleViewExtension.Utilities
 
             [XmlElement("InCanvasSearchEnabled")]
             public bool InCanvasSearchEnabled { get; set; } = true;
+            [XmlElement("QuickSaveDateFormat")]
+            public string QuickSaveDateFormat { get; set; } = "-yyyy.MM.dd_HH.mm.ss";
         }
 
 
@@ -91,6 +93,8 @@ namespace MonocleViewExtension.Utilities
                 Globals.IsFocaEnabled = newSettings.IsFocaEnabled;
 
                 Globals.InCanvasSearchEnabled = newSettings.InCanvasSearchEnabled;
+
+                Globals.QuickSaveDateFormat = newSettings.QuickSaveDateFormat;
             }
             catch (Exception)
             {
@@ -102,7 +106,7 @@ namespace MonocleViewExtension.Utilities
         {
             try
             {
-                Utilities.Settings.MonocleSettings settings = new Utilities.Settings.MonocleSettings { Settings = Globals.MonocleGroupSettings.Values.ToList(), CustomNodeIdentifierSettings = new CustomNodeIdentifierSettings(){CustomNodeColor = Globals.CustomNodeIdentificationColor.ToString(),BorderThickness = Globals.CustomNodeBorderThickness }, CustomNodeNotePrefix = Globals.CustomNodeNotePrefix, IsFocaEnabled = Globals.IsFocaEnabled, InCanvasSearchEnabled = Globals.InCanvasSearchEnabled };
+                Utilities.Settings.MonocleSettings settings = new Utilities.Settings.MonocleSettings { Settings = Globals.MonocleGroupSettings.Values.ToList(), CustomNodeIdentifierSettings = new CustomNodeIdentifierSettings(){CustomNodeColor = Globals.CustomNodeIdentificationColor.ToString(),BorderThickness = Globals.CustomNodeBorderThickness }, CustomNodeNotePrefix = Globals.CustomNodeNotePrefix, IsFocaEnabled = Globals.IsFocaEnabled, InCanvasSearchEnabled = Globals.InCanvasSearchEnabled, QuickSaveDateFormat = Globals.QuickSaveDateFormat};
                 Utilities.Settings.SerializeModels(Globals.SettingsFile, settings);
             }
             catch (Exception e)
