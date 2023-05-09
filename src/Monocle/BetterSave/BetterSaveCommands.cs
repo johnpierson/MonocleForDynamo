@@ -1,25 +1,32 @@
 ﻿using System;
-using System.Windows.Controls;
+using System.Linq;
+using System.Windows.Forms;
 using System.Windows.Input;
 using Dynamo.Controls;
+using Dynamo.Graph.Workspaces;
+using Dynamo.Nodes.Prompts;
+using Dynamo.UI.Prompts;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using Dynamo.Wpf.Interfaces;
+using MenuItem = System.Windows.Controls.MenuItem;
 
 namespace MonocleViewExtension.BetterSave
 {
     internal class BetterSaveCommand
     {
+        private static BetterSaveModel betterSaveModel;
         public static void AddMenuItem(ViewLoadedParams p)
         {
             var dvm = p.DynamoWindow.DataContext as DynamoViewModel;
-            var m = new BetterSaveModel(dvm, p);
+            betterSaveModel = new BetterSaveModel(dvm, p);
 
             var flyout = new MenuItem
             {
                 Header = "Better Save",
                 ToolTip = "Better save options. Because you deserve it. Brought to you by monocle™️"
             };
+            //quick save with timestamp
             var quickSave = new MenuItem
             {
                 Header = "Quick Save",
@@ -29,7 +36,7 @@ namespace MonocleViewExtension.BetterSave
 
             quickSave.Click += (sender, args) =>
             {
-                m.BetterSave("QuickSave");
+                betterSaveModel.BetterSave("QuickSave");
             };
 
             flyout.Items.Add(quickSave);
@@ -43,12 +50,25 @@ namespace MonocleViewExtension.BetterSave
 
             saveWithNewGuids.Click += (sender, args) =>
             {
-                m.BetterSave("SaveWithNewGuids");
+                betterSaveModel.BetterSave("SaveWithNewGuids");
             };
 
             flyout.Items.Add(saveWithNewGuids);
 
-            
+            //sloppy save with random words
+            var sloppySave = new MenuItem
+            {
+                Header = "Sloppy Save",
+                ToolTip = "Quickly save your file to your desktop, because you knew you were going to anyway."
+            };
+
+            sloppySave.Click += (sender, args) =>
+            {
+                betterSaveModel.BetterSave("SloppySave");
+            };
+
+            flyout.Items.Add(sloppySave);
+
 
             foreach (MenuItem menu in p.dynamoMenu.Items)
             {
@@ -58,8 +78,29 @@ namespace MonocleViewExtension.BetterSave
                 }
             }
 
-            RegisterKeyboardShortcuts(p, m);
+            RegisterKeyboardShortcuts(p, betterSaveModel);
+
+
+            p.CurrentWorkspaceClearingStarted += POnCurrentWorkspaceClearingStarted;
         }
+
+        private static void POnCurrentWorkspaceClearingStarted(IWorkspaceModel obj)
+        {
+            if(!obj.Nodes.Any()) return;
+            
+            //Dynamo.UI.Prompts.GenericTaskDialog dialog = new GenericTaskDialog();
+            //dialog.ShowDialog(); tODO: Make this dialog dynamo-ey
+
+            var result = MessageBox.Show("sloppy save file?", "sloppy save to desktop", MessageBoxButtons.YesNo);
+
+            if (result == DialogResult.Yes)
+            {
+                betterSaveModel.BetterSave("SloppySave");
+            }
+           
+        }
+
+      
 
         private static void RegisterKeyboardShortcuts(ViewLoadedParams p, BetterSaveModel m)
         {

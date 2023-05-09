@@ -30,7 +30,11 @@ namespace MonocleViewExtension.BetterSave
         }
         public void BetterSave(string command)
         {
-            if(string.IsNullOrWhiteSpace(dynamoViewModel.CurrentSpace.FileName)) return;
+            if (string.IsNullOrWhiteSpace(dynamoViewModel.CurrentSpace.FileName))
+            {
+                SloppySave();
+                return;
+            };
 
             var originalName = dynamoViewModel.CurrentSpace.FileName;
 
@@ -45,6 +49,9 @@ namespace MonocleViewExtension.BetterSave
                     break;
                 case "SaveWithNewGuids":
                     MakeWorkspaceUnique(originalName);
+                    break;
+                case "SloppySave":
+                    SloppySave();
                     break;
             }
         }
@@ -87,7 +94,46 @@ namespace MonocleViewExtension.BetterSave
 
             //reopen it
             dynamoViewModel.OpenCommand.Execute(path);
-            
         }
+
+        private void SloppySave()
+        {
+            var dogeWords = new List<string>()
+            {
+                "very",
+                "wow",
+                "much",
+                "heckin",
+                "many",
+                "so"
+            };
+            var dogeWords2 = new List<string>()
+            {
+                "neat",
+                "plz",
+                "cool",
+                "what"
+            };
+            var graphDescriptors = new List<string>()
+            {
+                "graph",
+                "script",
+                "workflow",
+                "dee why in",
+                "thingy",
+                "scripty"
+            };
+
+            var random = new Random();
+
+            string sloppyFileName =
+                $"{dogeWords[random.Next(dogeWords.Count)]} {dogeWords2[random.Next(dogeWords2.Count)]} {graphDescriptors[random.Next(graphDescriptors.Count)]} {random.Next(100)}.dyn";
+
+            string userDesktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
+            dynamoViewModel.SaveAs(Path.Combine(userDesktop,sloppyFileName), SaveContext.SaveAs,true);
+        }
+
+
     }
 }

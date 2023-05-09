@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Dynamo.Controls;
+using Dynamo.Extensions;
 using Dynamo.PackageManager;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.About;
