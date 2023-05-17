@@ -32,24 +32,24 @@ namespace MonocleViewExtension.Utilities
         public static Dictionary<string, Settings.GroupSetting> MonocleGroupSettings =
             new Dictionary<string, Settings.GroupSetting>
             {
-                {"Group1",new Settings.GroupSetting(){GroupId = 1, GroupColor = "#FFD3D3D3",GroupText = "Background"}},
-                {"Group2",new Settings.GroupSetting(){GroupId = 2, GroupColor = "#FFB0C4DE",GroupText = "Input"}},
-                {"Group3",new Settings.GroupSetting(){GroupId = 3, GroupColor = "#FF90EE90",GroupText = "Control"}},
-                {"Group4",new Settings.GroupSetting(){GroupId = 4, GroupColor = "#FFFFA07A",GroupText = "To Revit"}},
-                {"Group5",new Settings.GroupSetting(){GroupId = 5, GroupColor = "#FF87CEFA",GroupText = "Annotation"}},
-                {"Group6",new Settings.GroupSetting(){GroupId = 6, GroupColor = "#FFFFE4C4",GroupText = "Info"}}
+                {"Group1",new Settings.GroupSetting(){GroupId = 1, GroupColor = "#FFD3D3D3",GroupText = "Background", FontSize = 24}},
+                {"Group2",new Settings.GroupSetting(){GroupId = 2, GroupColor = "#FFB0C4DE",GroupText = "Input", FontSize = 24}},
+                {"Group3",new Settings.GroupSetting(){GroupId = 3, GroupColor = "#FF90EE90",GroupText = "Control", FontSize = 24}},
+                {"Group4",new Settings.GroupSetting(){GroupId = 4, GroupColor = "#FFFFA07A",GroupText = "To Revit", FontSize = 24}},
+                {"Group5",new Settings.GroupSetting(){GroupId = 5, GroupColor = "#FF87CEFA",GroupText = "Annotation", FontSize = 24}},
+                {"Group6",new Settings.GroupSetting(){GroupId = 6, GroupColor = "#FFFFE4C4",GroupText = "Info", FontSize = 24}}
 
             };
 
         public static Dictionary<string, Settings.GroupSetting> DefaultGroupSettings =
             new Dictionary<string, Settings.GroupSetting>
             {
-                {"Group1",new Settings.GroupSetting(){GroupId = 1, GroupColor = "#FFD3D3D3",GroupText = "Background"}},
-                {"Group2",new Settings.GroupSetting(){GroupId = 2, GroupColor = "#FFB0C4DE",GroupText = "Input"}},
-                {"Group3",new Settings.GroupSetting(){GroupId = 3, GroupColor = "#FF90EE90",GroupText = "Control"}},
-                {"Group4",new Settings.GroupSetting(){GroupId = 4, GroupColor = "#FFFFA07A",GroupText = "To Revit"}},
-                {"Group5",new Settings.GroupSetting(){GroupId = 5, GroupColor = "#FF87CEFA",GroupText = "Annotation"}},
-                {"Group6",new Settings.GroupSetting(){GroupId = 6, GroupColor = "#FFFFE4C4",GroupText = "Info"}}
+                {"Group1",new Settings.GroupSetting(){GroupId = 1, GroupColor = "#FFD3D3D3",GroupText = "Background", FontSize = 24}},
+                {"Group2",new Settings.GroupSetting(){GroupId = 2, GroupColor = "#FFB0C4DE",GroupText = "Input", FontSize = 24}},
+                {"Group3",new Settings.GroupSetting(){GroupId = 3, GroupColor = "#FF90EE90",GroupText = "Control", FontSize = 24}},
+                {"Group4",new Settings.GroupSetting(){GroupId = 4, GroupColor = "#FFFFA07A",GroupText = "To Revit", FontSize = 24}},
+                {"Group5",new Settings.GroupSetting(){GroupId = 5, GroupColor = "#FF87CEFA",GroupText = "Annotation", FontSize = 24}},
+                {"Group6",new Settings.GroupSetting(){GroupId = 6, GroupColor = "#FFFFE4C4",GroupText = "Info", FontSize = 24}}
 
             };
 
