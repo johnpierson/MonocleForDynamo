@@ -80,7 +80,6 @@ namespace MonocleViewExtension.BetterSave
 
             RegisterKeyboardShortcuts(p, betterSaveModel);
 
-
             p.CurrentWorkspaceClearingStarted += POnCurrentWorkspaceClearingStarted;
         }
 
@@ -108,17 +107,16 @@ namespace MonocleViewExtension.BetterSave
 
             try
             {
-                //Paste without wires
-                var pasteWithoutWires = new CommandBinding(new RoutedUICommand("QuickSave", "QuickSaveCommand",
+                var quickSave = new CommandBinding(new RoutedUICommand("QuickSave", "QuickSaveCommand",
                     typeof(ResourceNames.MainWindow), new InputGestureCollection
                     {
                         new KeyGesture(Key.S, ModifierKeys.Alt | ModifierKeys.Control)
                     }));
-                pasteWithoutWires.Executed += (sender, args) =>
+                quickSave.Executed += (sender, args) =>
                 {
                     m.BetterSave("QuickSave");
                 };
-                view.CommandBindings.Add(pasteWithoutWires);
+                view.CommandBindings.Add(quickSave);
             }
             catch (Exception e)
             {

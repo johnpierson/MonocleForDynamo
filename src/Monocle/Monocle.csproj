@@ -269,6 +269,12 @@
       <DependentUpon>NodeDocumentationView.xaml</DependentUpon>
     </Compile>
     <Compile Include="NodeDocumentation\NodeDocumentationViewModel.cs" />
+    <Compile Include="NodeSwapper\NodeSwapperCommand.cs" />
+    <Compile Include="NodeSwapper\NodeSwapperModel.cs" />
+    <Compile Include="NodeSwapper\NodeSwapperView.xaml.cs">
+      <DependentUpon>NodeSwapperView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="NodeSwapper\NodeSwapperViewModel.cs" />
     <Compile Include="PackageUsage\PackageUsageCommand.cs" />
     <Compile Include="PackageUsage\PackageUsageDogeView.xaml.cs">
       <DependentUpon>PackageUsageDogeView.xaml</DependentUpon>
@@ -355,6 +361,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="NodeSwapper\NodeSwapperView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="PackageUsage\PackageUsageDogeView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -436,7 +446,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug copy "$(ProjectDir)bin\Debug\MonocleViewExtension.dll" "C:\Users\Johnt\AppData\Roaming\Dynamo\Dynamo Core\2.16\packages\Monocle\bin"
+    <PostBuildEvent>if $(ConfigurationName) == Debug copy "$(ProjectDir)bin\Debug\MonocleViewExtension.dll" "C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\2.16\packages\Monocle\bin"
 
 if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.12\packages\Monocle\bin"
 if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.13\packages\Monocle\bin"

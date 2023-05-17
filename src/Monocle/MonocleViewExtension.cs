@@ -17,6 +17,7 @@ using MonocleViewExtension.Foca;
 using MonocleViewExtension.GraphResizerer;
 using MonocleViewExtension.MonocleSettings;
 using MonocleViewExtension.NodeDocumentation;
+using MonocleViewExtension.NodeSwapper;
 using MonocleViewExtension.PackageUsage;
 using MonocleViewExtension.Photocopier;
 using MonocleViewExtension.SimpleSearch;
@@ -88,12 +89,14 @@ namespace MonocleViewExtension
             AboutCommand.AddMenuItem(monocleMenuItem,p);
             PackageUsageCommand.AddMenuItem(monocleMenuItem,p);
             GraphResizererCommand.AddMenuItem(monocleMenuItem, p);
+            NodeSwapperCommand.AddMenuItem(monocleMenuItem, p);
             FocaCommand.EnableFoca(p, monocleMenuItem);
             SimpleSearchCommand.AddMenuItem(p, monocleMenuItem, this);
             StandardViewsCommand.EnableStandardViews(p);
             MonocleSettingsCommand.AddMenuItem(monocleMenuItem);
             FancyPasteCommand.AddMenuItem(p);
             BetterSaveCommand.AddMenuItem(p);
+            
 
 #if DEBUG
             SnippetsCommand.AddMenuItem(monocleMenuItem,p,this);
