@@ -31,6 +31,7 @@
                 <Label Content="{Binding NodeToSwapName, FallbackValue=pending}" HorizontalAlignment="Center" HorizontalContentAlignment="Center"/>
                 <Button Content="select node to swap" Background="White" Command="{Binding SelectNodeToSwap}" Cursor="Hand"/>
             </StackPanel>
+
             <StackPanel Grid.Column="1" Margin="4">
                 <Label Content="{Binding NodeToSwapToName, FallbackValue=pending}" HorizontalAlignment="Center" HorizontalContentAlignment="Center"/>
                 <Button Content="select node to swap to" Background="White" Command="{Binding SelectNodeToSwapTo}"  Cursor="Hand"/>

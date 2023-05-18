@@ -215,7 +215,7 @@
     </Reference>
     <Reference Include="Xceed.Wpf.AvalonDock, Version=4.3.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <HintPath>..\packages\Extended.Wpf.Toolkit.4.3.0\lib\net40\Xceed.Wpf.AvalonDock.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Xceed.Wpf.AvalonDock.Themes.Aero, Version=4.3.0.0, Culture=neutral, PublicKeyToken=3e4669d2f30244f4, processorArchitecture=MSIL">
       <HintPath>..\packages\Extended.Wpf.Toolkit.4.3.0\lib\net40\Xceed.Wpf.AvalonDock.Themes.Aero.dll</HintPath>
@@ -271,6 +271,9 @@
     <Compile Include="NodeDocumentation\NodeDocumentationViewModel.cs" />
     <Compile Include="NodeSwapper\NodeSwapperCommand.cs" />
     <Compile Include="NodeSwapper\NodeSwapperModel.cs" />
+    <Compile Include="NodeSwapper\NodeSwapperPaintBrush.xaml.cs">
+      <DependentUpon>NodeSwapperPaintBrush.xaml</DependentUpon>
+    </Compile>
     <Compile Include="NodeSwapper\NodeSwapperView.xaml.cs">
       <DependentUpon>NodeSwapperView.xaml</DependentUpon>
     </Compile>
@@ -287,13 +290,7 @@
     <Compile Include="PackageUsage\PackageUsageViewModel.cs" />
     <Compile Include="FancyPaste\FancyPasteCommands.cs" />
     <Compile Include="FancyPaste\FancyPasteModel.cs" />
-    <Compile Include="Photocopier\PhotocopierCommand.cs" />
-    <Compile Include="Photocopier\PhotocopierView.xaml.cs">
-      <DependentUpon>PhotocopierView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Photocopier\PhotocopierViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Photocopier\PhotocopierModel.cs" />
     <Compile Include="SimpleSearch\SimpleSearchCommand.cs" />
     <Compile Include="SimpleSearch\SimpleSearchView.xaml.cs">
       <DependentUpon>SimpleSearchView.xaml</DependentUpon>
@@ -361,6 +358,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="NodeSwapper\NodeSwapperPaintBrush.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="NodeSwapper\NodeSwapperView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -373,9 +374,9 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Photocopier\PhotocopierView.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="Resources\IconDictionary.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="SimpleSearch\SimpleSearchView.xaml">
       <SubType>Designer</SubType>
@@ -436,14 +437,13 @@
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
     <Content Include="images\logo.png" />
+    <EmbeddedResource Include="Resources\Xceed.Wpf.AvalonDock.dll" />
     <EmbeddedResource Include="Resources\smalls.JPG" />
     <EmbeddedResource Include="Resources\WpfAnimatedGif.dll" />
     <Resource Include="PackageUsage\DogeImages\dwight-pumpkin.gif" />
     <Resource Include="PackageUsage\DogeImages\david-s-pumpkins.gif" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="GraphInformation\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if $(ConfigurationName) == Debug copy "$(ProjectDir)bin\Debug\MonocleViewExtension.dll" "C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\2.16\packages\Monocle\bin"

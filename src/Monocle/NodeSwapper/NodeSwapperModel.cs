@@ -36,6 +36,8 @@ namespace MonocleViewExtension.NodeSwapper
 
         public NodeViewModel Selection(string mode = "")
         {
+            if (!dynamoViewModel.CurrentSpaceViewModel.HasSelection) return null;
+            
             return dynamoViewModel.CurrentSpaceViewModel.Nodes.First(n => n.NodeModel.IsSelected);
         }
        

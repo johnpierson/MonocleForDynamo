@@ -19,7 +19,6 @@ using MonocleViewExtension.MonocleSettings;
 using MonocleViewExtension.NodeDocumentation;
 using MonocleViewExtension.NodeSwapper;
 using MonocleViewExtension.PackageUsage;
-using MonocleViewExtension.Photocopier;
 using MonocleViewExtension.SimpleSearch;
 using MonocleViewExtension.Snippets;
 using MonocleViewExtension.StandardViews;
@@ -100,9 +99,7 @@ namespace MonocleViewExtension
 
 #if DEBUG
             SnippetsCommand.AddMenuItem(monocleMenuItem,p,this);
-            PhotocopierCommand.AddMenuItem(monocleMenuItem,p);
             NodeDocumentationCommand.AddMenuItem(monocleMenuItem,p);
-
 
             MenuItem myDynamoNoWorkie = new MenuItem
             {

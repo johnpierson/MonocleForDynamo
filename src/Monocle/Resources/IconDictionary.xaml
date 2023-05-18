@@ -1,0 +1,7 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+           >
+    <Geometry x:Key="PaintBrush">
+        M437 976q-24 0-42-17.625T377 916V716H220q-24 0-42-18t-18-42V353q0-55 39.656-96T295 216h505v440q0 24-18 42t-42 18H583v200q0 24.75-18 42.375T523 976h-86ZM220 502h520V276h-56v171h-60V276h-71v85h-60v-85H295q-32 0-53.5 23T220 353v149Zm0 154h520v-94H220v94Zm0-94v94-94Z
+    </Geometry>
+    </ResourceDictionary>

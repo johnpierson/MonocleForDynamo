@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using Dynamo.Controls;
 using Dynamo.Extensions;
 using Dynamo.Graph.Nodes;
 using Dynamo.Models;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
+using Dynamo.Views;
+using Xceed.Wpf.AvalonDock.Controls;
 
 namespace MonocleViewExtension.NodeSwapper
 {
@@ -77,10 +79,37 @@ namespace MonocleViewExtension.NodeSwapper
             get { return _runCount; }
             set { _runCount = value; RaisePropertyChanged(() => RunCount); }
         }
+
+        private System.Windows.Media.SolidColorBrush _paintBrushColor;
+        public System.Windows.Media.SolidColorBrush PaintBrushColor
+        {
+            get { return _paintBrushColor; }
+            set { _paintBrushColor = value; RaisePropertyChanged(() => PaintBrushColor); }
+        }
+        private string _paintStatusMessage;
+        public string PaintStatusMessage
+        {
+            get { return _paintStatusMessage; }
+            set { _paintStatusMessage = value; RaisePropertyChanged(() => PaintStatusMessage); }
+        }
+
+        private int _currentStep = 0;
+        private NodeSwapperPaintBrush _paintBrush;
+
+        private WorkspaceView _workspaceView;
         public NodeSwapperViewModel(NodeSwapperModel m)
         {
             Model = m;
             _readyParams = m.LoadedParams;
+
+            _paintBrush = new NodeSwapperPaintBrush()
+            {
+                // Set the data context for the main grid in the window.
+                MainGrid = { DataContext = this },
+                // Set the owner of the window to the Dynamo window.
+                Owner = m.LoadedParams.DynamoWindow
+            };
+            _paintBrush.Show(); ;
 
             CanRun = false;
             NodeToSwapName = "pending";
@@ -98,6 +127,30 @@ namespace MonocleViewExtension.NodeSwapper
             ResultsVisibility = false;
 
             Model.SetRunStatus();
+
+            //set paint brush settings
+            PaintBrushColor = new System.Windows.Media.SolidColorBrush(Colors.Coral);
+            PaintStatusMessage = "please select a node to use as a replacement";
+
+            _workspaceView = Model.dynamoView.FindVisualChildren<WorkspaceView>().First();
+            _workspaceView.MouseLeftButtonUp += WsViewOnMouseUp;
+            _workspaceView.MouseMove += WsViewOnMouseMove;
+        }
+
+        private void Wipeout()
+        {
+            _workspaceView.MouseLeftButtonUp -= WsViewOnMouseUp;
+            _workspaceView.MouseMove -= WsViewOnMouseMove;
+            _workspaceView = null;
+
+            Model = null;
+            _paintBrush.Close();
+            _paintBrush = null;
+        }
+
+        private void WsViewOnMouseMove(object sender, MouseEventArgs e)
+        {
+            _paintBrush.UpdateLocation();
         }
 
         private void OnSelectToSwap(object command)
@@ -123,76 +176,122 @@ namespace MonocleViewExtension.NodeSwapper
         private void OnSwapNode(object o)
         {
             //create a duplicate first
-            DynamoModel.CreateNodeCommand createRefactoredIf =
-                new DynamoModel.CreateNodeCommand(Guid.NewGuid().ToString(), NodeToSwapTo.Name, NodeToSwap.X, NodeToSwap.Y, false, false);
 
-            Model.dynamoViewModel.ExecuteCommand(createRefactoredIf);
+            if (NodeToSwapTo.NodeModel.NodeType.Equals("CodeBlockNode"))
+            {
+                CodeBlockNodeModel existingCodeBlock = NodeToSwapTo.NodeModel as CodeBlockNodeModel;
+                var codeBlock = new CodeBlockNodeModel(existingCodeBlock.Code, 0, 0, Model.dynamoViewModel.Model.LibraryServices, Model.dynamoViewModel.Model.CurrentWorkspace.ElementResolver);
+
+                Model.dynamoViewModel.ExecuteCommand(new DynamoModel.CreateNodeCommand(codeBlock, NodeToSwap.X, NodeToSwap.Y, false, false));
+            }
+
+            else
+            {
+                DynamoModel.CreateNodeCommand replacementCommand =
+                    new DynamoModel.CreateNodeCommand(Guid.NewGuid().ToString(), NodeToSwapTo.Name, NodeToSwap.X, NodeToSwap.Y, false, false);
+                Model.dynamoViewModel.ExecuteCommand(replacementCommand);
+            }
+
 
             NodeViewModel replacementNode = Model.dynamoViewModel.CurrentSpaceViewModel.Nodes.LastOrDefault();
 
 
             List<DynamoModel.MakeConnectionCommand> connectionCommands = new List<DynamoModel.MakeConnectionCommand>();
 
-            
+
             var inports = NodeToSwap.NodeModel.InPorts.ToList();
             var outports = NodeToSwap.NodeModel.OutPorts.ToList();
 
             //connect inports
-            foreach (var inport in inports)
+            if (replacementNode.InPorts.Any())
             {
-                foreach (var connector in inport.Connectors)
+                foreach (var inport in inports)
                 {
-                    var guid = connector.Start.Owner.GUID;
+                    foreach (var connector in inport.Connectors)
+                    {
+                        var guid = connector.Start.Owner.GUID;
 
-                    var portIndex = connector.Start.Index;
+                        var portIndex = connector.Start.Index;
 
-                    //begin the connection
-                    connectionCommands.Add(new DynamoModel.MakeConnectionCommand(guid, portIndex, PortType.Output,
-                        DynamoModel.MakeConnectionCommand.Mode.Begin));
+                        //begin the connection
+                        connectionCommands.Add(new DynamoModel.MakeConnectionCommand(guid, portIndex, PortType.Output,
+                            DynamoModel.MakeConnectionCommand.Mode.Begin));
 
-                    //end the connection
-                    connectionCommands.Add(
-                        new DynamoModel.MakeConnectionCommand(replacementNode.NodeModel.GUID, connector.End.Index, PortType.Input,
-                            DynamoModel.MakeConnectionCommand.Mode.End));
+                        //end the connection
+                        connectionCommands.Add(
+                            new DynamoModel.MakeConnectionCommand(replacementNode.NodeModel.GUID, connector.End.Index, PortType.Input,
+                                DynamoModel.MakeConnectionCommand.Mode.End));
+                    }
                 }
             }
             //connect outports
-            foreach (var outport in outports)
+            if (replacementNode.OutPorts.Any())
             {
-                foreach (var connector in outport.Connectors)
+                foreach (var outport in outports)
                 {
-                    var guid = connector.End.Owner.GUID;
+                    foreach (var connector in outport.Connectors)
+                    {
+                        var guid = connector.End.Owner.GUID;
 
-                    var portIndex = connector.Start.Index;
+                        var portIndex = connector.Start.Index;
 
-                    //begin the connection
-                    connectionCommands.Add(
-                        new DynamoModel.MakeConnectionCommand(replacementNode.NodeModel.GUID, portIndex,
-                            PortType.Output,
-                            DynamoModel.MakeConnectionCommand.Mode.Begin));
+                        //begin the connection
+                        connectionCommands.Add(
+                            new DynamoModel.MakeConnectionCommand(replacementNode.NodeModel.GUID, portIndex,
+                                PortType.Output,
+                                DynamoModel.MakeConnectionCommand.Mode.Begin));
 
-                    //end the connection
-                    connectionCommands.Add(new DynamoModel.MakeConnectionCommand(guid, connector.End.Index,
-                        PortType.Input,
-                        DynamoModel.MakeConnectionCommand.Mode.End));
+                        //end the connection
+                        connectionCommands.Add(new DynamoModel.MakeConnectionCommand(guid, connector.End.Index,
+                            PortType.Input,
+                            DynamoModel.MakeConnectionCommand.Mode.End));
+                    }
                 }
             }
-
             foreach (var connectionCommand in connectionCommands)
             {
                 Model.dynamoViewModel.ExecuteCommand(connectionCommand);
             }
 
-            
+
             DynamoModel.DeleteModelCommand delete = new DynamoModel.DeleteModelCommand(NodeToSwap.NodeModel.GUID);
 
-            
+
             Model.dynamoViewModel.ExecuteCommand(delete);
 
             NodeToSwap = null;
             NodeToSwapName = "pending";
             CanRun = false;
             
+        }
+
+        private void WsViewOnMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (_currentStep == 0)
+            {
+                NodeToSwapTo = Model.Selection();
+
+                if (NodeToSwapTo != null)
+                {
+                    _currentStep++;
+
+                    //set the message
+                    PaintStatusMessage = "now select the nodes to match to the target node. (click a blank area when finished)";
+                    PaintBrushColor = new System.Windows.Media.SolidColorBrush(Colors.CornflowerBlue);
+                }
+            }
+            else
+            {
+                NodeToSwap = Model.Selection();
+                if (NodeToSwap != null)
+                {
+                    OnSwapNode(new object());
+                }
+                else
+                {
+                    Wipeout();
+                }
+            }
         }
 
         private void OnLink(object o)
@@ -204,7 +303,7 @@ namespace MonocleViewExtension.NodeSwapper
             ResultsVisibility = false;
             RunCount = 0;
             NodeSwapperView win = o as NodeSwapperView;
-           win.Close();
+            win.Close();
         }
     }
 }

@@ -28,15 +28,14 @@ namespace MonocleViewExtension.NodeSwapper
                 var m = new NodeSwapperModel(dvm, p);
                 var viewModel = new NodeSwapperViewModel(m);
 
-                var window = new NodeSwapperView()
-                {
-                    // Set the data context for the main grid in the window.
-                    MainGrid = { DataContext = viewModel },
-                    // Set the owner of the window to the Dynamo window.
-                    Owner = p.DynamoWindow
-                };
-
-                window.Show();
+                //var window = new NodeSwapperView()
+                //{
+                //    // Set the data context for the main grid in the window.
+                //    MainGrid = { DataContext = viewModel },
+                //    // Set the owner of the window to the Dynamo window.
+                //    Owner = p.DynamoWindow
+                //};
+               
             };
 
             //add the graph resizerer menu
