@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using Dynamo.Controls;
@@ -12,7 +13,10 @@ using Dynamo.Models;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
 using Dynamo.Views;
+using MonocleViewExtension.Utilities;
 using Xceed.Wpf.AvalonDock.Controls;
+using Cursor = System.Windows.Forms.Cursor;
+using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 
 namespace MonocleViewExtension.NodeSwapper
 {
@@ -31,6 +35,12 @@ namespace MonocleViewExtension.NodeSwapper
         {
             get { return _canRun; }
             set { _canRun = value; RaisePropertyChanged(() => CanRun); }
+        }
+        private bool _imageMode;
+        public bool ImageMode
+        {
+            get { return _imageMode; }
+            set { _imageMode = value; RaisePropertyChanged(() => ImageMode); }
         }
 
 
@@ -102,6 +112,8 @@ namespace MonocleViewExtension.NodeSwapper
             Model = m;
             _readyParams = m.LoadedParams;
 
+            ImageMode = true;
+
             _paintBrush = new NodeSwapperPaintBrush()
             {
                 // Set the data context for the main grid in the window.
@@ -110,6 +122,7 @@ namespace MonocleViewExtension.NodeSwapper
                 Owner = m.LoadedParams.DynamoWindow
             };
             _paintBrush.Show(); ;
+           
 
             CanRun = false;
             NodeToSwapName = "pending";
@@ -135,6 +148,10 @@ namespace MonocleViewExtension.NodeSwapper
             _workspaceView = Model.dynamoView.FindVisualChildren<WorkspaceView>().First();
             _workspaceView.MouseLeftButtonUp += WsViewOnMouseUp;
             _workspaceView.MouseMove += WsViewOnMouseMove;
+
+
+            //set to manual run mode
+            Model.dynamoViewModel.CurrentSpaceViewModel.RunSettingsViewModel.Model.RunType = RunType.Manual;
         }
 
         private void Wipeout()
@@ -274,9 +291,10 @@ namespace MonocleViewExtension.NodeSwapper
                 if (NodeToSwapTo != null)
                 {
                     _currentStep++;
+                    ImageMode = false;
 
                     //set the message
-                    PaintStatusMessage = "now select the nodes to match to the target node. (click a blank area when finished)";
+                    PaintStatusMessage = "now select the nodes to match to the target node.";
                     PaintBrushColor = new System.Windows.Media.SolidColorBrush(Colors.CornflowerBlue);
                 }
             }

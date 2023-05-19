@@ -311,6 +311,7 @@
     <Compile Include="StandardViews\StandardViewsCommand.cs" />
     <Compile Include="StandardViews\StandardViewsModel.cs" />
     <Compile Include="StandardViews\StandardViewsViewModel.cs" />
+    <Compile Include="Utilities\Cursors.cs" />
     <Compile Include="Utilities\Globals.cs" />
     <Compile Include="Utilities\Settings.cs" />
     <Compile Include="Utilities\Utilities.cs" />
