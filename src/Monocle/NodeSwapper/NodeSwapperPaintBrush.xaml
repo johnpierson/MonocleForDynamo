@@ -4,8 +4,8 @@
          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
          xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
          xmlns:local="clr-namespace:MonocleViewExtension.NodeSwapper"
-         Width="180"
-         FontFamily="Comic Sans MS"
+         Width="200"
+         FontFamily="Artifakt Element Regular"
          AllowsTransparency="True" Background="{x:Null}"
          WindowStyle="None"
          SizeToContent="Height" IsHitTestVisible="False">
@@ -65,7 +65,9 @@
         <Image Grid.Row="0" Grid.Column="0" Margin="2" Source="{StaticResource PaintBrushIconDrawingImage}" Stretch="Uniform"
                Visibility="{Binding ImageMode, Converter={StaticResource BooleanConverter2}, FallbackValue=true}"/>
 
-        <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding PaintStatusMessage, FallbackValue=please select a node to use as a swap}" FontSize="12" VerticalAlignment="Top" TextWrapping="Wrap" />
-        <TextBlock Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Text="*select a blank area to quit" FontSize="10" VerticalAlignment="Top" TextWrapping="Wrap" />
+        <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding PaintStatusMessage, FallbackValue=please select a node to use as a swap}" FontSize="14" VerticalAlignment="Top" TextWrapping="Wrap"  TextAlignment="Center" Foreground="#FF499EC0"/>
+
+        <TextBlock Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Text="*select a blank area to quit*" FontSize="12" VerticalAlignment="Bottom" TextWrapping="Wrap" TextAlignment="Center" Foreground="#FF499EC0" Padding="0 4"/>
+    
     </Grid>
 </Window>

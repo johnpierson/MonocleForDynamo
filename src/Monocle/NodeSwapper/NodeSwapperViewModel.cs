@@ -297,6 +297,10 @@ namespace MonocleViewExtension.NodeSwapper
                     PaintStatusMessage = "now select the nodes to match to the target node.";
                     PaintBrushColor = new System.Windows.Media.SolidColorBrush(Colors.CornflowerBlue);
                 }
+                else
+                {
+                    Wipeout();
+                }
             }
             else
             {
