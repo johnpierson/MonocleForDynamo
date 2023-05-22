@@ -80,7 +80,9 @@ namespace MonocleViewExtension.BetterSave
 
             RegisterKeyboardShortcuts(p, betterSaveModel);
 
+#if DEBUG
             p.CurrentWorkspaceClearingStarted += POnCurrentWorkspaceClearingStarted;
+#endif
         }
 
         private static void POnCurrentWorkspaceClearingStarted(IWorkspaceModel obj)

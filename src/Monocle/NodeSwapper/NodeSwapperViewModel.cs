@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -11,11 +12,13 @@ using Dynamo.Extensions;
 using Dynamo.Graph.Nodes;
 using Dynamo.Models;
 using Dynamo.UI.Commands;
+using Dynamo.Utilities;
 using Dynamo.ViewModels;
 using Dynamo.Views;
 using MonocleViewExtension.Utilities;
 using Xceed.Wpf.AvalonDock.Controls;
 using Cursor = System.Windows.Forms.Cursor;
+using ModifierKeys = Dynamo.Utilities.ModifierKeys;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 
 namespace MonocleViewExtension.NodeSwapper
@@ -24,18 +27,8 @@ namespace MonocleViewExtension.NodeSwapper
     {
         public NodeSwapperModel Model { get; set; }
         private ReadyParams _readyParams;
-        public DelegateCommand SwapNode { get; set; }
-        public DelegateCommand SelectNodeToSwap { get; set; }
-        public DelegateCommand SelectNodeToSwapTo { get; set; }
-        public DelegateCommand Link { get; set; }
-        public DelegateCommand Close { get; set; }
 
-        private bool _canRun;
-        public bool CanRun
-        {
-            get { return _canRun; }
-            set { _canRun = value; RaisePropertyChanged(() => CanRun); }
-        }
+
         private bool _imageMode;
         public bool ImageMode
         {
@@ -77,25 +70,7 @@ namespace MonocleViewExtension.NodeSwapper
             get { return _results; }
             set { _results = value; RaisePropertyChanged(() => Results); }
         }
-        private bool _resultsVisibility;
-        public bool ResultsVisibility
-        {
-            get { return _resultsVisibility; }
-            set { _resultsVisibility = value; RaisePropertyChanged(() => ResultsVisibility); }
-        }
-        private int _runCount;
-        public int RunCount
-        {
-            get { return _runCount; }
-            set { _runCount = value; RaisePropertyChanged(() => RunCount); }
-        }
 
-        private System.Windows.Media.SolidColorBrush _paintBrushColor;
-        public System.Windows.Media.SolidColorBrush PaintBrushColor
-        {
-            get { return _paintBrushColor; }
-            set { _paintBrushColor = value; RaisePropertyChanged(() => PaintBrushColor); }
-        }
         private string _paintStatusMessage;
         public string PaintStatusMessage
         {
@@ -107,51 +82,72 @@ namespace MonocleViewExtension.NodeSwapper
         private NodeSwapperPaintBrush _paintBrush;
 
         private WorkspaceView _workspaceView;
-        public NodeSwapperViewModel(NodeSwapperModel m)
+        public NodeSwapperViewModel(NodeSwapperModel m, NodeModel node = null)
         {
             Model = m;
             _readyParams = m.LoadedParams;
+            _workspaceView = Model.dynamoView.FindVisualChildren<WorkspaceView>().First();
+
+            //set paint brush settings
+            PaintStatusMessage = "please select a node to use as a replacement";
+
+            //set to manual run mode
+            Model.SetRunStatus();
 
             ImageMode = true;
+
+            //in canvas
+            if (node != null)
+            {
+                InCanvas(node);
+            }
+            else
+            {
+                _paintBrush = new NodeSwapperPaintBrush()
+                {
+                    // Set the data context for the main grid in the window.
+                    MainGrid = { DataContext = this },
+                    // Set the owner of the window to the Dynamo window.
+                    Owner = m.LoadedParams.DynamoWindow
+                };
+                _paintBrush.Show();
+
+                _workspaceView.MouseLeftButtonUp += WsViewOnMouseUp;
+                _workspaceView.MouseMove += WsViewOnMouseMove;
+            }
+        }
+
+        private void InCanvas(NodeModel node)
+        {
+   
+            DynamoModel.SelectModelCommand select = new DynamoModel.SelectModelCommand(node.GUID, ModifierKeys.None);
+            Model.dynamoViewModel.Model.ExecuteCommand(select);
+
+            NodeToSwapTo = Model.Selection();
+            NodeToSwapToName = NodeToSwapTo.Name;
+
+            _currentStep++;
+            ImageMode = false;
+
+            //set the message
+            PaintStatusMessage = "now select the nodes to match to the target node you selected.";
+
 
             _paintBrush = new NodeSwapperPaintBrush()
             {
                 // Set the data context for the main grid in the window.
                 MainGrid = { DataContext = this },
                 // Set the owner of the window to the Dynamo window.
-                Owner = m.LoadedParams.DynamoWindow
+                Owner = Model.LoadedParams.DynamoWindow
             };
-            _paintBrush.Show(); ;
-           
 
-            CanRun = false;
-            NodeToSwapName = "pending";
-            NodeToSwapToName = "pending";
+ 
+            _paintBrush.Show();
 
-            RunCount = 0;
-
-            SelectNodeToSwap = new DelegateCommand(OnSelectToSwap);
-            SelectNodeToSwapTo = new DelegateCommand(OnSelectToSwapTo);
-
-            SwapNode = new DelegateCommand(OnSwapNode);
-            Link = new DelegateCommand(OnLink);
-            Close = new DelegateCommand(OnClose);
-
-            ResultsVisibility = false;
-
-            Model.SetRunStatus();
-
-            //set paint brush settings
-            PaintBrushColor = new System.Windows.Media.SolidColorBrush(Colors.Coral);
-            PaintStatusMessage = "please select a node to use as a replacement";
-
-            _workspaceView = Model.dynamoView.FindVisualChildren<WorkspaceView>().First();
             _workspaceView.MouseLeftButtonUp += WsViewOnMouseUp;
+            _currentStep++;
+            
             _workspaceView.MouseMove += WsViewOnMouseMove;
-
-
-            //set to manual run mode
-            Model.dynamoViewModel.CurrentSpaceViewModel.RunSettingsViewModel.Model.RunType = RunType.Manual;
         }
 
         private void Wipeout()
@@ -170,26 +166,7 @@ namespace MonocleViewExtension.NodeSwapper
             _paintBrush.UpdateLocation();
         }
 
-        private void OnSelectToSwap(object command)
-        {
-            NodeToSwap = Model.Selection();
-            NodeToSwapName = NodeToSwap.Name;
-
-            if (NodeToSwap != null && NodeToSwapTo != null)
-            {
-                CanRun = true;
-            }
-        }
-        private void OnSelectToSwapTo(object command)
-        {
-            NodeToSwapTo = Model.Selection();
-            NodeToSwapToName = NodeToSwapTo.Name;
-
-            if (NodeToSwap != null && NodeToSwapTo != null)
-            {
-                CanRun = true;
-            }
-        }
+      
         private void OnSwapNode(object o)
         {
             //create a duplicate first
@@ -278,8 +255,6 @@ namespace MonocleViewExtension.NodeSwapper
 
             NodeToSwap = null;
             NodeToSwapName = "pending";
-            CanRun = false;
-            
         }
 
         private void WsViewOnMouseUp(object sender, MouseButtonEventArgs e)
@@ -295,14 +270,14 @@ namespace MonocleViewExtension.NodeSwapper
 
                     //set the message
                     PaintStatusMessage = "now select the nodes to match to the target node.";
-                    PaintBrushColor = new System.Windows.Media.SolidColorBrush(Colors.CornflowerBlue);
                 }
                 else
                 {
                     Wipeout();
                 }
             }
-            else
+
+            if (_currentStep == 1)
             {
                 NodeToSwap = Model.Selection();
                 if (NodeToSwap != null)
@@ -314,18 +289,11 @@ namespace MonocleViewExtension.NodeSwapper
                     Wipeout();
                 }
             }
-        }
 
-        private void OnLink(object o)
-        {
-            Process.Start("https://forum.dynamobim.com/t/graph-resizer-for-dynamo-2-13/75612");
-        }
-        private void OnClose(object o)
-        {
-            ResultsVisibility = false;
-            RunCount = 0;
-            NodeSwapperView win = o as NodeSwapperView;
-            win.Close();
+            if (_currentStep == 2)
+            {
+                _currentStep = 1;
+            }
         }
     }
 }

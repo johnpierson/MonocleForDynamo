@@ -15,7 +15,9 @@ using Dynamo.Nodes;
 using Dynamo.Utilities;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
+using MonocleViewExtension.NodeSwapper;
 using MonocleViewExtension.Utilities;
+using ProtoCore.AST;
 using Thickness = System.Windows.Thickness;
 
 namespace MonocleViewExtension.Foca
@@ -72,6 +74,28 @@ namespace MonocleViewExtension.Foca
                         //this error is silenced
                     }
 
+                    break;
+                case "nodeSwapper":
+                    try
+                    {
+                        var lastNode = nodes.Last();
+
+                        //for some reason we need to make a temporary node to get the selection to freakin stop
+                        //var codeBlock = new CodeBlockNodeModel("you see nothing", 0, 0, DynamoViewModel.Model.LibraryServices, DynamoViewModel.Model.CurrentWorkspace.ElementResolver);
+                        //DynamoViewModel.Model.ExecuteCommand(
+                        //new DynamoModel.CreateNodeCommand(codeBlock, 0, 0, false, false));
+
+                        //var tempNode = DynamoViewModel.CurrentSpaceViewModel.Nodes.Last();
+
+                        //DynamoViewModel.Model.ExecuteCommand(new DynamoModel.DeleteModelCommand(tempNode.Id));
+
+                        var m = new NodeSwapperModel(DynamoViewModel, LoadedParams);
+                        var viewModel = new NodeSwapperViewModel(m, lastNode);
+                    }
+                    catch (Exception e)
+                    {
+                        //this error is silenced
+                    }
                     break;
             }
         }

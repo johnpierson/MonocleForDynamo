@@ -107,6 +107,12 @@ namespace MonocleViewExtension.Foca
             get => _listPowVisibility;
             set { _listPowVisibility = value; RaisePropertyChanged(() => ListPowVisibility); }
         }
+        private int _nodeSwapVisibility;
+        public int NodeSwapVisibility
+        {
+            get => _nodeSwapVisibility;
+            set { _nodeSwapVisibility = value; RaisePropertyChanged(() => NodeSwapVisibility); }
+        }
 
         public FocaViewModel(FocaModel model)
         {
@@ -122,6 +128,7 @@ namespace MonocleViewExtension.Foca
             CombineVisibility = 0;
             DropdownVisibility = 0;
             ListPowVisibility = 0;
+            NodeSwapVisibility = 0;
 
             //commands
             MouseEnter = new DelegateCommand(OnMouseEnter);
@@ -201,6 +208,7 @@ namespace MonocleViewExtension.Foca
                 CombineVisibility = count > 1 ? 1 : 0;
                 DropdownVisibility = count == 1 ? 1 : 0;
                 ListPowVisibility = count == 1 ? 1 : 0;
+                NodeSwapVisibility = count == 1 ? 1 : 0;
 
                 DropdownVisibility = Model.LoadedParams.CurrentWorkspaceModel.CurrentSelection.First().NodeType == "ExtensionNode" ? 1 : 0;
                 UpdateColors();

@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Dynamo.Controls;
+using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Shapes;
+using Xceed.Wpf.AvalonDock.Controls;
 
 namespace MonocleViewExtension.Foca
 {
@@ -14,8 +17,10 @@ namespace MonocleViewExtension.Foca
         public FocaView()
         {
             InitializeComponent();
+            
         }
 
+       
 
         private void UIElement_OnMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -44,11 +49,15 @@ namespace MonocleViewExtension.Foca
         private void ToolboxItems_OnMouseDown(object sender, MouseButtonEventArgs e)
         {
             var vm = this.MainGrid.DataContext as FocaViewModel;
+            if (sender is Path path)
+            {
+                vm.ToolboxClick.Execute(path.Name);
+            }
 
-            Path path = sender as Path;
-
-            vm.ToolboxClick.Execute(path.Name);
-  
+            if (sender is Image image)
+            {
+                vm.ToolboxClick.Execute(image.Name);
+            }
         }
 
         private void ToolboxGrid_OnMouseLeave(object sender, MouseEventArgs e)
@@ -64,6 +73,7 @@ namespace MonocleViewExtension.Foca
             this.combinifier.Visibility = Convert.ToInt32(this.combinifier.Tag) == 1 ? Visibility.Visible : Visibility.Hidden;
             this.powList.Visibility = Convert.ToInt32(this.powList.Tag) == 1 ? Visibility.Visible : Visibility.Hidden;
             this.dropdownConverter.Visibility = Convert.ToInt32(this.dropdownConverter.Tag) == 1 ? Visibility.Visible : Visibility.Hidden;
+            this.nodeSwapper.Visibility = Convert.ToInt32(this.nodeSwapper.Tag) == 1 ? Visibility.Visible : Visibility.Hidden;
 
         }
 
@@ -72,7 +82,10 @@ namespace MonocleViewExtension.Foca
             this.combinifier.Visibility = Visibility.Hidden;
             this.powList.Visibility = Visibility.Hidden;
             this.dropdownConverter.Visibility = Visibility.Hidden;
+            this.nodeSwapper.Visibility = Visibility.Hidden;
         }
+
+      
     }
     
 }
