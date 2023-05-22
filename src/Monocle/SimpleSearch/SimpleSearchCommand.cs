@@ -9,12 +9,14 @@ using Dynamo.Controls;
 using Dynamo.Graph.Nodes;
 using Dynamo.Logging;
 using Dynamo.Models;
+using Dynamo.UI.Controls;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using Dynamo.Wpf.Interfaces;
 using HelixToolkit.Wpf.SharpDX.Utilities;
 using MonocleViewExtension.Utilities;
 using ProtoCore.AST;
+using Xceed.Wpf.AvalonDock.Controls;
 using static Dynamo.ViewModels.SearchViewModel;
 
 namespace MonocleViewExtension.SimpleSearch
@@ -189,6 +191,12 @@ namespace MonocleViewExtension.SimpleSearch
                     }));
                 bindingInCanvs.Executed += (sender, args) =>
                 {
+                    //don't fire off command if the user is editing a code block
+                    var codeBlockEdits = view.FindVisualChildren<CodeBlockEditor>().ToList();
+
+                    if (codeBlockEdits.Any(c => c.IsKeyboardFocusWithin)) return;
+                    
+
                     SimpleSearchInCanvas(p, dvm);
                 };
                 view.CommandBindings.Add(bindingInCanvs);

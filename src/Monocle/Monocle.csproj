@@ -437,7 +437,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
-    <Content Include="images\logo.png" />
     <EmbeddedResource Include="Resources\Xceed.Wpf.AvalonDock.dll" />
     <EmbeddedResource Include="Resources\smalls.JPG" />
     <EmbeddedResource Include="Resources\WpfAnimatedGif.dll" />
