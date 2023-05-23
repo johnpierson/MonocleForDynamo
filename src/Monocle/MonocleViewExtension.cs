@@ -95,12 +95,34 @@ namespace MonocleViewExtension
             MonocleSettingsCommand.AddMenuItem(monocleMenuItem);
             FancyPasteCommand.AddMenuItem(p);
             BetterSaveCommand.AddMenuItem(p);
-            
+            ScaffoldTheJacobSmallSpecial(p);
 
 #if DEBUG
             SnippetsCommand.AddMenuItem(monocleMenuItem,p,this);
             NodeDocumentationCommand.AddMenuItem(monocleMenuItem,p);
+#endif
 
+
+
+            /*if the user has plugins loaded in Revit (or otherwise) that use a toolkit called "DevExpress",
+            we fix the overrides that toolkit forces on the app.
+            A popular example of this is KiwiCodes Family Browser R3.
+            This code will fix it for all of the Dynamo UI.
+            */
+            Compatibility.CheckForDevExpress();
+            Compatibility.FixThemesForDevExpress(p.DynamoWindow);
+        }
+
+        
+
+        public void Shutdown()
+        {
+            //save monocle settings
+            Settings.SaveMonocleSettings();
+        }
+
+        internal void ScaffoldTheJacobSmallSpecial(ViewLoadedParams p)
+        {
             MenuItem myDynamoNoWorkie = new MenuItem
             {
                 Header = "My Dynamo is not loading correctly."
@@ -121,7 +143,7 @@ namespace MonocleViewExtension
             wrapPanel.Children.Add(img);
             wrapPanel.Children.Add(jacobSmallSpecial);
 
-            jacobSmallSpecial.Click+= (sender, args) =>
+            jacobSmallSpecial.Click += (sender, args) =>
             {
                 Process.Start(@"https://forum.dynamobim.com/t/2022-1-latest-revit-update-broke-dynamo/73412/3");
             };
@@ -129,25 +151,6 @@ namespace MonocleViewExtension
             myDynamoNoWorkie.Items.Add(wrapPanel);
 
             p.AddMenuItem(MenuBarType.Help, myDynamoNoWorkie);
-#endif
-
-
-
-            /*if the user has plugins loaded in Revit (or otherwise) that use a toolkit called "DevExpress",
-            we fix the overrides that toolkit forces on the app.
-            A popular example of this is KiwiCodes Family Browser R3.
-            This code will fix it for all of the Dynamo UI.
-            */
-            Compatibility.CheckForDevExpress();
-            Compatibility.FixThemesForDevExpress(p.DynamoWindow);
-        }
-
-        
-
-        public void Shutdown()
-        {
-            //save monocle settings
-            Settings.SaveMonocleSettings();
         }
     }
 }
