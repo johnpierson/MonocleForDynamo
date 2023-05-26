@@ -21,16 +21,16 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="150"/>
             <RowDefinition Height="36"/>
-            <RowDefinition Height="24"/>
+            <RowDefinition Height="12"/>
             <RowDefinition Height="24"/>
             <RowDefinition Height="48"/>
             <RowDefinition Height="48"/>
         </Grid.RowDefinitions>
-        <Image Grid.Column="0" Grid.ColumnSpan="4" Source="/MonocleViewExtension;component/Resources/monocleLogoRoundedSquare.png"/>
+        <Image Grid.Column="0" Grid.ColumnSpan="4" Source="/MonocleViewExtension;component/PackageUsage/DogeImages/doge-comfort.png"/>
 
-        <Label Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="1" HorizontalAlignment="Center" Content="Monocle for Dynamo" Foreground="White" FontFamily="Comic Sans MS" FontWeight="Bold" FontSize="18"/>
+        <Label Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="1" HorizontalAlignment="Center" Content="monocle for Dynamo" Foreground="White" FontFamily="Comic Sans MS" FontWeight="Bold" FontSize="18"/>
         <Label Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="2" HorizontalAlignment="Center" Content="{Binding MonocleVersion}" Foreground="White" FontFamily="Comic Sans MS" FontStyle="Italic" FontSize="10"/>
 
         <Separator  Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="3" Background="#FFB8321A"></Separator>

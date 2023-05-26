@@ -82,7 +82,7 @@ namespace MonocleViewExtension.PackageUsage
                             "/MonocleViewExtension;component/PackageUsage/DogeImages/dogePreview.png",
                             "/MonocleViewExtension;component/PackageUsage/DogeImages/doge_halloween.gif",
                         };
-                        var selector = randomHalloween.Next(4);
+                        var selector = randomHalloween.Next(3);
                         return day == 1 ? "/MonocleViewExtension;component/PackageUsage/DogeImages/dwight-pumpkin.gif" : possibleHalloween[selector];
                       
                     case 12:                       
@@ -97,9 +97,12 @@ namespace MonocleViewExtension.PackageUsage
                             "/MonocleViewExtension;component/PackageUsage/DogeImages/dogePreview.png",
                             "/MonocleViewExtension;component/PackageUsage/DogeImages/dogePreview.png",
                             "/MonocleViewExtension;component/PackageUsage/DogeImages/doge_dapper.jpg",
-                            "/MonocleViewExtension;component/PackageUsage/DogeImages/doge_business.jpg"
+                            "/MonocleViewExtension;component/PackageUsage/DogeImages/doge_business.jpg",
+                            "/MonocleViewExtension;component/PackageUsage/DogeImages/doge-comfort.png",
+                            "/MonocleViewExtension;component/PackageUsage/DogeImages/doge-comfort.png",
+                            "/MonocleViewExtension;component/PackageUsage/DogeImages/doge-comfort.png"
                         };
-                        return possibleOthers[rand.Next(5)];
+                        return possibleOthers[rand.Next(7)];
                 }
             }
         }

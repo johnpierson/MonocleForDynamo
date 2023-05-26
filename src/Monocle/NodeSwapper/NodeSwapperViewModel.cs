@@ -1,23 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Forms;
 using System.Windows.Input;
-using System.Windows.Media;
-using Dynamo.Controls;
 using Dynamo.Extensions;
 using Dynamo.Graph.Nodes;
+using Dynamo.Logging;
 using Dynamo.Models;
-using Dynamo.UI.Commands;
-using Dynamo.Utilities;
 using Dynamo.ViewModels;
 using Dynamo.Views;
-using MonocleViewExtension.Utilities;
 using Xceed.Wpf.AvalonDock.Controls;
-using Cursor = System.Windows.Forms.Cursor;
 using ModifierKeys = Dynamo.Utilities.ModifierKeys;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 
@@ -44,12 +35,6 @@ namespace MonocleViewExtension.NodeSwapper
             set { _nodeToSwap = value; RaisePropertyChanged(() => NodeToSwap); }
         }
 
-        private string _nodeToSwapName;
-        public string NodeToSwapName
-        {
-            get { return _nodeToSwapName; }
-            set { _nodeToSwapName = value; RaisePropertyChanged(() => NodeToSwapName); }
-        }
 
         private NodeViewModel _nodeToSwapTo;
         public NodeViewModel NodeToSwapTo
@@ -57,13 +42,7 @@ namespace MonocleViewExtension.NodeSwapper
             get { return _nodeToSwapTo; }
             set { _nodeToSwapTo = value; RaisePropertyChanged(() => NodeToSwap); }
         }
-        private string _nodeToSwapToName;
-        public string NodeToSwapToName
-        {
-            get { return _nodeToSwapToName; }
-            set { _nodeToSwapToName = value; RaisePropertyChanged(() => NodeToSwapToName); }
-        }
-
+        
         private string _results;
         public string Results
         {
@@ -124,7 +103,6 @@ namespace MonocleViewExtension.NodeSwapper
             Model.dynamoViewModel.Model.ExecuteCommand(select);
 
             NodeToSwapTo = Model.Selection();
-            NodeToSwapToName = NodeToSwapTo.Name;
 
             _currentStep++;
             ImageMode = false;
@@ -169,23 +147,30 @@ namespace MonocleViewExtension.NodeSwapper
       
         private void OnSwapNode(object o)
         {
-            //create a duplicate first
-
-            if (NodeToSwapTo.NodeModel.NodeType.Equals("CodeBlockNode"))
+            if (NodeToSwapTo.IsCustomFunction)
             {
-                CodeBlockNodeModel existingCodeBlock = NodeToSwapTo.NodeModel as CodeBlockNodeModel;
-                var codeBlock = new CodeBlockNodeModel(existingCodeBlock.Code, 0, 0, Model.dynamoViewModel.Model.LibraryServices, Model.dynamoViewModel.Model.CurrentWorkspace.ElementResolver);
-
-                Model.dynamoViewModel.ExecuteCommand(new DynamoModel.CreateNodeCommand(codeBlock, NodeToSwap.X, NodeToSwap.Y, false, false));
+                DynamoModel.CreateNodeCommand replacementCommand =
+                    new DynamoModel.CreateNodeCommand(Guid.NewGuid().ToString(), NodeToSwapTo.NodeModel.CreationName, NodeToSwap.X, NodeToSwap.Y, false, false);
+                Model.dynamoViewModel.ExecuteCommand(replacementCommand);
             }
 
             else
             {
-                DynamoModel.CreateNodeCommand replacementCommand =
-                    new DynamoModel.CreateNodeCommand(Guid.NewGuid().ToString(), NodeToSwapTo.Name, NodeToSwap.X, NodeToSwap.Y, false, false);
-                Model.dynamoViewModel.ExecuteCommand(replacementCommand);
-            }
+                //create code block if that is the node.
+                if (NodeToSwapTo.NodeModel.NodeType.Equals("CodeBlockNode"))
+                {
+                    CodeBlockNodeModel existingCodeBlock = NodeToSwapTo.NodeModel as CodeBlockNodeModel;
+                    var codeBlock = new CodeBlockNodeModel(existingCodeBlock.Code, 0, 0, Model.dynamoViewModel.Model.LibraryServices, Model.dynamoViewModel.Model.CurrentWorkspace.ElementResolver);
 
+                    Model.dynamoViewModel.ExecuteCommand(new DynamoModel.CreateNodeCommand(codeBlock, NodeToSwap.X, NodeToSwap.Y, false, false));
+                }
+                else
+                {
+                    DynamoModel.CreateNodeCommand replacementCommand =
+                        new DynamoModel.CreateNodeCommand(Guid.NewGuid().ToString(), NodeToSwapTo.Name, NodeToSwap.X, NodeToSwap.Y, false, false);
+                    Model.dynamoViewModel.ExecuteCommand(replacementCommand);
+                }
+            }
 
             NodeViewModel replacementNode = Model.dynamoViewModel.CurrentSpaceViewModel.Nodes.LastOrDefault();
 
@@ -244,7 +229,15 @@ namespace MonocleViewExtension.NodeSwapper
             }
             foreach (var connectionCommand in connectionCommands)
             {
-                Model.dynamoViewModel.ExecuteCommand(connectionCommand);
+                try
+                {
+                    Model.dynamoViewModel.ExecuteCommand(connectionCommand);
+                }
+                catch (Exception)
+                {
+                    //suppress, this happens when you are replacing a node with one with more outputs
+                }
+             
             }
 
 
@@ -254,7 +247,6 @@ namespace MonocleViewExtension.NodeSwapper
             Model.dynamoViewModel.ExecuteCommand(delete);
 
             NodeToSwap = null;
-            NodeToSwapName = "pending";
         }
 
         private void WsViewOnMouseUp(object sender, MouseButtonEventArgs e)
@@ -282,7 +274,15 @@ namespace MonocleViewExtension.NodeSwapper
                 NodeToSwap = Model.Selection();
                 if (NodeToSwap != null)
                 {
-                    OnSwapNode(new object());
+                    try
+                    {
+                        OnSwapNode(new object());
+                    }
+                    catch (Exception exception)
+                    {
+                        Model.dynamoViewModel.Model.Logger.LogWarning($"Monocle- {exception.Message}", WarningLevel.Mild);
+                    }
+                 
                 }
                 else
                 {

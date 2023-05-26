@@ -437,6 +437,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="FodyWeavers.xml" />
+    <Resource Include="PackageUsage\DogeImages\doge-comfort.png" />
     <EmbeddedResource Include="Resources\Xceed.Wpf.AvalonDock.dll" />
     <EmbeddedResource Include="Resources\smalls.JPG" />
     <EmbeddedResource Include="Resources\WpfAnimatedGif.dll" />
@@ -446,17 +447,20 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug copy "$(ProjectDir)bin\Debug\MonocleViewExtension.dll" "C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\2.16\packages\Monocle\bin"
+    <PostBuildEvent>if $(ConfigurationName) == Debug copy "$(ProjectDir)bin\Debug\MonocleViewExtension.dll" "C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\2.18\packages\Monocle\bin"
 
 if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.12\packages\Monocle\bin"
 if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.13\packages\Monocle\bin"
+if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.16\packages\Monocle\bin"
+if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.17\packages\Monocle\bin"
+if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.18\packages\Monocle\bin"
 
 
 if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.0\packages\Monocle\bin"
 if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.6\packages\Monocle\bin"
 if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.12\packages\Monocle\bin"
 if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.16\packages\Monocle\bin"
-</PostBuildEvent>
+if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.17\packages\Monocle\bin"</PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
