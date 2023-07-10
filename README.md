@@ -21,7 +21,7 @@ If you appreciate the work put into this free package, please vote in support of
 This code is licensed primarily under [BSD 3-Clause](https://github.com/johnpierson/MonocleForDynamo/blob/master/LICENSE) with a [Commons Clause License](https://commonsclause.com/) attached to that.
 
 ## Current Version
-Monocle is currently built against the latest Dynamo stable build. At this time that is 2.12.0. _However, monocle has been tested for Dynamo 2.0.3 - 2.13.0._
+Monocle is currently built against the latest Dynamo stable build. At this time that is 2.17.0. _However, monocle has been tested for Dynamo 2.0.3 - 2.19.0._
 
 ## Known Issues
 - When installing from the package manager for the first time, you may need to restart Dynamo.
