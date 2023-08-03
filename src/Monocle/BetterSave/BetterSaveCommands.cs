@@ -23,15 +23,15 @@ namespace MonocleViewExtension.BetterSave
 
             var flyout = new MenuItem
             {
-                Header = "Better Save",
-                ToolTip = "Better save options. Because you deserve it. Brought to you by monocle™️"
+                Header = Properties.Resources.ResourceManager.GetString("BetterSaveFlyoutHeader"),
+                ToolTip = Properties.Resources.ResourceManager.GetString("BetterSaveFlyoutTooltip")
             };
             //quick save with timestamp
             var quickSave = new MenuItem
             {
-                Header = "Quick Save",
-                InputGestureText = "Ctrl + Alt + S",
-                ToolTip = "Provides a quick date/time stamped \"snapshot\" of the current file."
+                Header = Properties.Resources.ResourceManager.GetString("QuickSaveMenuItemHeader"),
+                InputGestureText = Properties.Resources.ResourceManager.GetString("QuickSaveMenuItemKeyboardShortcut"),
+                ToolTip = Properties.Resources.ResourceManager.GetString("QuickSaveMenuItemTooltip")
             };
 
             quickSave.Click += (sender, args) =>
@@ -41,25 +41,12 @@ namespace MonocleViewExtension.BetterSave
 
             flyout.Items.Add(quickSave);
 
-            //save with new guids
-            var saveWithNewGuids = new MenuItem
-            {
-                Header = "Save With New Guids",
-                ToolTip = "You may not know this, but Dynamo (before 2.18) saves workspace with duplicate GUIDs which sucks. This fixes that."
-            };
-
-            saveWithNewGuids.Click += (sender, args) =>
-            {
-                betterSaveModel.BetterSave("SaveWithNewGuids");
-            };
-
-            flyout.Items.Add(saveWithNewGuids);
 
             //sloppy save with random words
             var sloppySave = new MenuItem
             {
-                Header = "Sloppy Save",
-                ToolTip = "Quickly save your file to your desktop, because you knew you were going to anyway."
+                Header = Properties.Resources.ResourceManager.GetString("SloppySaveMenuItemHeader"),
+                ToolTip = Properties.Resources.ResourceManager.GetString("SloppySaveMenuItemTooltip")
             };
 
             sloppySave.Click += (sender, args) =>
@@ -92,7 +79,7 @@ namespace MonocleViewExtension.BetterSave
             //Dynamo.UI.Prompts.GenericTaskDialog dialog = new GenericTaskDialog();
             //dialog.ShowDialog(); tODO: Make this dialog dynamo-ey
 
-            var result = MessageBox.Show("sloppy save file?", "sloppy save to desktop", MessageBoxButtons.YesNo);
+            var result = MessageBox.Show(Properties.Resources.ResourceManager.GetString("SloppySaveMessageBoxTitle"), Properties.Resources.ResourceManager.GetString("SloppySaveMessageBoxCaption"), MessageBoxButtons.YesNo);
 
             if (result == DialogResult.Yes)
             {
