@@ -21,7 +21,7 @@ namespace MonocleViewExtension.GraphResizerer
         {
             var dvm = p.DynamoWindow.DataContext as DynamoViewModel;
             
-            var graphResizererMenu = new MenuItem { Header = $"graph resizerer" };
+            var graphResizererMenu = new MenuItem { Header = Properties.Resources.ResourceManager.GetString("GraphResizererMenuItemHeader") };
 
             graphResizererMenu.Click += (sender, args) =>
             {

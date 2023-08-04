@@ -29,7 +29,7 @@ namespace MonocleViewExtension.SimpleSearch
 
         internal static MenuItem ssMenuItem;
         internal static Popup SimpleSearchPopup;
-        internal static string Header = "simple search";
+        internal static string Header = Properties.Resources.ResourceManager.GetString("SimpleSearchMenuItemHeader");
         /// <summary>
         /// Create the simple search menu
         /// </summary>

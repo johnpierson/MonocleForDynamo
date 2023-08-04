@@ -117,11 +117,62 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AboutMenuItemHeader" xml:space="preserve">
+    <value>about monocle</value>
+  </data>
+  <data name="AboutMenuItemUpdateHeader" xml:space="preserve">
+    <value>about monocle | Update Available! v.</value>
+  </data>
+  <data name="AboutMenuItemUpdateTooltip" xml:space="preserve">
+    <value>There is a new monocle update available. Please update via the package manager.</value>
+  </data>
   <data name="BetterSaveFlyoutHeader" xml:space="preserve">
     <value>Better Save (ᵇʳᵒᵘᵍʰᵗ ᵗᵒ ʸᵒᵘ ᵇʸ ᵐᵒⁿᵒᶜˡᵉ™️)</value>
   </data>
   <data name="BetterSaveFlyoutTooltip" xml:space="preserve">
     <value>Better save options. Because you deserve it. Brought to you by monocle™️</value>
+  </data>
+  <data name="FocaMenuItemHeader" xml:space="preserve">
+    <value>enable FOCA</value>
+  </data>
+  <data name="FocaMenuItemTooltip" xml:space="preserve">
+    <value>FOCA, formerly known as the "in-canvas align widget", is the cleaner of your dynamo graphs. this feature includes alignment tools, grouping tools and more.</value>
+  </data>
+  <data name="FocaStandardGroupMenuItemHeader" xml:space="preserve">
+    <value>standard group creation</value>
+  </data>
+  <data name="GraphResizererMenuItemHeader" xml:space="preserve">
+    <value>graph resizerer</value>
+  </data>
+  <data name="HighlightDisableMenuItemHeader" xml:space="preserve">
+    <value>disable highlighting</value>
+  </data>
+  <data name="HighlightEnableMenuItemHeader" xml:space="preserve">
+    <value>enable highlighting</value>
+  </data>
+  <data name="MegaInputIdentifierMenuItem" xml:space="preserve">
+    <value>mega input identifier</value>
+  </data>
+  <data name="NodeIndentifierMenuItemHeader" xml:space="preserve">
+    <value>node identifiers</value>
+  </data>
+  <data name="NodeSwapperMenuItemHeader" xml:space="preserve">
+    <value>node swapper</value>
+  </data>
+  <data name="NodeSwapperStatusMessageSelectReplacement" xml:space="preserve">
+    <value>please select a node to use as a replacement</value>
+  </data>
+  <data name="NodeSwapperStatusMessageSelectToReplace" xml:space="preserve">
+    <value>now select the nodes to match to the target node you selected.</value>
+  </data>
+  <data name="PackageUsageBoringMenuItemHeader" xml:space="preserve">
+    <value>package usage boring mode</value>
+  </data>
+  <data name="PackageUsageDogeMenuItemHeader" xml:space="preserve">
+    <value>package usage doge</value>
+  </data>
+  <data name="PackageUsageMenuItemHeader" xml:space="preserve">
+    <value>package usage</value>
   </data>
   <data name="QuickSaveMenuItemHeader" xml:space="preserve">
     <value>Quick Save</value>
@@ -131,6 +182,21 @@
   </data>
   <data name="QuickSaveMenuItemTooltip" xml:space="preserve">
     <value>Provides a quick date/time stamped "snapshot" of the current file.</value>
+  </data>
+  <data name="SettingsLoadMenuItemHeader" xml:space="preserve">
+    <value>load settings from path</value>
+  </data>
+  <data name="SettingsMenuItemHeader" xml:space="preserve">
+    <value>monocle settings</value>
+  </data>
+  <data name="SettingsRestoreMenuItemHeader" xml:space="preserve">
+    <value>restore default settings</value>
+  </data>
+  <data name="SettingsSaveMenuItemHeader" xml:space="preserve">
+    <value>save current settings to default path</value>
+  </data>
+  <data name="SimpleSearchMenuItemHeader" xml:space="preserve">
+    <value>simple search</value>
   </data>
   <data name="SloppySaveMenuItemHeader" xml:space="preserve">
     <value>Sloppy Save</value>

@@ -36,7 +36,9 @@
         <Image Grid.Row="0" Grid.Column="0" Margin="2" Source="{StaticResource PaintBrushIconDrawingImage}" Stretch="Uniform"
                Visibility="{Binding ImageMode, Converter={StaticResource BooleanConverter2}, FallbackValue=true}"/>
 
-        <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding PaintStatusMessage, FallbackValue=please select a node to use as a swap}" FontSize="14" VerticalAlignment="Top" TextWrapping="Wrap"  TextAlignment="Center" Foreground="#FF499EC0"/>
+        <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" 
+                   Text="{Binding PaintStatusMessage, FallbackValue=please select a node to use as a swap}" 
+                   FontSize="14" VerticalAlignment="Top" TextWrapping="Wrap"  TextAlignment="Center" Foreground="#FF499EC0"/>
 
         <TextBlock Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Text="*select a blank area to quit*" FontSize="12" VerticalAlignment="Bottom" TextWrapping="Wrap" TextAlignment="Center" Foreground="#FF499EC0" Padding="0 4"/>
     

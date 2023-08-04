@@ -61,6 +61,33 @@ namespace MonocleViewExtension.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to about monocle.
+        /// </summary>
+        internal static string AboutMenuItemHeader {
+            get {
+                return ResourceManager.GetString("AboutMenuItemHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to about monocle | Update Available! v..
+        /// </summary>
+        internal static string AboutMenuItemUpdateHeader {
+            get {
+                return ResourceManager.GetString("AboutMenuItemUpdateHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There is a new monocle update available. Please update via the package manager..
+        /// </summary>
+        internal static string AboutMenuItemUpdateTooltip {
+            get {
+                return ResourceManager.GetString("AboutMenuItemUpdateTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Better Save (ᵇʳᵒᵘᵍʰᵗ ᵗᵒ ʸᵒᵘ ᵇʸ ᵐᵒⁿᵒᶜˡᵉ™️).
         /// </summary>
         internal static string BetterSaveFlyoutHeader {
@@ -75,6 +102,132 @@ namespace MonocleViewExtension.Properties {
         internal static string BetterSaveFlyoutTooltip {
             get {
                 return ResourceManager.GetString("BetterSaveFlyoutTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to enable FOCA.
+        /// </summary>
+        internal static string FocaMenuItemHeader {
+            get {
+                return ResourceManager.GetString("FocaMenuItemHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to FOCA, formerly known as the &quot;in-canvas align widget&quot;, is the cleaner of your dynamo graphs. this feature includes alignment tools, grouping tools and more..
+        /// </summary>
+        internal static string FocaMenuItemTooltip {
+            get {
+                return ResourceManager.GetString("FocaMenuItemTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to standard group creation.
+        /// </summary>
+        internal static string FocaStandardGroupMenuItemHeader {
+            get {
+                return ResourceManager.GetString("FocaStandardGroupMenuItemHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to graph resizerer.
+        /// </summary>
+        internal static string GraphResizererMenuItemHeader {
+            get {
+                return ResourceManager.GetString("GraphResizererMenuItemHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to disable highlighting.
+        /// </summary>
+        internal static string HighlightDisableMenuItemHeader {
+            get {
+                return ResourceManager.GetString("HighlightDisableMenuItemHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to enable highlighting.
+        /// </summary>
+        internal static string HighlightEnableMenuItemHeader {
+            get {
+                return ResourceManager.GetString("HighlightEnableMenuItemHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to mega input identifier.
+        /// </summary>
+        internal static string MegaInputIdentifierMenuItem {
+            get {
+                return ResourceManager.GetString("MegaInputIdentifierMenuItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to node identifiers.
+        /// </summary>
+        internal static string NodeIndentifierMenuItemHeader {
+            get {
+                return ResourceManager.GetString("NodeIndentifierMenuItemHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to node swapper.
+        /// </summary>
+        internal static string NodeSwapperMenuItemHeader {
+            get {
+                return ResourceManager.GetString("NodeSwapperMenuItemHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to please select a node to use as a replacement.
+        /// </summary>
+        internal static string NodeSwapperStatusMessageSelectReplacement {
+            get {
+                return ResourceManager.GetString("NodeSwapperStatusMessageSelectReplacement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to now select the nodes to match to the target node you selected..
+        /// </summary>
+        internal static string NodeSwapperStatusMessageSelectToReplace {
+            get {
+                return ResourceManager.GetString("NodeSwapperStatusMessageSelectToReplace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to package usage boring mode.
+        /// </summary>
+        internal static string PackageUsageBoringMenuItemHeader {
+            get {
+                return ResourceManager.GetString("PackageUsageBoringMenuItemHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to package usage doge.
+        /// </summary>
+        internal static string PackageUsageDogeMenuItemHeader {
+            get {
+                return ResourceManager.GetString("PackageUsageDogeMenuItemHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to package usage.
+        /// </summary>
+        internal static string PackageUsageMenuItemHeader {
+            get {
+                return ResourceManager.GetString("PackageUsageMenuItemHeader", resourceCulture);
             }
         }
         
@@ -102,6 +255,51 @@ namespace MonocleViewExtension.Properties {
         internal static string QuickSaveMenuItemTooltip {
             get {
                 return ResourceManager.GetString("QuickSaveMenuItemTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to load settings from path.
+        /// </summary>
+        internal static string SettingsLoadMenuItemHeader {
+            get {
+                return ResourceManager.GetString("SettingsLoadMenuItemHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to monocle settings.
+        /// </summary>
+        internal static string SettingsMenuItemHeader {
+            get {
+                return ResourceManager.GetString("SettingsMenuItemHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to restore default settings.
+        /// </summary>
+        internal static string SettingsRestoreMenuItemHeader {
+            get {
+                return ResourceManager.GetString("SettingsRestoreMenuItemHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to save current settings to default path.
+        /// </summary>
+        internal static string SettingsSaveMenuItemHeader {
+            get {
+                return ResourceManager.GetString("SettingsSaveMenuItemHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to simple search.
+        /// </summary>
+        internal static string SimpleSearchMenuItemHeader {
+            get {
+                return ResourceManager.GetString("SimpleSearchMenuItemHeader", resourceCulture);
             }
         }
         

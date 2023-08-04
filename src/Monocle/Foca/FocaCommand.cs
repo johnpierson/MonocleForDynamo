@@ -52,8 +52,8 @@ namespace MonocleViewExtension.Foca
             var focaMenuItem = new MenuItem
             {
                 IsCheckable = true,
-                Header = "enable FOCA   | ᶘ ᵒᴥᵒᶅ",
-                ToolTip = "FOCA, formerly known as the \"in-canvas align widget\", is the cleaner of your dynamo graphs. this feature includes alignment tools, grouping tools and more.",
+                Header = $"{Properties.Resources.ResourceManager.GetString("FocaMenuItemHeader")} | ᶘ ᵒᴥᵒᶅ",
+                ToolTip = Properties.Resources.ResourceManager.GetString("FocaMenuItemTooltip"),
                 IsChecked = Globals.IsFocaEnabled
             };
 
@@ -71,7 +71,7 @@ namespace MonocleViewExtension.Foca
 
             RegisterKeyboardShortcuts(p, m);
 
-            var colorCodeMenuItem = new MenuItem { Header = "standard group creation" };
+            var colorCodeMenuItem = new MenuItem { Header = Properties.Resources.ResourceManager.GetString("FocaStandardGroupMenuItemHeader") };
 
             colorCodeMenuItem.Click += (sender, args) =>
             {

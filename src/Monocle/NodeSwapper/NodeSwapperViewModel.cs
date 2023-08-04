@@ -17,7 +17,7 @@ namespace MonocleViewExtension.NodeSwapper
     internal class NodeSwapperViewModel : ViewModelBase
     {
         public NodeSwapperModel Model { get; set; }
-        private ReadyParams _readyParams;
+        private readonly ReadyParams _readyParams;
 
 
         private bool _imageMode;
@@ -68,7 +68,7 @@ namespace MonocleViewExtension.NodeSwapper
             _workspaceView = Model.dynamoView.FindVisualChildren<WorkspaceView>().First();
 
             //set paint brush settings
-            PaintStatusMessage = "please select a node to use as a replacement";
+            PaintStatusMessage =  Properties.Resources.ResourceManager.GetString("NodeSwapperStatusMessageSelectReplacement");
 
             //set to manual run mode
             Model.SetRunStatus();
@@ -108,7 +108,7 @@ namespace MonocleViewExtension.NodeSwapper
             ImageMode = false;
 
             //set the message
-            PaintStatusMessage = "now select the nodes to match to the target node you selected.";
+            PaintStatusMessage = Properties.Resources.ResourceManager.GetString("NodeSwapperStatusMessageSelectToReplace");
 
 
             _paintBrush = new NodeSwapperPaintBrush()
@@ -261,7 +261,7 @@ namespace MonocleViewExtension.NodeSwapper
                     ImageMode = false;
 
                     //set the message
-                    PaintStatusMessage = "now select the nodes to match to the target node.";
+                    PaintStatusMessage = Properties.Resources.ResourceManager.GetString("NodeSwapperStatusMessageSelectToReplace");
                 }
                 else
                 {

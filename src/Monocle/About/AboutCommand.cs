@@ -20,7 +20,7 @@ namespace MonocleViewExtension.About
 
             var viewModel = new AboutViewModel(p);
 
-            var aboutMenu = new MenuItem{Header = $"about monocle"};
+            var aboutMenu = new MenuItem{Header = Properties.Resources.ResourceManager.GetString("AboutMenuItemHeader") };
 
             aboutMenu.Click += (sender, args) =>
             {
@@ -44,8 +44,8 @@ namespace MonocleViewExtension.About
             if (MiscUtils.CheckForInternetConnection() && CheckForUpdate("johnpierson","monoclefordynamo"))
             {
                 aboutMenu.Foreground = new SolidColorBrush(Colors.LawnGreen);
-                aboutMenu.Header = $"about monocle | Update Available! v.{Latest}";
-                aboutMenu.ToolTip = "There is a new monocle update available. Please update via the package manager.";
+                aboutMenu.Header = $"{Properties.Resources.ResourceManager.GetString("AboutMenuItemUpdateHeader")}{Latest}";
+                aboutMenu.ToolTip = Properties.Resources.ResourceManager.GetString("AboutMenuItemUpdateTooltip");
             }
 
         }
