@@ -4,10 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ui="clr-namespace:Dynamo.UI;assembly=DynamoCoreWpf"
+             xmlns:controls="clr-namespace:MonocleViewExtension.About"
              mc:Ignorable="d"
              Width="350"
-             Height="400"
-             MinHeight="400"
+             Height="500"
+             MinHeight="500"
              MinWidth="350"
              Title="{Binding MonocleVersion}"
              Background="#535353"
@@ -16,40 +17,72 @@
     <Grid Name="MainGrid" Margin="12">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="32"/>
             <ColumnDefinition Width="250"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="150"/>
             <RowDefinition Height="36"/>
-            <RowDefinition Height="12"/>
-            <RowDefinition Height="24"/>
-            <RowDefinition Height="48"/>
-            <RowDefinition Height="48"/>
+            <RowDefinition Height="36"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Image Grid.Column="0" Grid.ColumnSpan="4" Source="/MonocleViewExtension;component/PackageUsage/DogeImages/doge-comfort.png"/>
+        <Image Grid.Column="0" Grid.ColumnSpan="3" Source="/MonocleViewExtension;component/PackageUsage/DogeImages/doge-comfort.png"/>
 
-        <Label Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="1" HorizontalAlignment="Center" Content="monocle for Dynamo" Foreground="White" FontFamily="Comic Sans MS" FontWeight="Bold" FontSize="18"/>
-        <Label Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="2" HorizontalAlignment="Center" Content="{Binding MonocleVersion}" Foreground="White" FontFamily="Comic Sans MS" FontStyle="Italic" FontSize="10"/>
+        <Label Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" HorizontalAlignment="Center" Content="monocle for Dynamo" Foreground="White" FontFamily="Comic Sans MS" FontWeight="Bold" FontSize="18"/>
+        <Label Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2" HorizontalAlignment="Center" Content="{Binding MonocleVersion}" Foreground="White" FontFamily="Comic Sans MS" FontStyle="Italic" FontSize="10"/>
 
-        <Separator  Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="3" Background="#FFB8321A"></Separator>
 
-        <Image Grid.Column="1" Grid.Row="4" Source="/MonocleViewExtension;component/Resources/about_github.png"/>
-        <TextBlock Grid.Column="2" Grid.Row="4" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8 0" Foreground="White" FontSize="16">           
-            <Run Text="check out monocle"></Run>
-            <Hyperlink NavigateUri="https://github.com/johnpierson/MonocleForDynamo" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#FFB8321A">
-                 on github.
-            </Hyperlink>
-        </TextBlock>
+        <TabControl Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="3" Background="#535353">
+            <TabItem Header="About">
+                <Grid Background="#535353" Margin="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="32"/>
+                        <ColumnDefinition Width="250"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="24"/>
+                        <RowDefinition Height="48"/>
+                        <RowDefinition Height="48"/>
+                    </Grid.RowDefinitions>
+                    <Image Grid.Column="0" Grid.Row="0" Source="/MonocleViewExtension;component/Resources/about_github.png"/>
+                    <TextBlock Grid.Column="1" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8 0" Foreground="White" FontSize="16">           
+                    <Run Text="check out monocle"></Run>
+                    <Hyperlink NavigateUri="https://github.com/johnpierson/MonocleForDynamo" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#FFB8321A">
+                        on github.
+                    </Hyperlink>
+                    </TextBlock>
 
-        <Image Grid.Column="1" Grid.Row="5" Source="/MonocleViewExtension;component/Resources/about_john.png"/>
-        <TextBlock TextWrapping="Wrap" Grid.Column="2" Grid.Row="5" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8 0" Foreground="White" FontSize="16">           
-           <Run Text="follow john on the"></Run>
-            <Hyperlink NavigateUri="https://bio.link/johntpierson" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#FFB8321A">
-                socials.
-            </Hyperlink>
-        </TextBlock>
+                    <Image Grid.Column="0" Grid.Row="1" Source="/MonocleViewExtension;component/Resources/about_john.png"/>
+                    <TextBlock TextWrapping="Wrap" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8 0" Foreground="White" FontSize="16">           
+                    <Run Text="follow john on the"></Run>
+                    <Hyperlink NavigateUri="https://bio.link/johntpierson" RequestNavigate="Hyperlink_RequestNavigate" Foreground="#FFB8321A">
+                        socials.
+                    </Hyperlink>
+                    </TextBlock>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Special Thanks">
+                <ScrollViewer>
+                    <StackPanel CanVerticallyScroll="True">
+                        <TextBlock TextWrapping="Wrap" Foreground="White" FontSize="10" FontFamily="Comic Sans MS">
+                            <TextBlock.Text>
+                                monocle is made possible by, "people like you"™. click the link to see their github profile
+                            </TextBlock.Text>
+                        </TextBlock>
+                        <controls:ContributorUserControl UserName="AndyDandy74" UserImageSource="/MonocleViewExtension;component/About/Resources/andydandy74.jpg" NavigateUri="https://github.com/andydandy74"/>
+                        <controls:ContributorUserControl UserName="chuongmep" UserImageSource="/MonocleViewExtension;component/About/Resources/chuongmep.jpg" NavigateUri="https://github.com/chuongmep"/>
+                        <controls:ContributorUserControl UserName="SvenAmiet" UserImageSource="/MonocleViewExtension;component/About/Resources/svenamiet.png" NavigateUri="https://github.com/svenAmiet"/>
+
+                    </StackPanel>
+                </ScrollViewer>
+
+
+            </TabItem>
+
+        </TabControl>
+
+
+
 
     </Grid>
 </Window>

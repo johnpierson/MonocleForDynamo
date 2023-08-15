@@ -240,6 +240,9 @@
       <DependentUpon>AboutView.xaml</DependentUpon>
     </Compile>
     <Compile Include="About\AboutViewModel.cs" />
+    <Compile Include="About\ContributorUserControl.xaml.cs">
+      <DependentUpon>ContributorUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="BetterSave\BetterSaveModel.cs" />
     <Compile Include="BetterSave\BetterSaveCommands.cs" />
     <Compile Include="FancyPaste\ExamineClipboardView.xaml.cs">
@@ -354,6 +357,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="About\ContributorUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="FancyPaste\ExamineClipboardView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -451,6 +458,9 @@
     <Resource Include="Foca\Resources\customnode-64.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="About\Resources\andydandy74.jpg" />
+    <Resource Include="About\Resources\chuongmep.jpg" />
+    <Resource Include="About\Resources\svenamiet.png" />
     <Content Include="FodyWeavers.xml" />
     <Resource Include="PackageUsage\DogeImages\doge-comfort.png" />
     <EmbeddedResource Include="Properties\Resources.de-DE.resx">
