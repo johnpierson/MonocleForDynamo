@@ -1,0 +1,213 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AboutMenuItemHeader" xml:space="preserve">
+    <value>À propos de Monocle</value>
+  </data>
+  <data name="AboutMenuItemUpdateHeader" xml:space="preserve">
+    <value>À propos de Monocle | Mise à jour disponible ! v.</value>
+  </data>
+  <data name="AboutMenuItemUpdateTooltip" xml:space="preserve">
+    <value>Une nouvelle mise à jour de monocle est disponible. Veuillez mettre à jour à l'aide du gestionnaire de package.</value>
+  </data>
+  <data name="BetterSaveFlyoutHeader" xml:space="preserve">
+    <value>Meilleur Enregistrement (vous est offert par ᵐᵒⁿᵒᶜˡᵉ™️)</value>
+  </data>
+  <data name="BetterSaveFlyoutTooltip" xml:space="preserve">
+    <value>Réglages de Meilleur Enregistrement. Parce que vous le meritez. Vous est offert par monocle™️</value>
+  </data>
+  <data name="FocaMenuItemHeader" xml:space="preserve">
+    <value>Activer FOCA</value>
+  </data>
+  <data name="FocaMenuItemTooltip" xml:space="preserve">
+    <value>FOCA, précédemment connu comme "in-canvas align widget", est l'outil de nettoyage de vos graphs dynamo. Cette fonctionnalité inclut les outils d'alignement, de création de groupes et bien d'autres.</value>
+  </data>
+  <data name="FocaStandardGroupMenuItemHeader" xml:space="preserve">
+    <value>Création de groupes par défaut</value>
+  </data>
+  <data name="GraphResizererMenuItemHeader" xml:space="preserve">
+    <value>Redimensionneur de Graph</value>
+  </data>
+  <data name="HighlightDisableMenuItemHeader" xml:space="preserve">
+    <value>Désactiver la surbrillance</value>
+  </data>
+  <data name="HighlightEnableMenuItemHeader" xml:space="preserve">
+    <value>Activer la surbrillance</value>
+  </data>
+  <data name="MegaInputIdentifierMenuItem" xml:space="preserve">
+    <value>Mega identificateur d'entrées</value>
+  </data>
+  <data name="NodeIndentifierMenuItemHeader" xml:space="preserve">
+    <value>Identificateur de noeud</value>
+  </data>
+  <data name="NodeSwapperMenuItemHeader" xml:space="preserve">
+    <value>Remplaceur de noeud</value>
+  </data>
+  <data name="NodeSwapperStatusMessageSelectReplacement" xml:space="preserve">
+    <value>Veuillez sélectionner un noeud à utiliser en remplacement</value>
+  </data>
+  <data name="NodeSwapperStatusMessageSelectToReplace" xml:space="preserve">
+    <value>Sélectionnez maintenant les noeuds à remplacer par le noeud sélectionné.</value>
+  </data>
+  <data name="PackageUsageBoringMenuItemHeader" xml:space="preserve">
+    <value>Utilisation de package - Mode ennuyeux</value>
+  </data>
+  <data name="PackageUsageDogeMenuItemHeader" xml:space="preserve">
+    <value>Utilisation de package - Doge</value>
+  </data>
+  <data name="PackageUsageMenuItemHeader" xml:space="preserve">
+    <value>Utilisation de package</value>
+  </data>
+  <data name="QuickSaveMenuItemHeader" xml:space="preserve">
+    <value>Enregistrement rapide</value>
+  </data>
+  <data name="QuickSaveMenuItemKeyboardShortcut" xml:space="preserve">
+    <value>Ctrl + Alt + S</value>
+  </data>
+  <data name="QuickSaveMenuItemTooltip" xml:space="preserve">
+    <value>Crée un "snapshot" rapide du fichier courant avec indication date/heure.</value>
+  </data>
+  <data name="SettingsLoadMenuItemHeader" xml:space="preserve">
+    <value>Charger les réglages depuis un chemin</value>
+  </data>
+  <data name="SettingsMenuItemHeader" xml:space="preserve">
+    <value>Réglages de monocle</value>
+  </data>
+  <data name="SettingsRestoreMenuItemHeader" xml:space="preserve">
+    <value>Réinitialiser les réglages par défaut</value>
+  </data>
+  <data name="SettingsSaveMenuItemHeader" xml:space="preserve">
+    <value>Enregistrer les réglages actuels dans le chemin par défaut</value>
+  </data>
+  <data name="SimpleSearchMenuItemHeader" xml:space="preserve">
+    <value>Recherche simple</value>
+  </data>
+  <data name="SloppySaveMenuItemHeader" xml:space="preserve">
+    <value>Enregistrement bâclé</value>
+  </data>
+  <data name="SloppySaveMenuItemTooltip" xml:space="preserve">
+    <value>Enregistre le fichier sur le bureau car vous alliez le faire de toute façon</value>
+  </data>
+  <data name="SloppySaveMessageBoxCaption" xml:space="preserve">
+    <value>Enregistrement bâclé sur le bureau</value>
+  </data>
+  <data name="SloppySaveMessageBoxTitle" xml:space="preserve">
+    <value>Faire un enregistrement bâclé du fichier?</value>
+  </data>
+</root>
