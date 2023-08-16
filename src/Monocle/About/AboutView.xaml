@@ -69,9 +69,10 @@
                                 monocle is made possible by, "people like you"™. click the link to see their github profile
                             </TextBlock.Text>
                         </TextBlock>
-                        <controls:ContributorUserControl UserName="AndyDandy74" UserImageSource="/MonocleViewExtension;component/About/Resources/andydandy74.jpg" NavigateUri="https://github.com/andydandy74"/>
-                        <controls:ContributorUserControl UserName="chuongmep" UserImageSource="/MonocleViewExtension;component/About/Resources/chuongmep.jpg" NavigateUri="https://github.com/chuongmep"/>
-                        <controls:ContributorUserControl UserName="SvenAmiet" UserImageSource="/MonocleViewExtension;component/About/Resources/svenamiet.png" NavigateUri="https://github.com/svenAmiet"/>
+                        <controls:ContributorUserControl UserName="AndyDandy74" UserImageSource="/MonocleViewExtension;component/About/Resources/andydandy74.jpg" NavigateUri="https://github.com/andydandy74" Contribution="Contribution: Various"/>
+                        <controls:ContributorUserControl UserName="chuongmep" UserImageSource="/MonocleViewExtension;component/About/Resources/chuongmep.jpg" NavigateUri="https://github.com/chuongmep" Contribution="Contribution: Various"/>
+                        <controls:ContributorUserControl UserName="eml-henn" UserImageSource="/MonocleViewExtension;component/About/Resources/eml-henn.png" NavigateUri="https://github.com/eml-henn" Contribution="Contribution: Italian Translation"/>
+                        <controls:ContributorUserControl UserName="SvenAmiet" UserImageSource="/MonocleViewExtension;component/About/Resources/svenamiet.png" NavigateUri="https://github.com/svenAmiet" Contribution="Contribution: French Translation"/>
 
                     </StackPanel>
                 </ScrollViewer>

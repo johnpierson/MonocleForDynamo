@@ -29,7 +29,7 @@ namespace MonocleViewExtension.About
         public string UserName { get; set; }
         public string UserImageSource { get; set; }
         public string NavigateUri { get; set; }
-
+        public string Contribution { get; set; }
         private void Hyperlink_OnRequestNavigate(object sender, RequestNavigateEventArgs e)
         {
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
