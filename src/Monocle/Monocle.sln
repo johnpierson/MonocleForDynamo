@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.1758
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34003.232
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monocle", "Monocle\Monocle.csproj", "{2C5F174E-DA7C-44A1-A91B-B519CD595254}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monocle", "Monocle.csproj", "{2C5F174E-DA7C-44A1-A91B-B519CD595254}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,6 +20,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {D691459E-E67D-4F98-9D57-455EBC682814}
+		SolutionGuid = {38913F80-9F0F-4B3B-9E4E-4C9AE366FDC6}
 	EndGlobalSection
 EndGlobal
