@@ -157,7 +157,14 @@ namespace MonocleViewExtension
 
             myDynamoNoWorkie.Items.Add(wrapPanel);
 
-            p.AddMenuItem(MenuBarType.Help, myDynamoNoWorkie);
+            //in Dynamo 2.18+, the team decided I can't add things to the help menu the old way, this fixes that.
+            var allMenus = p.dynamoMenu.Items.OfType<MenuItem>();
+            var helpMenu = allMenus.FirstOrDefault(m => m.Name.Equals("HelpMenu"));
+
+            if (helpMenu != null)
+            {
+                helpMenu.Items.Add(myDynamoNoWorkie);
+            }
         }
     }
 }

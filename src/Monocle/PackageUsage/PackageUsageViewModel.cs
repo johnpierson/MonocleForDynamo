@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using Dynamo.Extensions;
 using Dynamo.Graph.Nodes;
 using Dynamo.UI.Commands;
@@ -60,6 +61,12 @@ namespace MonocleViewExtension.PackageUsage
         {
             get
             {
+                if (Keyboard.IsKeyDown(Key.LeftCtrl))
+                {
+                    return "/MonocleViewExtension;component/PackageUsage/DogeImages/cheems_heaven.jpg";
+                }
+
+
                 int switcher = DateTime.Now.Month;
 
                 if (DateTime.Now.Month == 1 && DateTime.Now.Day <=7)
@@ -95,12 +102,12 @@ namespace MonocleViewExtension.PackageUsage
                         {
                             "/MonocleViewExtension;component/PackageUsage/DogeImages/dogePreview.png",
                             "/MonocleViewExtension;component/PackageUsage/DogeImages/dogePreview.png",
-                            "/MonocleViewExtension;component/PackageUsage/DogeImages/dogePreview.png",
                             "/MonocleViewExtension;component/PackageUsage/DogeImages/doge_dapper.jpg",
                             "/MonocleViewExtension;component/PackageUsage/DogeImages/doge_business.jpg",
                             "/MonocleViewExtension;component/PackageUsage/DogeImages/doge-comfort.png",
                             "/MonocleViewExtension;component/PackageUsage/DogeImages/doge-comfort.png",
-                            "/MonocleViewExtension;component/PackageUsage/DogeImages/doge-comfort.png"
+                            "/MonocleViewExtension;component/PackageUsage/DogeImages/doge_heaven.jpg",
+                            "/MonocleViewExtension;component/PackageUsage/DogeImages/cheems_heaven.jpg"
                         };
                         return possibleOthers[rand.Next(7)];
                 }
