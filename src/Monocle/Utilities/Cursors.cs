@@ -61,9 +61,8 @@ namespace MonocleViewExtension.Utilities
         internal System.Windows.Forms.Cursor GetFormsIcon(Bitmap bmp, int hot_x, int hot_y)
         {
             // Initialize the cursor information.
-            ICONINFO icon_info = new ICONINFO();
             IntPtr h_icon = bmp.GetHicon();
-            GetIconInfo(h_icon, out icon_info);
+            GetIconInfo(h_icon, out var icon_info);
             icon_info.xHotspot = hot_x;
             icon_info.yHotspot = hot_y;
             icon_info.fIcon = false;    // Cursor, not icon.
@@ -136,7 +135,7 @@ namespace MonocleViewExtension.Utilities
 
         public void Dispose()
         {
-            if (this.FormsCursor == null || this.FormsCursor.Handle == null) return;
+            if (this.FormsCursor == null) return;
             DestroyIcon(this.FormsCursor.Handle);
             this.FormsCursor.Dispose();
             this.WpfCursor.Dispose();

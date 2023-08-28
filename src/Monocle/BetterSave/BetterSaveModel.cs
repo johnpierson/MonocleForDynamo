@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Web.ModelBinding;
 using Dynamo.Controls;
 using Dynamo.Graph;
 using Dynamo.Graph.Connectors;
@@ -18,25 +17,25 @@ namespace MonocleViewExtension.BetterSave
 {
     internal class BetterSaveModel
     {
-        public DynamoView dynamoView { get; }
-        public DynamoViewModel dynamoViewModel { get; }
+        public DynamoView DynamoView { get; }
+        public DynamoViewModel DynamoViewModel { get; }
         public ViewLoadedParams LoadedParams { get; }
 
         public BetterSaveModel(DynamoViewModel dvm, ViewLoadedParams loadedParams)
         {
-            dynamoView = loadedParams.DynamoWindow as DynamoView;
-            dynamoViewModel = dvm;
+            DynamoView = loadedParams.DynamoWindow as DynamoView;
+            DynamoViewModel = dvm;
             LoadedParams = loadedParams;
         }
         public void BetterSave(string command)
         {
-            if (string.IsNullOrWhiteSpace(dynamoViewModel.CurrentSpace.FileName))
+            if (string.IsNullOrWhiteSpace(DynamoViewModel.CurrentSpace.FileName))
             {
                 SloppySave();
                 return;
             };
 
-            var originalName = dynamoViewModel.CurrentSpace.FileName;
+            var originalName = DynamoViewModel.CurrentSpace.FileName;
 
             var timestamp = $"{DateTime.Now.ToString(Globals.QuickSaveDateFormat)}.dyn";
 
@@ -45,7 +44,7 @@ namespace MonocleViewExtension.BetterSave
             switch (command)
             {
                 case "QuickSave":
-                    dynamoViewModel.SaveAs(nameWithTimestamp, SaveContext.Copy,true);
+                    DynamoViewModel.SaveAs(nameWithTimestamp, SaveContext.Copy,true);
                     break;
                 case "SaveWithNewGuids":
                     MakeWorkspaceUnique(originalName);
@@ -59,10 +58,10 @@ namespace MonocleViewExtension.BetterSave
         private void MakeWorkspaceUnique(string path)
         {
             //first save it as is
-            dynamoViewModel.SaveAs(path, SaveContext.Save, false);
+            DynamoViewModel.SaveAs(path, SaveContext.Save, false);
 
             //close it
-            dynamoViewModel.CloseHomeWorkspaceCommand.Execute(null);
+            DynamoViewModel.CloseHomeWorkspaceCommand.Execute(null);
 
 
             string jsonData = File.ReadAllText(path);
@@ -93,7 +92,7 @@ namespace MonocleViewExtension.BetterSave
 
 
             //reopen it
-            dynamoViewModel.OpenCommand.Execute(path);
+            DynamoViewModel.OpenCommand.Execute(path);
         }
 
         private void SloppySave()
@@ -131,7 +130,7 @@ namespace MonocleViewExtension.BetterSave
 
             string userDesktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
-            dynamoViewModel.SaveAs(Path.Combine(userDesktop,sloppyFileName), SaveContext.SaveAs,true);
+            DynamoViewModel.SaveAs(Path.Combine(userDesktop,sloppyFileName), SaveContext.SaveAs,true);
         }
 
 

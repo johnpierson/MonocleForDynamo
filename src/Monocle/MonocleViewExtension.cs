@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using Dynamo.Controls;
-using Dynamo.Extensions;
 using Dynamo.PackageManager;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.About;
@@ -18,11 +13,9 @@ using MonocleViewExtension.FancyPaste;
 using MonocleViewExtension.Foca;
 using MonocleViewExtension.GraphResizerer;
 using MonocleViewExtension.MonocleSettings;
-using MonocleViewExtension.NodeDocumentation;
 using MonocleViewExtension.NodeSwapper;
 using MonocleViewExtension.PackageUsage;
 using MonocleViewExtension.SimpleSearch;
-using MonocleViewExtension.Snippets;
 using MonocleViewExtension.StandardViews;
 using MonocleViewExtension.Utilities;
 
@@ -61,12 +54,10 @@ namespace MonocleViewExtension
             }
 
             // Load assembly from resource
-            using (var stream = Globals.ExecutingAssembly.GetManifestResourceStream(resourceName))
-            {
-                var bytes = new byte[stream.Length];
-                stream.Read(bytes, 0, bytes.Length);
-                return Assembly.Load(bytes);
-            }
+            using var stream = Globals.ExecutingAssembly.GetManifestResourceStream(resourceName);
+            var bytes = new byte[stream.Length];
+            stream.Read(bytes, 0, bytes.Length);
+            return Assembly.Load(bytes);
         }
 
         public void Loaded(ViewLoadedParams p)
@@ -128,14 +119,14 @@ namespace MonocleViewExtension
             Settings.SaveMonocleSettings();
         }
 
-        internal void ScaffoldTheJacobSmallSpecial(ViewLoadedParams p)
+        internal static void ScaffoldTheJacobSmallSpecial(ViewLoadedParams p)
         {
-            MenuItem myDynamoNoWorkie = new MenuItem
+            var myDynamoNoWorkie = new MenuItem
             {
                 Header = "My Dynamo is not loading correctly."
             };
 
-            MenuItem jacobSmallSpecial = new MenuItem
+            var jacobSmallSpecial = new MenuItem
             {
                 Header = "Invoke the Jacob Small Special™️ ??"
             };
@@ -146,7 +137,7 @@ namespace MonocleViewExtension
                 Width = 32,
                 Stretch = Stretch.Uniform
             };
-            WrapPanel wrapPanel = new WrapPanel();
+            var wrapPanel = new WrapPanel();
             wrapPanel.Children.Add(img);
             wrapPanel.Children.Add(jacobSmallSpecial);
 
@@ -161,10 +152,7 @@ namespace MonocleViewExtension
             var allMenus = p.dynamoMenu.Items.OfType<MenuItem>();
             var helpMenu = allMenus.FirstOrDefault(m => m.Name.Equals("HelpMenu"));
 
-            if (helpMenu != null)
-            {
-                helpMenu.Items.Add(myDynamoNoWorkie);
-            }
+            helpMenu?.Items.Add(myDynamoNoWorkie);
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Dynamo.Core;
 using Dynamo.Logging;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
@@ -24,7 +25,7 @@ namespace MonocleViewExtension.StandardViews
         public StackPanel ViewControlPanel
         {
             get => _viewControlPanel;
-            set { _viewControlPanel = value; RaisePropertyChanged(() => ViewControlPanel); }
+            set { _viewControlPanel = value; RaisePropertyChanged(nameof(ViewControlPanel)); }
         }
 
         public StandardViewsViewModel(StandardViewsModel model)
@@ -101,9 +102,9 @@ namespace MonocleViewExtension.StandardViews
                 for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
                 {
                     DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
-                    if (child != null && child is T)
+                    if (child is T dependencyObject)
                     {
-                        yield return (T)child;
+                        yield return dependencyObject;
                     }
 
                     foreach (T childOfChild in FindVisualChildren<T>(child))

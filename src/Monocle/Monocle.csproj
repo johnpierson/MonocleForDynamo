@@ -2,55 +2,15 @@
   <PropertyGroup>
     <RootNamespace>MonocleViewExtension</RootNamespace>
     <AssemblyName>MonocleViewExtension</AssemblyName>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
+	<UseWPF>true</UseWPF>
+	<UseWindowsForms>true</UseWindowsForms>
     <AssemblyTitle>Monocle</AssemblyTitle>
     <Product>Monocle</Product>
     <Copyright>Copyright©  2023 john pierson</Copyright>
     <AssemblyVersion>2023.8.1</AssemblyVersion>
     <FileVersion>2023.8.1</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
-    <PostBuildEvent>if $(ConfigurationName) == Debug copy "$(ProjectDir)bin\Debug\MonocleViewExtension.dll" "C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\2.18\packages\Monocle\bin"
-
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.12\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.13\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.16\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.17\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.18\packages\Monocle\bin"
-
-
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.0\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.6\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.12\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.16\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.17\packages\Monocle\bin"</PostBuildEvent>
-    <PostBuildEvent>if $(ConfigurationName) == Debug copy "$(ProjectDir)bin\Debug\MonocleViewExtension.dll" "C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\2.18\packages\Monocle\bin"
-
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.12\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.13\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.16\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.17\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.18\packages\Monocle\bin"
-
-
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.0\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.6\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.12\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.16\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.17\packages\Monocle\bin"</PostBuildEvent>
-    <PostBuildEvent>if $(ConfigurationName) == Debug copy "$(ProjectDir)bin\Debug\MonocleViewExtension.dll" "C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\2.18\packages\Monocle\bin"
-
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.12\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.13\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.16\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.17\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.18\packages\Monocle\bin"
-
-
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.0\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.6\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.12\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.16\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.17\packages\Monocle\bin"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -59,58 +19,9 @@ if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExt
     <DebugType>pdbonly</DebugType>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>if $(ConfigurationName) == Debug copy "$(ProjectDir)bin\Debug\MonocleViewExtension.dll" "C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\2.18\packages\Monocle\bin"
-
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.12\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.13\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.16\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.17\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Core\2.18\packages\Monocle\bin"
-
-
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.0\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.6\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.12\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.16\packages\Monocle\bin"
-if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExtension.dll" "$(AppData)\Dynamo\Dynamo Revit\2.17\packages\Monocle\bin"</PostBuildEvent>
+    <SupportedOSPlatformVersion>7.0</SupportedOSPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CommonServiceLocator" Version="2.0.2" />
-    <PackageReference Include="Cyotek.Drawing.BitmapFont" Version="2.0.0" />
-    <PackageReference Include="DynamoVisualProgramming.Core" Version="2.12.1.8246" />
-    <PackageReference Include="DynamoVisualProgramming.DynamoServices" Version="2.12.1.8246" />
-    <PackageReference Include="DynamoVisualProgramming.WpfUILibrary" Version="2.12.1.8246" />
-    <PackageReference Include="DynamoVisualProgramming.ZeroTouchLibrary" Version="2.12.1.8246" />
-    <PackageReference Include="Extended.Wpf.Toolkit" Version="4.3.0" />
-    <PackageReference Include="Fody" Version="6.6.3">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="HelixToolkit" Version="2.16.1" />
-    <PackageReference Include="HelixToolkit.Wpf" Version="2.16.1" />
-    <PackageReference Include="HelixToolkit.Wpf.SharpDX" Version="2.16.1" />
-    <PackageReference Include="ILMerge.Fody" Version="1.23.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="NUnit" Version="2.6.3" />
-    <PackageReference Include="Prism" Version="4.1.0.0" />
-    <PackageReference Include="SharpDX" Version="4.2.0" />
-    <PackageReference Include="SharpDX.D3DCompiler" Version="4.2.0" />
-    <PackageReference Include="SharpDX.Direct2D1" Version="4.2.0" />
-    <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
-    <PackageReference Include="SharpDX.Direct3D9" Version="4.2.0" />
-    <PackageReference Include="SharpDX.DXGI" Version="4.2.0" />
-    <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
-    <PackageReference Include="System.Buffers" Version="4.5.1" />
-    <PackageReference Include="System.Collections.Immutable" Version="1.7.1" />
-    <PackageReference Include="System.Memory" Version="4.5.4" />
-    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.3" />
-    <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="DynamoPackages">
-      <HintPath>C:\Program Files\Autodesk\Revit 2022\AddIns\DynamoForRevit\DynamoPackages.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System.Configuration" />
@@ -185,9 +96,6 @@ if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExt
     <Compile Update="SimpleSearch\SimpleSearchView.xaml.cs">
       <DependentUpon>SimpleSearchView.xaml</DependentUpon>
     </Compile>
-    <Compile Update="Snippets\SnippetsView.xaml.cs">
-      <DependentUpon>SnippetsView.xaml</DependentUpon>
-    </Compile>
     <Compile Update="StandardViews\StandardViews.xaml.cs">
       <DependentUpon>StandardViews.xaml</DependentUpon>
     </Compile>
@@ -208,68 +116,7 @@ if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExt
     <Resource Include="PackageUsage\DogeImages\doge_halloween.gif" />
     <Resource Include="PackageUsage\DogeImages\doge_summer.jpg" />
   </ItemGroup>
-  <ItemGroup>
-    <Page Include="About\AboutView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="About\ContributorUserControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="FancyPaste\ExamineClipboardView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Foca\ColorCodeView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Foca\FocaView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="GraphResizerer\GraphResizererView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="NodeDocumentation\NodeDocumentationView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="NodeSwapper\NodeSwapperPaintBrush.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="NodeSwapper\NodeSwapperView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="PackageUsage\PackageUsageDogeView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="PackageUsage\PackageUsageView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Resources\IconDictionary.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="SimpleSearch\SimpleSearchView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Snippets\SnippetsView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="StandardViews\StandardViews.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
+ 
   <ItemGroup>
     <Resource Include="PackageUsage\DogeImages\doge_newyear.png" />
   </ItemGroup>
@@ -325,6 +172,12 @@ if $(ConfigurationName) == Release copy "$(ProjectDir)bin\Release\MonocleViewExt
     <EmbeddedResource Include="Resources\Xceed.Wpf.AvalonDock.dll" />
     <EmbeddedResource Include="Resources\smalls.JPG" />
     <EmbeddedResource Include="Resources\WpfAnimatedGif.dll" />
+    <PackageReference Include="DynamoVisualProgramming.Core" Version="3.0.0-beta6017" />
+    <PackageReference Include="DynamoVisualProgramming.DynamoServices" Version="3.0.0-beta6017" />
+    <PackageReference Include="DynamoVisualProgramming.WpfUILibrary" Version="3.0.0-beta6017" />
+    <PackageReference Include="Extended.Wpf.Toolkit" Version="4.5.1" />
+    <PackageReference Include="HelixToolkit.Wpf" Version="2.24.0" />
+    <PackageReference Include="HelixToolkit.Wpf.SharpDX" Version="2.24.0" />
     <Resource Include="PackageUsage\DogeImages\dwight-pumpkin.gif" />
     <Resource Include="PackageUsage\DogeImages\david-s-pumpkins.gif" />
   </ItemGroup>

@@ -24,7 +24,7 @@ namespace MonocleViewExtension.NodeSwapper
         public bool ImageMode
         {
             get { return _imageMode; }
-            set { _imageMode = value; RaisePropertyChanged(() => ImageMode); }
+            set { _imageMode = value; RaisePropertyChanged(nameof(ImageMode)); }
         }
 
 
@@ -32,7 +32,7 @@ namespace MonocleViewExtension.NodeSwapper
         public NodeViewModel NodeToSwap
         {
             get { return _nodeToSwap; }
-            set { _nodeToSwap = value; RaisePropertyChanged(() => NodeToSwap); }
+            set { _nodeToSwap = value; RaisePropertyChanged(nameof(NodeToSwap)); }
         }
 
 
@@ -40,21 +40,21 @@ namespace MonocleViewExtension.NodeSwapper
         public NodeViewModel NodeToSwapTo
         {
             get { return _nodeToSwapTo; }
-            set { _nodeToSwapTo = value; RaisePropertyChanged(() => NodeToSwap); }
+            set { _nodeToSwapTo = value; RaisePropertyChanged(nameof(NodeToSwap)); }
         }
         
         private string _results;
         public string Results
         {
             get { return _results; }
-            set { _results = value; RaisePropertyChanged(() => Results); }
+            set { _results = value; RaisePropertyChanged(nameof(Results)); }
         }
 
         private string _paintStatusMessage;
         public string PaintStatusMessage
         {
             get { return _paintStatusMessage; }
-            set { _paintStatusMessage = value; RaisePropertyChanged(() => PaintStatusMessage); }
+            set { _paintStatusMessage = value; RaisePropertyChanged(nameof(PaintStatusMessage)); }
         }
 
         private int _currentStep = 0;
@@ -145,7 +145,7 @@ namespace MonocleViewExtension.NodeSwapper
         }
 
       
-        private void OnSwapNode(object o)
+        private void OnSwapNode()
         {
             if (NodeToSwapTo.IsCustomFunction)
             {
@@ -276,7 +276,7 @@ namespace MonocleViewExtension.NodeSwapper
                 {
                     try
                     {
-                        OnSwapNode(new object());
+                        OnSwapNode();
                     }
                     catch (Exception exception)
                     {
