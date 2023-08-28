@@ -25,31 +25,31 @@ namespace MonocleViewExtension.GraphResizerer
         public double XScaleFactor
         {
             get { return _xScaleFactor; }
-            set { _xScaleFactor = value; RaisePropertyChanged(() => XScaleFactor); }
+            set { _xScaleFactor = value; RaisePropertyChanged(nameof(XScaleFactor)); }
         }
         private double _yScaleFactor;
         public double YScaleFactor
         {
             get { return _yScaleFactor; }
-            set { _yScaleFactor = value; RaisePropertyChanged(() => YScaleFactor); }
+            set { _yScaleFactor = value; RaisePropertyChanged(nameof(YScaleFactor)); }
         }
         private string _results;
         public string Results
         {
             get { return _results; }
-            set { _results = value; RaisePropertyChanged(() => Results); }
+            set { _results = value; RaisePropertyChanged(nameof(Results)); }
         }
         private bool _resultsVisibility;
         public bool ResultsVisibility
         {
             get { return _resultsVisibility; }
-            set { _resultsVisibility = value; RaisePropertyChanged(() => ResultsVisibility); }
+            set { _resultsVisibility = value; RaisePropertyChanged(nameof(ResultsVisibility)); }
         }
         private int _runCount;
         public int RunCount
         {
             get { return _runCount; }
-            set { _runCount = value; RaisePropertyChanged(() => RunCount); }
+            set { _runCount = value; RaisePropertyChanged(nameof(RunCount)); }
         }
         public GraphResizererViewModel(GraphResizererModel m)
         {

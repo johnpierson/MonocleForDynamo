@@ -40,14 +40,14 @@ namespace MonocleViewExtension.Snippets
         public string DirectoryPath
         {
             get { return _directoryPath; }
-            set { _directoryPath = value; RaisePropertyChanged(() => DirectoryPath); }
+            set { _directoryPath = value; RaisePropertyChanged(nameof(DirectoryPath));}
         }
 
         private List<WorkspaceModel> _workspaceSnippets { get; set; }
         public List<WorkspaceModel> WorkspaceSnippets
         {
             get { return _workspaceSnippets; }
-            set { _workspaceSnippets = value; RaisePropertyChanged(() => WorkspaceSnippets);
+            set { _workspaceSnippets = value; RaisePropertyChanged(nameof(WorkspaceSnippets));
             }
         }
 
@@ -58,7 +58,7 @@ namespace MonocleViewExtension.Snippets
             set
             {
                 _workspaceButtons = value;
-                RaisePropertyChanged(() => WorkspaceButtons);
+                RaisePropertyChanged(nameof(WorkspaceButtons));
             }
         }
         public SnippetsViewModel(SnippetsModel m)

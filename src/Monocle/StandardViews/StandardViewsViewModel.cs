@@ -24,7 +24,7 @@ namespace MonocleViewExtension.StandardViews
         public StackPanel ViewControlPanel
         {
             get => _viewControlPanel;
-            set { _viewControlPanel = value; RaisePropertyChanged(() => ViewControlPanel); }
+            set { _viewControlPanel = value; RaisePropertyChanged(nameof(ViewControlPanel)); }
         }
 
         public StandardViewsViewModel(StandardViewsModel model)

@@ -30,21 +30,21 @@ namespace MonocleViewExtension.PackageUsage
         public string Result
         {
             get { return _result; }
-            set { _result = value; RaisePropertyChanged(() => Result); }
+            set { _result = value; RaisePropertyChanged(nameof(Result)); }
         }
 
         private string _customNodePrefix;
         public string CustomNodePrefix
         {
             get { return Globals.CustomNodeNotePrefix; }
-            set { Globals.CustomNodeNotePrefix = value; RaisePropertyChanged(() => CustomNodePrefix); }
+            set { Globals.CustomNodeNotePrefix = value; RaisePropertyChanged(nameof(CustomNodePrefix)); }
         }
 
         private ObservableCollection<PackageUsageWrapper> _activeCustomNodes;
         public ObservableCollection<PackageUsageWrapper> ActiveCustomNodes
         {
             get { return _activeCustomNodes; }
-            set { _activeCustomNodes = value; RaisePropertyChanged(() => ActiveCustomNodes); }
+            set { _activeCustomNodes = value; RaisePropertyChanged(nameof(ActiveCustomNodes)); }
         }
 
         private string _packagesInUse;
@@ -54,7 +54,7 @@ namespace MonocleViewExtension.PackageUsage
             {
                 return _packagesInUse;
             }
-            set { _packagesInUse = value; RaisePropertyChanged(() => PackagesInUse); }
+            set { _packagesInUse = value; RaisePropertyChanged(nameof(PackagesInUse)); }
         }
 
         public string DisplayImage

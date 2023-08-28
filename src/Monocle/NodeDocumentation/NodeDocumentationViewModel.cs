@@ -19,20 +19,20 @@ namespace MonocleViewExtension.NodeDocumentation
         public string Path
         {
             get { return _path; }
-            set { _path = value; RaisePropertyChanged(() => Path); }
+            set { _path = value; RaisePropertyChanged(nameof(Path)); }
         }
         private string _nodeName;
         public string NodeName
         {
             get { return _nodeName; }
-            set { _nodeName = value; RaisePropertyChanged(() => NodeName); }
+            set { _nodeName = value; RaisePropertyChanged(nameof(NodeName)); }
         }
 
         private string _description;
         public string Description
         {
             get { return _description; }
-            set { _description = value; RaisePropertyChanged(() => Description); }
+            set { _description = value; RaisePropertyChanged(nameof(Description)); }
         }
 
         public NodeDocumentationViewModel(NodeDocumentationModel m)
