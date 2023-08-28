@@ -17,7 +17,7 @@ namespace MonocleViewExtension.PackageUsage
     public class PackageUsageViewModel : ViewModelBase
     {
         public PackageUsageModel Model { get; set; }
-        private ReadyParams _readyParams;
+        private readonly ReadyParams _readyParams;
 
         public DelegateCommand AnnotateNodes { get; set; }
         public DelegateCommand ClearNotes { get; set; }
@@ -36,8 +36,8 @@ namespace MonocleViewExtension.PackageUsage
         private string _customNodePrefix;
         public string CustomNodePrefix
         {
-            get { return Globals.CustomNodeNotePrefix; }
-            set { Globals.CustomNodeNotePrefix = value; RaisePropertyChanged(nameof(CustomNodePrefix)); }
+            get { return _customNodePrefix; }
+            set { _customNodePrefix = value; RaisePropertyChanged(nameof(CustomNodePrefix)); }
         }
 
         private ObservableCollection<PackageUsageWrapper> _activeCustomNodes;
@@ -126,7 +126,7 @@ namespace MonocleViewExtension.PackageUsage
             _readyParams.CurrentWorkspaceModel.NodeAdded += CurrentWorkspaceModel_NodesChanged;
             _readyParams.CurrentWorkspaceModel.NodeRemoved += CurrentWorkspaceModel_NodesChanged;
 
-            CustomNodePrefix = Globals.CustomNodeNotePrefix;
+            _customNodePrefix = Globals.CustomNodeNotePrefix;
 
             AnnotateNodes = new DelegateCommand(OnAnnotateNodes);
             ClearNotes = new DelegateCommand(OnClearNotes);

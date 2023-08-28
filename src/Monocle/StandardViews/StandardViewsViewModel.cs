@@ -101,9 +101,9 @@ namespace MonocleViewExtension.StandardViews
                 for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
                 {
                     DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
-                    if (child != null && child is T)
+                    if (child is T dependencyObject)
                     {
-                        yield return (T)child;
+                        yield return dependencyObject;
                     }
 
                     foreach (T childOfChild in FindVisualChildren<T>(child))

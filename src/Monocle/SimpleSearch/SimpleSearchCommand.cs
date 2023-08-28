@@ -115,9 +115,9 @@ namespace MonocleViewExtension.SimpleSearch
             {
                 ssWindow?.Close();
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                //
+                //suppress
             }
         }
         private static void CloseSimpleSearch(ViewLoadedParams p, MonocleViewExtension m)

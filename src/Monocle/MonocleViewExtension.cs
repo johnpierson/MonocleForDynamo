@@ -161,10 +161,7 @@ namespace MonocleViewExtension
             var allMenus = p.dynamoMenu.Items.OfType<MenuItem>();
             var helpMenu = allMenus.FirstOrDefault(m => m.Name.Equals("HelpMenu"));
 
-            if (helpMenu != null)
-            {
-                helpMenu.Items.Add(myDynamoNoWorkie);
-            }
+            helpMenu?.Items.Add(myDynamoNoWorkie);
         }
     }
 }

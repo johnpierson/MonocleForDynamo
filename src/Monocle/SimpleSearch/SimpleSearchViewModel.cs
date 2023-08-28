@@ -10,7 +10,7 @@ namespace MonocleViewExtension.SimpleSearch
     {
         public DynamoViewModel dynamoViewModel;
 
-        private ICollectionView nodes;
+        private readonly ICollectionView nodes;
         private NodeSearchElement selectedNode;
 
         public SimpleSearchViewModel(DynamoViewModel dvm)
@@ -68,8 +68,7 @@ namespace MonocleViewExtension.SimpleSearch
 
         private bool ContainsFilter(object item)
         {
-            var node = item as NodeSearchElement;
-            if (node == null)
+            if (!(item is NodeSearchElement node))
             {
                 return false;
             }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Dynamo.Extensions;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
 
@@ -12,7 +11,6 @@ namespace MonocleViewExtension.NodeDocumentation
     internal class NodeDocumentationViewModel : ViewModelBase
     {
         public NodeDocumentationModel Model { get; set; }
-        private ReadyParams _readyParams;
         public DelegateCommand CreateDocumentation { get; set; }
 
         private string _path;
@@ -39,10 +37,9 @@ namespace MonocleViewExtension.NodeDocumentation
         {
             Model = m;
 
-            _readyParams = m.LoadedParams;
             try
             {
-                NodeName = m.dynamoViewModel.CurrentSpace.CurrentSelection.First().Name;
+                NodeName = m.DynamoViewModel.CurrentSpace.CurrentSelection.First().Name;
                 string basePath = @"D:\Autodesk\Generative BIM - Dynamo Dictionary\";
                 Path = $"{basePath}{NodeName}";
             }

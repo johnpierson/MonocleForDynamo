@@ -13,7 +13,6 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Dynamo.Extensions;
 using Dynamo.Graph;
 using Dynamo.Graph.Nodes;
 using Dynamo.Graph.Workspaces;
@@ -33,28 +32,27 @@ namespace MonocleViewExtension.Snippets
     internal class SnippetsViewModel : ViewModelBase
     {
         public SnippetsModel Model { get; set; }
-        private ReadyParams _readyParams;
         public DelegateCommand LoadSnippets { get; set; }
 
         private string _directoryPath;
         public string DirectoryPath
         {
-            get { return _directoryPath; }
+            get => _directoryPath;
             set { _directoryPath = value; RaisePropertyChanged(nameof(DirectoryPath));}
         }
 
-        private List<WorkspaceModel> _workspaceSnippets { get; set; }
+        private List<WorkspaceModel> _workspaceSnippets;
         public List<WorkspaceModel> WorkspaceSnippets
         {
-            get { return _workspaceSnippets; }
+            get => _workspaceSnippets;
             set { _workspaceSnippets = value; RaisePropertyChanged(nameof(WorkspaceSnippets));
             }
         }
 
-        private  List<Button> _workspaceButtons { get; set; }
+        private List<Button> _workspaceButtons;
         public List<Button> WorkspaceButtons
         {
-            get { return _workspaceButtons; }
+            get => _workspaceButtons;
             set
             {
                 _workspaceButtons = value;
@@ -64,7 +62,6 @@ namespace MonocleViewExtension.Snippets
         public SnippetsViewModel(SnippetsModel m)
         {
             Model = m;
-            _readyParams = m.LoadedParams;
 
             LoadSnippets = new DelegateCommand(OnLoadSnippets);
         }
@@ -91,8 +88,7 @@ namespace MonocleViewExtension.Snippets
 
                         foreach (string filePath in files)
                         {
-                            string fileContents;
-                            if (DynamoUtilities.PathHelper.isValidJson(filePath, out fileContents, out Exception ex))
+                            if (DynamoUtilities.PathHelper.isValidJson(filePath, out var fileContents, out Exception ex))
                             {
                                 HomeWorkspaceModel wm = WorkspaceModel.FromJson(fileContents, null, Model.dynamoViewModel.EngineController,
                                     Model.dynamoViewModel.Model.Scheduler, Model.dynamoViewModel.Model.NodeFactory,
@@ -106,10 +102,12 @@ namespace MonocleViewExtension.Snippets
                                     Stretch = Stretch.Uniform
                                 };
                                 //make the textbox too
-                                Label buttonLabel = new Label();
-                                buttonLabel.Text = wm.Name;
-                                buttonLabel.TextAlign = ContentAlignment.BottomCenter;
-                                System.Windows.Controls.Button btn = new Button
+                                var buttonLabel = new Label()
+                                {
+                                    Text = wm.Name,
+                                    TextAlign = ContentAlignment.BottomCenter
+                                };
+                                var btn = new Button
                                 {
                                     Background = imageBrush,
                                     Width = 200,

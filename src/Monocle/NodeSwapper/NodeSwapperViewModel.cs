@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
-using Dynamo.Extensions;
 using Dynamo.Graph.Nodes;
 using Dynamo.Logging;
 using Dynamo.Models;
@@ -17,7 +16,6 @@ namespace MonocleViewExtension.NodeSwapper
     internal class NodeSwapperViewModel : ViewModelBase
     {
         public NodeSwapperModel Model { get; set; }
-        private readonly ReadyParams _readyParams;
 
 
         private bool _imageMode;
@@ -64,7 +62,6 @@ namespace MonocleViewExtension.NodeSwapper
         public NodeSwapperViewModel(NodeSwapperModel m, NodeModel node = null)
         {
             Model = m;
-            _readyParams = m.LoadedParams;
             _workspaceView = Model.dynamoView.FindVisualChildren<WorkspaceView>().First();
 
             //set paint brush settings
@@ -147,6 +144,10 @@ namespace MonocleViewExtension.NodeSwapper
       
         private void OnSwapNode(object o)
         {
+            // this is reserved for future use
+            var theObject = o.ToString();
+            Model.dynamoViewModel.Model.Logger.LogNotification($"Monocle","NodeSwapper",$"{theObject}",$"Node swapped.");
+
             if (NodeToSwapTo.IsCustomFunction)
             {
                 DynamoModel.CreateNodeCommand replacementCommand =

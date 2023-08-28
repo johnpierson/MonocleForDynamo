@@ -24,12 +24,12 @@ namespace MonocleViewExtension.Foca
 {
     public class FocaModel
     {
-        public DynamoView dynamoView { get; }
+        public DynamoView DynamoView { get; }
         public ViewLoadedParams LoadedParams { get; }
         public DynamoViewModel DynamoViewModel { get; }
         public FocaModel(ViewLoadedParams p)
         {
-            dynamoView = p.DynamoWindow as DynamoView;
+            DynamoView = p.DynamoWindow as DynamoView;
             LoadedParams = p;
             DynamoViewModel = p.DynamoWindow.DataContext as DynamoViewModel;
         }
@@ -92,7 +92,7 @@ namespace MonocleViewExtension.Foca
                         var m = new NodeSwapperModel(DynamoViewModel, LoadedParams);
                         var viewModel = new NodeSwapperViewModel(m, lastNode);
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         //this error is silenced
                     }
@@ -106,7 +106,7 @@ namespace MonocleViewExtension.Foca
                 return;
             }
 
-            var nodeViews = MiscUtils.FindVisualChildren<NodeView>(dynamoView);
+            var nodeViews = MiscUtils.FindVisualChildren<NodeView>(DynamoView);
 
             var nodeView = nodeViews.FirstOrDefault(n => n.ViewModel.Id.Equals(nodeModel.GUID));
 
@@ -279,7 +279,7 @@ namespace MonocleViewExtension.Foca
 
                 for (int i = 0; i < count; i++)
                 {
-                    codeBlockString = codeBlockString + $"value[{i}];";
+                    codeBlockString += $"value[{i}];";
                 }
 
                 var codeBlock = new CodeBlockNodeModel(codeBlockString, 0, 0, DynamoViewModel.Model.LibraryServices, DynamoViewModel.Model.CurrentWorkspace.ElementResolver);
@@ -320,14 +320,14 @@ namespace MonocleViewExtension.Foca
 
         public Rect WrapNodes()
         {
-            var nodeViews = Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0 ? FindVisualChildren<NodeView>(dynamoView).Where(nv => ((Border)nv.FindName("selectionBorder")).IsVisible).ToList() : FindVisualChildren<NodeView>(dynamoView).Where(nv => ((System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder")).IsVisible).ToList();
+            var nodeViews = Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0 ? FindVisualChildren<NodeView>(DynamoView).Where(nv => ((Border)nv.FindName("selectionBorder")).IsVisible).ToList() : FindVisualChildren<NodeView>(DynamoView).Where(nv => ((System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder")).IsVisible).ToList();
 
             return GetBoundingRectangle(nodeViews);
         }
 
         public Canvas GetExpansionBay()
         {
-            var nodeViews = Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0 ? FindVisualChildren<NodeView>(dynamoView).Where(nv => ((Border)nv.FindName("selectionBorder")).IsVisible).ToList() : FindVisualChildren<NodeView>(dynamoView).Where(nv => ((System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder")).IsVisible).ToList();
+            var nodeViews = Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0 ? FindVisualChildren<NodeView>(DynamoView).Where(nv => ((Border)nv.FindName("selectionBorder")).IsVisible).ToList() : FindVisualChildren<NodeView>(DynamoView).Where(nv => ((System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder")).IsVisible).ToList();
 
 
             var leftMostNode = nodeViews.OrderBy(nv => nv.ViewModel.Left).ThenBy(nv => nv.ViewModel.Top).First();
@@ -340,7 +340,7 @@ namespace MonocleViewExtension.Foca
 
         public Thickness GetThickness()
         {
-            var nodeViews = Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0 ? FindVisualChildren<NodeView>(dynamoView).Where(nv => ((Border)nv.FindName("selectionBorder")).IsVisible).ToList() : FindVisualChildren<NodeView>(dynamoView).Where(nv => ((System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder")).IsVisible).ToList();
+            var nodeViews = Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0 ? FindVisualChildren<NodeView>(DynamoView).Where(nv => ((Border)nv.FindName("selectionBorder")).IsVisible).ToList() : FindVisualChildren<NodeView>(DynamoView).Where(nv => ((System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder")).IsVisible).ToList();
 
             var leftMostNode = nodeViews.OrderBy(nv => nv.ViewModel.Left).ThenBy(nv => nv.ViewModel.Top).First();
             var topMostNode = nodeViews.OrderBy(nv => nv.ViewModel.Top).First();
@@ -480,7 +480,7 @@ namespace MonocleViewExtension.Foca
         public void FixHeaderColors()
         {
             //cleanup darker group colors
-            var annotations = MiscUtils.FindVisualChildren<AnnotationView>(dynamoView);
+            var annotations = MiscUtils.FindVisualChildren<AnnotationView>(DynamoView);
 
             foreach (var annotation in annotations)
             {
@@ -503,9 +503,9 @@ namespace MonocleViewExtension.Foca
                         textBlock2.Foreground = new SolidColorBrush(Colors.White);
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-
+                    //suppress
                 }
               
             }
@@ -869,9 +869,9 @@ namespace MonocleViewExtension.Foca
                 for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
                 {
                     DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
-                    if (child != null && child is T)
+                    if (child != null && child is T dependencyObject)
                     {
-                        yield return (T)child;
+                        yield return dependencyObject;
                     }
 
                     foreach (T childOfChild in FindVisualChildren<T>(child))

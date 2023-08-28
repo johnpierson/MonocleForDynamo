@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using Dynamo.Extensions;
 using Dynamo.Models;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
@@ -16,7 +15,6 @@ namespace MonocleViewExtension.GraphResizerer
     internal class GraphResizererViewModel : ViewModelBase
     {
         public GraphResizererModel Model { get; set; }
-        private ReadyParams _readyParams;
         public DelegateCommand ResizeGraph { get; set; }
         public DelegateCommand Link { get; set; }
         public DelegateCommand Close { get; set; }
@@ -54,7 +52,6 @@ namespace MonocleViewExtension.GraphResizerer
         public GraphResizererViewModel(GraphResizererModel m)
         {
             Model = m;
-            _readyParams = m.LoadedParams;
 
             XScaleFactor = 1.5;
             YScaleFactor = 2.25;

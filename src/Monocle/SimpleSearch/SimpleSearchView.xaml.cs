@@ -46,7 +46,7 @@ namespace MonocleViewExtension.SimpleSearch
 
                 PlaceNode(svm.dynamoViewModel,nse);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
                //
             }
@@ -111,7 +111,7 @@ namespace MonocleViewExtension.SimpleSearch
                 var svm = this.DataContext as SimpleSearchViewModel;
                 svm.SelectedNode = e.AddedItems as NodeSearchElement;
             }
-            catch (Exception exception)
+            catch (Exception)
             {
                 // suppress for now
             }

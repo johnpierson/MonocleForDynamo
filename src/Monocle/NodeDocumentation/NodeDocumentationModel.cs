@@ -14,34 +14,35 @@ namespace MonocleViewExtension.NodeDocumentation
 
     public class NodeDocumentationModel
     {
-        public DynamoView dynamoView { get; }
-        public DynamoViewModel dynamoViewModel { get; }
+        public DynamoView DynamoView { get; }
+        public DynamoViewModel DynamoViewModel { get; }
         public ViewLoadedParams LoadedParams { get; }
 
         public NodeDocumentationModel(DynamoViewModel dvm, ViewLoadedParams loadedParams)
         {
-            dynamoView = loadedParams.DynamoWindow as DynamoView;
-            dynamoViewModel = dvm;
+            DynamoView = loadedParams.DynamoWindow as DynamoView;
+            DynamoViewModel = dvm;
             LoadedParams = loadedParams;
         }
 
         public void SaveDyn(string path)
         {
             //dynamoViewModel.DoGraphAutoLayout("");
-            dynamoViewModel.SaveAs(path,SaveContext.Save,false);
+            DynamoViewModel.SaveAs(path,SaveContext.Save,false);
 
             try
             {
-                dynamoViewModel.CurrentSpace.CurrentSelection.First().Deselect();
+                DynamoViewModel.CurrentSpace.CurrentSelection.First().Deselect();
             }
-            catch (Exception e)
+            catch (Exception)
             {
+                //suppress it all
             }
         }
 
         public void ExportImage(string path)
         {
-            dynamoViewModel.SaveImage(path);
+            DynamoViewModel.SaveImage(path);
         }
 
         public void ExportMd(string nodeName, string path, string content)
