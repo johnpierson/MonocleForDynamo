@@ -196,7 +196,7 @@ namespace MonocleViewExtension.PackageUsage
             }
             catch (Exception e)
             {
-                m.dynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
+                m.DynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
             }
 
             InputGestureCollection gestures = new InputGestureCollection

@@ -30,14 +30,14 @@ namespace MonocleViewExtension.PackageUsage
 {
     public class PackageUsageModel
     {
-        public DynamoView dynamoView { get; }
-        public DynamoViewModel dynamoViewModel { get; }
+        public DynamoView DynamoView { get; }
+        public DynamoViewModel DynamoViewModel { get; }
         public ViewLoadedParams LoadedParams { get; }
 
         public PackageUsageModel(DynamoViewModel dvm, ViewLoadedParams loadedParams)
         {
-            dynamoView = loadedParams.DynamoWindow as DynamoView;
-            dynamoViewModel = dvm;
+            DynamoView = loadedParams.DynamoWindow as DynamoView;
+            DynamoViewModel = dvm;
             LoadedParams = loadedParams;
         }
 
@@ -74,12 +74,12 @@ namespace MonocleViewExtension.PackageUsage
         public int ClearNotes()
         {
             int count = 0;
-            foreach (NoteModel note in dynamoViewModel.Model.CurrentWorkspace.Notes)
+            foreach (NoteModel note in DynamoViewModel.Model.CurrentWorkspace.Notes)
             {
                 if (note.Text.StartsWith("**") || note.Text.StartsWith("Custom Node:") || note.Text.StartsWith(Globals.CustomNodeNotePrefix))
                 {
                     //note.PinnedNode = null;
-                    dynamoViewModel.Model.ExecuteCommand(new DynamoModel.DeleteModelCommand(note.GUID));
+                    DynamoViewModel.Model.ExecuteCommand(new DynamoModel.DeleteModelCommand(note.GUID));
 
                     count++;
                 }
@@ -95,7 +95,7 @@ namespace MonocleViewExtension.PackageUsage
             //clear old notes first
             ClearNotes();
 
-            foreach (var node in dynamoViewModel.CurrentSpaceViewModel.Nodes)
+            foreach (var node in DynamoViewModel.CurrentSpaceViewModel.Nodes)
             {
                 if (IsCustomNode(node.NodeModel) && !node.NodeModel.Name.ToLower().Contains("relay") && !node.NodeModel.Name.ToLower().Contains("remember") && !node.NodeModel.Name.ToLower().Contains("gate"))
                 {
@@ -103,23 +103,23 @@ namespace MonocleViewExtension.PackageUsage
                     DynamoModel.RecordableCommand cmd = new DynamoModel.CreateNoteCommand(noteGuid,
                         Globals.CustomNodeNotePrefix + GetPackageName(node.NodeModel) + GetPackageVersion(node.NodeModel), node.X, node.Y - 35, false);
 
-                    dynamoViewModel.Model.ExecuteCommand(cmd);
+                    DynamoViewModel.Model.ExecuteCommand(cmd);
 
                     //try and fail if user is in older dynamo
                     try
                     {
-                        var newNote = dynamoViewModel.CurrentSpaceViewModel.Notes.First(note => note.Model.GUID.Equals(noteGuid));
+                        var newNote = DynamoViewModel.CurrentSpaceViewModel.Notes.First(note => note.Model.GUID.Equals(noteGuid));
 
                         DynamoModel.SelectModelCommand select = new DynamoModel.SelectModelCommand(node.NodeModel.GUID, ModifierKeys.None);
-                        dynamoViewModel.Model.ExecuteCommand(select);
+                        DynamoViewModel.Model.ExecuteCommand(select);
 
-                        var annotation = dynamoViewModel.CurrentSpaceViewModel.Annotations.FirstOrDefault(a =>
+                        var annotation = DynamoViewModel.CurrentSpaceViewModel.Annotations.FirstOrDefault(a =>
                             a.Nodes.Any(n => n.GUID.ToString().Equals(node.NodeModel.GUID.ToString())));
 
                         if (annotation != null)
                         {
                             annotation.AnnotationModel.Select();
-                            dynamoViewModel.Model.ExecuteCommand(new DynamoModel.AddModelToGroupCommand(newNote.Model.GUID.ToString()));
+                            DynamoViewModel.Model.ExecuteCommand(new DynamoModel.AddModelToGroupCommand(newNote.Model.GUID.ToString()));
                             annotation.AnnotationModel.Deselect();
                         }
 
@@ -130,7 +130,7 @@ namespace MonocleViewExtension.PackageUsage
                     }
                     catch (Exception e)
                     {
-                        dynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
+                        DynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
                     }
                     count++;
                 }
@@ -141,7 +141,7 @@ namespace MonocleViewExtension.PackageUsage
 
         public void HighlightCustomNodes()
         {
-            var nodeViews = MiscUtils.FindVisualChildren<NodeView>(dynamoView);
+            var nodeViews = MiscUtils.FindVisualChildren<NodeView>(DynamoView);
 
             foreach (var nv in nodeViews)
             {
@@ -190,7 +190,7 @@ namespace MonocleViewExtension.PackageUsage
                     }
                     catch (Exception e)
                     {
-                        dynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
+                        DynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
                     }
                 }
             }
@@ -198,7 +198,7 @@ namespace MonocleViewExtension.PackageUsage
 
         public void ResetCustomNodeHighlights()
         {
-            var nodeViews = MiscUtils.FindVisualChildren<NodeView>(dynamoView);
+            var nodeViews = MiscUtils.FindVisualChildren<NodeView>(DynamoView);
 
             foreach (var nv in nodeViews)
             {
@@ -212,7 +212,7 @@ namespace MonocleViewExtension.PackageUsage
                     }
                     catch (Exception e)
                     {
-                        dynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
+                        DynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
                     }
                 }
             }
@@ -243,7 +243,7 @@ namespace MonocleViewExtension.PackageUsage
 
         public void RevealInputs()
         {
-            var nodeViews = MiscUtils.FindVisualChildren<NodeView>(dynamoView);
+            var nodeViews = MiscUtils.FindVisualChildren<NodeView>(DynamoView);
 
             var inputNodeViews = nodeViews.Where(n => n.ViewModel.IsInput).ToList();
 
@@ -262,9 +262,10 @@ namespace MonocleViewExtension.PackageUsage
                 FillBehavior = FillBehavior.Stop
             };
 
-            ColorAnimation colorAnimation = new ColorAnimation(Colors.Transparent, Colors.Aquamarine, TimeSpan.FromSeconds(5), FillBehavior.Stop);
-
-            colorAnimation.RepeatBehavior = new RepeatBehavior(1);
+            ColorAnimation colorAnimation = new ColorAnimation(Colors.Transparent, Colors.Aquamarine, TimeSpan.FromSeconds(5), FillBehavior.Stop)
+                {
+                    RepeatBehavior = new RepeatBehavior(1)
+                };
 
             DoubleAnimation doubleAnimation = new DoubleAnimation
             {
@@ -311,7 +312,7 @@ namespace MonocleViewExtension.PackageUsage
                 }
                 catch (Exception e)
                 {
-                    dynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
+                    DynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
                 }
             }
             
@@ -321,7 +322,7 @@ namespace MonocleViewExtension.PackageUsage
 
         public List<string> GetCustomPackageList()
         {
-            List<NodeSearchElement> libraries = dynamoViewModel.Model.SearchModel.SearchEntries.ToList();
+            List<NodeSearchElement> libraries = DynamoViewModel.Model.SearchModel.SearchEntries.ToList();
             List<string> addOns = new List<string>();
             foreach (var element in libraries)
             {
@@ -344,7 +345,7 @@ namespace MonocleViewExtension.PackageUsage
         }
         public string AllCustomNodes()
         {
-            List<NodeSearchElement> libraries = dynamoViewModel.Model.SearchModel.SearchEntries.ToList();
+            List<NodeSearchElement> libraries = DynamoViewModel.Model.SearchModel.SearchEntries.ToList();
             List<string> addOns = new List<string>();
             foreach (var element in libraries)
             {
@@ -374,7 +375,6 @@ namespace MonocleViewExtension.PackageUsage
 
         public string GetPackageName(NodeModel node)
         {
-            string result = null;
             List<int> values = new List<int>();
 
             foreach (var c in GetCustomPackageList())
@@ -383,9 +383,9 @@ namespace MonocleViewExtension.PackageUsage
                 values.Add(StringUtils.Compute(nodeCat, c));
             }
             int minIndex = values.IndexOf(values.Min());
-            result = GetCustomPackageList()[minIndex];
+            var result = GetCustomPackageList()[minIndex];
 
-            string fixedResult = String.Empty;
+            string fixedResult;
             switch (result.ToLower())
             {
                 case "springs":

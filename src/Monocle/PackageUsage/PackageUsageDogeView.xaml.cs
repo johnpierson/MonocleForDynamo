@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media.Animation;
 
 namespace MonocleViewExtension.PackageUsage
@@ -42,5 +43,11 @@ namespace MonocleViewExtension.PackageUsage
             ShowLabel();
         }
 
+        private void DogeLogo_OnMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var packageUsageVm = this.DataContext as PackageUsageViewModel;
+
+            //this.DogeLogo = packageUsageVm.DisplayImage;
+        }
     }
 }

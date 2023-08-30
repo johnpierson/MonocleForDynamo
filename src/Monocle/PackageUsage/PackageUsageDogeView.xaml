@@ -29,7 +29,7 @@
                    Background="#2d2d2d"
                    Foreground="White"/>
 
-        <Image Grid.Row="0" Grid.Column="1" Name="DogeLogo" Cursor="Hand" Margin="6 0 0 0" Stretch="UniformToFill" Source="{Binding DisplayImage}" gif:ImageBehavior.AnimatedSource="{Binding DisplayImage}"/>
+        <Image Grid.Row="0" Grid.Column="1" Name="DogeLogo" Cursor="Hand" Margin="6 0 0 0" Stretch="UniformToFill" Source="{Binding DisplayImage}" gif:ImageBehavior.AnimatedSource="{Binding DisplayImage}" MouseRightButtonDown="DogeLogo_OnMouseRightButtonDown"/>
         <Button Grid.Row="2" Grid.Column="1" Content="Send Package Usage to Clipboard" FontSize="16" FontFamily="Comic Sans MS" Margin="6" Command="{Binding SendToClipboard}"/>
         <Button Grid.Row="3" Grid.Column="1"  Content="Annotate Custom Nodes (add note)" FontSize="16" FontFamily="Comic Sans MS" Margin="6" Command="{Binding AnnotateNodes}"/>
         <Button Grid.Row="4" Grid.Column="1"  Content="Clear Custom Node Notes"  FontSize="16" FontFamily="Comic Sans MS" Margin="6" Command="{Binding ClearNotes}"/>

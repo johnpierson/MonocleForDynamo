@@ -3,6 +3,7 @@
     <RootNamespace>MonocleViewExtension</RootNamespace>
     <AssemblyName>MonocleViewExtension</AssemblyName>
     <TargetFramework>net48</TargetFramework>
+	<PlatformTarget>x64</PlatformTarget>
     <AssemblyTitle>Monocle</AssemblyTitle>
     <Product>Monocle</Product>
     <Copyright>Copyright©  2023 john pierson</Copyright>
