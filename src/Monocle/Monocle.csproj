@@ -23,6 +23,9 @@
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild" />
   <ItemGroup>
+    <None Remove="About\Resources\nonica.png" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="CommonServiceLocator" Version="2.0.2" />
     <PackageReference Include="Cyotek.Drawing.BitmapFont" Version="2.0.0" />
     <PackageReference Include="DynamoVisualProgramming.Core" Version="2.12.1.8246" />
@@ -100,26 +103,6 @@
     </Compile>
     <Compile Update="PackageUsage\PackageUsageView.xaml.cs">
       <DependentUpon>PackageUsageView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Properties\Resources.de-DE.Designer.cs">
-      <DependentUpon>Resources.de-DE.resx</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Update="Properties\Resources.it-IT.Designer.cs">
-      <DependentUpon>Resources.it-IT.resx</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Update="Properties\Resources.fr-FR.Designer.cs">
-      <DependentUpon>Resources.fr-FR.resx</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
-    <Compile Update="Properties\Resources.en-US.Designer.cs">
-      <DependentUpon>Resources.en-US.resx</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Update="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -265,6 +248,7 @@
     <Resource Include="About\Resources\svenamiet.png" />
     <Resource Include="About\Resources\eml-henn.png" />
     <Resource Include="PackageUsage\DogeImages\doge-comfort.png" />
+    <Resource Include="About\Resources\nonica.png" />
     <EmbeddedResource Include="Resources\Xceed.Wpf.AvalonDock.dll" />
     <EmbeddedResource Include="Resources\smalls.JPG" />
     <EmbeddedResource Include="Resources\WpfAnimatedGif.dll" />
