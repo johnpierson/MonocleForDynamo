@@ -104,11 +104,7 @@ namespace MonocleViewExtension
             BetterSaveCommand.AddMenuItem(p);
             ScaffoldTheJacobSmallSpecial(p);
 
-#if DEBUG
-            SnippetsCommand.AddMenuItem(monocleMenuItem,p,this);
             NodeDocumentationCommand.AddMenuItem(monocleMenuItem,p);
-#endif
-
 
 
             /*if the user has plugins loaded in Revit (or otherwise) that use a toolkit called "DevExpress",

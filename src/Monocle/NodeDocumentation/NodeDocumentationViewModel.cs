@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
 
+
 namespace MonocleViewExtension.NodeDocumentation
 {
     internal class NodeDocumentationViewModel : ViewModelBase
@@ -70,6 +71,7 @@ namespace MonocleViewExtension.NodeDocumentation
             string basePath = @"D:\repos_john\DynamoRevit-NodeSamples\src\Documentation";
             Path = $"{basePath}";
             Description = selectedNode.Description;
+            
         }
         private void OnCreateDocumentation(object o)
         {
@@ -84,7 +86,11 @@ namespace MonocleViewExtension.NodeDocumentation
             //now save image
             Model.ExportImage(imgPath);
             //then save md
-            Model.ExportMd(NodeName, imageName, mdPath, Description);
+            Model.ExportMd(NodeName, imageName, mdPath, ExtendedDescription);
         }
+
+        
     }
+
+   
 }
