@@ -44,7 +44,7 @@ namespace MonocleViewExtension
 
             //for testing localization
 #if DEBUG
-            Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("fr-FR");
+            //Thread.CurrentThread.CurrentUICulture = CultureInfo.GetCultureInfo("fr-FR");
 #endif
         }
 

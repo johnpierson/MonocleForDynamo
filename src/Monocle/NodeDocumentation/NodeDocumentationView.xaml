@@ -8,26 +8,53 @@
              Height="400"
              Width="400">
     <Window.Resources>
+        <FontFamily x:Key="ComicNeueu">pack://application:,,,/NodeDocumentation/#ComicNeu</FontFamily>
         <Style TargetType="{x:Type Window}">
-            <Setter Property="FontFamily" Value="./#Comic Neue" />
+            <Setter Property="FontFamily" Value="{StaticResource ComicNeueu}" />
         </Style>
-</Window.Resources>
+    </Window.Resources>
     <Grid Margin="8" Name="MainGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="48"/>
-            <RowDefinition Height="32"/>
-            <RowDefinition Height="32"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="48"/>
         </Grid.RowDefinitions>
-        <Label Content="Mega Ultra Node Documenter" FontSize="32"></Label>
+        <Label Content="Mega Ultra Node Documenter" FontSize="24"></Label>
 
-        <TextBox Name="BasePath" Grid.Row="1" Text="{Binding Path, Mode=TwoWay}"/>
+        <StackPanel Grid.Row="1">
+            <Label Content="Base Path:" FontSize="12"></Label>
+            <TextBox Name="BasePath" VerticalContentAlignment="Center" Text="{Binding Path, Mode=TwoWay, FallbackValue=C:/}" Margin="4 4  0 0" Padding="8 0 0 0"/>
 
-        <TextBox Name="NodeName" Grid.Row="2" Text="{Binding NodeName, Mode=TwoWay}"/>
+            <Label Content="Full Node Name:" FontSize="12"></Label>
+            <TextBox Name="FullNodeName" VerticalContentAlignment="Center" Text="{Binding FullNodeName, Mode=TwoWay, FallbackValue=NodeName}" Margin="4 4  0 0" Padding="8 0 0 0"/>
 
 
-        <TextBox Name="BriefDescription" Grid.Row="3" Text="{Binding Description, Mode=TwoWay}"/>
-        <Button Grid.Row="4" Content="Document" Command="{Binding CreateDocumentation}"/>
+            <Label Content="Node Name:" FontSize="12"></Label>
+            <TextBox Name="NodeName" VerticalContentAlignment="Center" Text="{Binding NodeName, Mode=TwoWay, FallbackValue=NodeName}" Margin="4 4  0 0" Padding="8 0 0 0"/>
+
+            <Label Content="Brief Description:" FontSize="12"></Label>
+            <TextBox Name="BriefDescription" VerticalContentAlignment="Center" Text="{Binding Description, Mode=TwoWay, FallbackValue=Brief}" Margin="4 4  0 0" Padding="8 0 0 0"/>
+
+            <Label Content="Not So Brief Description:" FontSize="12"></Label>
+            <TextBox Name="ExtendedDescription" Height="64"  Text="{Binding ExtendedDescription, Mode=TwoWay, FallbackValue=Brief}" Margin="4 4  0 0" Padding="8 0 0 0"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"
+                     VerticalScrollBarVisibility="Visible"/>
+
+        </StackPanel>
+
+<Grid Grid.Row="2">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="24"/>
+            <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+        <Button Grid.Column="0" Content="Get Node" Command="{Binding GetNodeCommand}"/>
+        <Button Grid.Column="2" Content="Document" Command="{Binding CreateDocumentation}"/>
+
+</Grid>
+
+</Grid>
     </Grid>
 </Window>

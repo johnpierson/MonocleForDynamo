@@ -45,9 +45,9 @@ namespace MonocleViewExtension.NodeDocumentation
             DynamoViewModel.SaveImage(path);
         }
 
-        public void ExportMd(string nodeName, string path, string content)
+        public void ExportMd(string nodeName, string imageName, string path, string content)
         {
-            string documentation = $"## In Depth\n{content}\n___\n## Example File\n\n![{nodeName}](./{nodeName}.png)";
+            string documentation = $"## In Depth\n{content}\n___\n## Example File\n\n![{nodeName}](./{imageName})";
 
             File.WriteAllText(path,documentation);
         }
