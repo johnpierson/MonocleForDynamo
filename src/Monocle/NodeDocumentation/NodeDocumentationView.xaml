@@ -10,7 +10,7 @@
     <Window.Resources>
         <FontFamily x:Key="Comic">pack://application:,,,/NodeDocumentation/#Comic Neue</FontFamily>
         <Style TargetType="{x:Type Window}">
-            <Setter Property="FontFamily" Value="{StaticResource Comic}" />
+            <Setter Property="FontFamily" Value="Comic Neue" />
         </Style>
     </Window.Resources>
     <Grid Margin="8" Name="MainGrid">
