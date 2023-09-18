@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
 
@@ -14,6 +16,7 @@ namespace MonocleViewExtension.NodeDocumentation
     {
         public NodeDocumentationModel Model { get; set; }
         public DelegateCommand GetNodeCommand { get; set; }
+        public DelegateCommand PickPathCommand { get; set; }
         public DelegateCommand CreateDocumentation { get; set; }
 
         private string _path;
@@ -46,31 +49,40 @@ namespace MonocleViewExtension.NodeDocumentation
             get => _extendedDescription;
             set { _extendedDescription = value; RaisePropertyChanged(nameof(ExtendedDescription)); }
         }
+
+        private bool _fileExists;
+        public bool FileExists
+        {
+            get => _fileExists;
+            set { _fileExists = value; RaisePropertyChanged(nameof(FileExists)); }
+        }
         public NodeDocumentationViewModel(NodeDocumentationModel m)
         {
             Model = m;
 
-            try
-            {
-               OnGetNode(null);
-            }
-            catch (Exception e)
-            {
-                //
-            }
+            OnGetNode(null);
 
+            FileExists = false;
             Description = "description";
             GetNodeCommand = new DelegateCommand(OnGetNode);
             CreateDocumentation = new DelegateCommand(OnCreateDocumentation);
+            PickPathCommand = new DelegateCommand(OnPickPath);
         }
         private void OnGetNode(object o)
         {
-            var selectedNode = Model.DynamoViewModel.CurrentSpace.CurrentSelection.First();
-            FullNodeName = selectedNode.GetType().ToString();
-            NodeName = selectedNode.Name;
-            string basePath = @"D:\repos_john\DynamoRevit-NodeSamples\src\Documentation";
-            Path = $"{basePath}";
-            Description = selectedNode.Description;
+            try
+            {
+                var selectedNode = Model.DynamoViewModel.CurrentSpace.CurrentSelection.First();
+                FullNodeName = selectedNode.GetType().ToString();
+                NodeName = selectedNode.Name;
+                string basePath = @"D:\repos_john\DynamoRevit-NodeSamples\src\Documentation";
+                Path = $"{basePath}";
+                Description = selectedNode.Description;
+            }
+            catch (Exception)
+            {
+               //suppress for now TODO: Add some kind of alert here
+            }
             
         }
         private void OnCreateDocumentation(object o)
@@ -89,7 +101,23 @@ namespace MonocleViewExtension.NodeDocumentation
             Model.ExportMd(NodeName, imageName, mdPath, ExtendedDescription);
         }
 
-        
+        private void OnPickPath(object o)
+        {
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+            fbd.ShowNewFolderButton = true;
+
+            fbd.ShowDialog();
+
+            if (!string.IsNullOrWhiteSpace(fbd.SelectedPath))
+            {
+                Path = fbd.SelectedPath;
+            }
+
+            //check if the file exists to alert user
+            var dynPath = System.IO.Path.Combine(Path, $"{FullNodeName}.dyn");
+            FileExists = File.Exists(dynPath);
+        }
+
     }
 
    

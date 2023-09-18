@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dynamo.Controls;
 using Dynamo.Graph;
+using Dynamo.Models;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 
@@ -43,6 +45,15 @@ namespace MonocleViewExtension.NodeDocumentation
         public void ExportImage(string path)
         {
             DynamoViewModel.SaveImage(path);
+
+            //if (File.Exists(path))
+            //{
+            //    System.Drawing.Bitmap bitmap = new Bitmap(path);
+
+            //    var filled = Transparent2Color(bitmap, Color.White);
+
+            //    filled.Save(path);
+            //}
         }
 
         public void ExportMd(string nodeName, string imageName, string path, string content)
@@ -50,6 +61,18 @@ namespace MonocleViewExtension.NodeDocumentation
             string documentation = $"## In Depth\n{content}\n___\n## Example File\n\n![{nodeName}](./{imageName})";
 
             File.WriteAllText(path,documentation);
+        }
+
+        Bitmap Transparent2Color(Bitmap bmp1, Color target)
+        {
+            Bitmap bmp2 = new Bitmap(bmp1.Width, bmp1.Height);
+            Rectangle rect = new Rectangle(Point.Empty, bmp1.Size);
+            using (Graphics G = Graphics.FromImage(bmp2))
+            {
+                G.Clear(target);
+                G.DrawImageUnscaledAndClipped(bmp1, rect);
+            }
+            return bmp2;
         }
     }
 }

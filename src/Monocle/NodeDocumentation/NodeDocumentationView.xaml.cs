@@ -23,6 +23,7 @@ namespace MonocleViewExtension.NodeDocumentation
         public NodeDocumentationView()
         {
             InitializeComponent();
+            Style = (Style)FindResource(typeof(Window));
         }
     }
 }
