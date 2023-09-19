@@ -21,7 +21,7 @@
                              RepeatBehavior="0:0:1">
                 <DoubleAnimation.EasingFunction>
                     <ElasticEase EasingMode="EaseOut"
-                                 Oscillations="1"
+                                 Oscillations="4"
                                  Springiness="2" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
@@ -64,13 +64,19 @@
                      TextWrapping="Wrap"
                      AcceptsReturn="True"
                      VerticalScrollBarVisibility="Visible"/>
-            <TextBlock Text="{Binding NotificationMessage, NotifyOnTargetUpdated=True}"  Foreground="PaleVioletRed" Visibility="{Binding Path=FileExists, Converter={StaticResource BoolToVis}}" IsHitTestVisible="False">
-                <TextBlock.Triggers>
-                    <EventTrigger RoutedEvent="Binding.TargetUpdated">
-                        <BeginStoryboard Storyboard="{StaticResource WiggleStoryboard}"/>
-                    </EventTrigger>
-                </TextBlock.Triggers>
-            </TextBlock>
+            <Border>
+                <Border.RenderTransform>
+                    <RotateTransform x:Name="transform" CenterX="100"/>
+                </Border.RenderTransform>
+                <TextBlock Text="{Binding NotificationMessage, NotifyOnTargetUpdated=True}"  Foreground="PaleVioletRed" Visibility="{Binding Path=FileExists, Converter={StaticResource BoolToVis}}" IsHitTestVisible="False">
+                    <TextBlock.Triggers>
+                        <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                            <BeginStoryboard Storyboard="{StaticResource WiggleStoryboard}"/>
+                        </EventTrigger>
+                    </TextBlock.Triggers>
+                </TextBlock>
+            </Border>
+          
             
         </StackPanel>
 

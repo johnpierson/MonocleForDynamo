@@ -84,6 +84,8 @@ namespace MonocleViewExtension.NodeDocumentation
                 string basePath = @"D:\repos_john\DynamoRevit-NodeSamples\src\Documentation";
                 Path = $"{basePath}";
                 Description = selectedNode.Description;
+
+                CheckIfDocsExist();
             }
             catch (Exception)
             {
@@ -118,6 +120,13 @@ namespace MonocleViewExtension.NodeDocumentation
             {
                 Path = fbd.SelectedPath;
             }
+
+            CheckIfDocsExist();
+        }
+
+        private void CheckIfDocsExist()
+        {
+            if (string.IsNullOrWhiteSpace(Path)) return;
 
             //check if the file exists to alert user
             var dynPath = System.IO.Path.Combine(Path, $"{FullNodeName}.dyn");
