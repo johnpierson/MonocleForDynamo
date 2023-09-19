@@ -56,6 +56,12 @@ namespace MonocleViewExtension.NodeDocumentation
             get => _fileExists;
             set { _fileExists = value; RaisePropertyChanged(nameof(FileExists)); }
         }
+        private string _notificationMessage;
+        public string NotificationMessage
+        {
+            get => _notificationMessage;
+            set { _notificationMessage = value; RaisePropertyChanged(nameof(NotificationMessage)); }
+        }
         public NodeDocumentationViewModel(NodeDocumentationModel m)
         {
             Model = m;
@@ -116,6 +122,11 @@ namespace MonocleViewExtension.NodeDocumentation
             //check if the file exists to alert user
             var dynPath = System.IO.Path.Combine(Path, $"{FullNodeName}.dyn");
             FileExists = File.Exists(dynPath);
+
+            if (FileExists)
+            {
+                NotificationMessage = "documentation already exists at given location. 🥺";
+            }
         }
 
     }

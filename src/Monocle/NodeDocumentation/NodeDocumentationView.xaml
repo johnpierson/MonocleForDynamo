@@ -5,13 +5,28 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:MonocleViewExtension.NodeDocumentation"
              mc:Ignorable="d" 
-             Height="440"
+             Height="460"
              Width="400">
     <Window.Resources>
         <FontFamily x:Key="Comic">pack://application:,,,/NodeDocumentation/#Comic Neue</FontFamily>
         <Style TargetType="{x:Type Window}">
             <Setter Property="FontFamily" Value="Comic Neue" />
         </Style>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <Storyboard x:Key="WiggleStoryboard" FillBehavior="Stop">
+            <DoubleAnimation Storyboard.TargetName="transform"
+                             Storyboard.TargetProperty="Angle"
+                             From="5"
+                             Duration="0:0:1"
+                             RepeatBehavior="0:0:1">
+                <DoubleAnimation.EasingFunction>
+                    <ElasticEase EasingMode="EaseOut"
+                                 Oscillations="1"
+                                 Springiness="2" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+       
     </Window.Resources>
     <Grid Margin="8" Name="MainGrid">
         <Grid.RowDefinitions>
@@ -49,21 +64,28 @@
                      TextWrapping="Wrap"
                      AcceptsReturn="True"
                      VerticalScrollBarVisibility="Visible"/>
-
+            <TextBlock Text="{Binding NotificationMessage, NotifyOnTargetUpdated=True}"  Foreground="PaleVioletRed" Visibility="{Binding Path=FileExists, Converter={StaticResource BoolToVis}}" IsHitTestVisible="False">
+                <TextBlock.Triggers>
+                    <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                        <BeginStoryboard Storyboard="{StaticResource WiggleStoryboard}"/>
+                    </EventTrigger>
+                </TextBlock.Triggers>
+            </TextBlock>
+            
         </StackPanel>
 
-<Grid Grid.Row="2">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="24"/>
-            <ColumnDefinition Width="*"/>
+        <Grid Grid.Row="2">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="24"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0" Content="Get Node" Command="{Binding GetNodeCommand}" Background="LightSlateGray" Foreground="White"/>
                 <Button Grid.Column="2" Content="Document" Command="{Binding CreateDocumentation}" Background="LightSlateGray" Foreground="White"/>
 
-</Grid>
+            </Grid>
 
-</Grid>
+        </Grid>
     </Grid>
 </Window>
