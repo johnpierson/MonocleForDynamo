@@ -62,6 +62,9 @@ namespace MonocleViewExtension.NodeDocumentation
             get => _notificationMessage;
             set { _notificationMessage = value; RaisePropertyChanged(nameof(NotificationMessage)); }
         }
+
+        private NodeDocumentation _nodeDocumentation;
+
         public NodeDocumentationViewModel(NodeDocumentationModel m)
         {
             Model = m;
@@ -69,7 +72,7 @@ namespace MonocleViewExtension.NodeDocumentation
             OnGetNode(null);
 
             FileExists = false;
-            Description = "description";
+
             GetNodeCommand = new DelegateCommand(OnGetNode);
             CreateDocumentation = new DelegateCommand(OnCreateDocumentation);
             PickPathCommand = new DelegateCommand(OnPickPath);
@@ -79,34 +82,36 @@ namespace MonocleViewExtension.NodeDocumentation
             try
             {
                 var selectedNode = Model.DynamoViewModel.CurrentSpace.CurrentSelection.First();
-                FullNodeName = selectedNode.GetType().ToString();
-                NodeName = selectedNode.Name;
                 string basePath = @"D:\repos_john\DynamoRevit-NodeSamples\src\Documentation";
-                Path = $"{basePath}";
-                Description = selectedNode.Description;
 
+                _nodeDocumentation =
+                    new NodeDocumentation(basePath, selectedNode.GetType().ToString(), selectedNode.Name)
+                    {
+                        Description = selectedNode.Description
+                    };
+
+                Path = $"{basePath}";
+                NodeName = _nodeDocumentation.NodeName;
+                FullNodeName = _nodeDocumentation.FullNodeName;
+                Description = _nodeDocumentation.Description;
                 CheckIfDocsExist();
+
             }
             catch (Exception)
             {
-               //suppress for now TODO: Add some kind of alert here
+                //suppress for now TODO: Add some kind of alert here
             }
-            
+
         }
         private void OnCreateDocumentation(object o)
         {
-            string dynPath = System.IO.Path.Combine(Path, $"{FullNodeName}.dyn");
-            string imageName = $"{FullNodeName}_img.jpg";
-            string imgPath = System.IO.Path.Combine(Path, imageName);
-            string mdPath = System.IO.Path.Combine(Path, $"{FullNodeName}.md");
-
-
+            _nodeDocumentation.FullDescription = ExtendedDescription;
             //first save dyn
-            Model.SaveDyn(dynPath);
+            Model.SaveDyn(_nodeDocumentation.SampleGraph);
             //now save image
-            Model.ExportImage(imgPath);
+            Model.ExportImage(_nodeDocumentation.SampleGraphImagePath);
             //then save md
-            Model.ExportMd(NodeName, imageName, mdPath, ExtendedDescription);
+            Model.ExportMd(NodeName, _nodeDocumentation.SampleGraphImage, _nodeDocumentation.MarkdownPath, ExtendedDescription);
         }
 
         private void OnPickPath(object o)
@@ -130,15 +135,21 @@ namespace MonocleViewExtension.NodeDocumentation
 
             //check if the file exists to alert user
             var dynPath = System.IO.Path.Combine(Path, $"{FullNodeName}.dyn");
+            var mdPath = System.IO.Path.Combine(Path, $"{FullNodeName}.md");
+
             FileExists = File.Exists(dynPath);
 
             if (FileExists)
             {
                 NotificationMessage = "documentation already exists at given location. 🥺";
+
+                _nodeDocumentation.ReadMarkdown();
+
+                ExtendedDescription = _nodeDocumentation.FullDescription;
             }
         }
 
     }
 
-   
+
 }
