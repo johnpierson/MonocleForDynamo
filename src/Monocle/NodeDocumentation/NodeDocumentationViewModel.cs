@@ -63,6 +63,16 @@ namespace MonocleViewExtension.NodeDocumentation
             set { _notificationMessage = value; RaisePropertyChanged(nameof(NotificationMessage)); }
         }
 
+        private bool[] _imgModeArray = new bool[] { true, false, false };
+        public bool[] ImgModeArray
+        {
+            get { return _imgModeArray; }
+        }
+        public int SelectedImgMode
+        {
+            get { return Array.IndexOf(_imgModeArray, true); }
+        }
+
         private NodeDocumentation _nodeDocumentation;
 
         public NodeDocumentationViewModel(NodeDocumentationModel m)
@@ -108,8 +118,10 @@ namespace MonocleViewExtension.NodeDocumentation
             _nodeDocumentation.FullDescription = ExtendedDescription;
             //first save dyn
             Model.SaveDyn(_nodeDocumentation.SampleGraph);
+
             //now save image
-            Model.ExportImage(_nodeDocumentation.SampleGraphImagePath);
+            Model.ExportImage(SelectedImgMode,_nodeDocumentation.SampleGraphImagePath);
+            
             //then save md
             Model.ExportMd(NodeName, _nodeDocumentation.SampleGraphImage, _nodeDocumentation.MarkdownPath, ExtendedDescription);
         }

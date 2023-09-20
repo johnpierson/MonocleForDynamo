@@ -5,7 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:MonocleViewExtension.NodeDocumentation"
              mc:Ignorable="d" 
-             Height="460"
+             Height="550"
+             MinHeight="550"
              Width="400">
     <Window.Resources>
         <FontFamily x:Key="Comic">pack://application:,,,/NodeDocumentation/#Comic Neue</FontFamily>
@@ -26,7 +27,7 @@
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
-       
+
     </Window.Resources>
     <Grid Margin="8" Name="MainGrid">
         <Grid.RowDefinitions>
@@ -64,6 +65,14 @@
                      TextWrapping="Wrap"
                      AcceptsReturn="True"
                      VerticalScrollBarVisibility="Visible"/>
+          
+            <GroupBox Header="Image Export Options">
+                <StackPanel>
+                    <RadioButton GroupName="ImgOptions" Content="Workspace" Margin="0 2" VerticalContentAlignment="Center" IsChecked="{Binding Path=ImgModeArray[0], Mode=TwoWay, FallbackValue=True}"/>
+                    <RadioButton GroupName="ImgOptions" Content="Background" Margin="0 2" VerticalContentAlignment="Center" IsChecked="{Binding Path=ImgModeArray[1], Mode=TwoWay}"/>
+                    <RadioButton GroupName="ImgOptions" Content="Workspace Over Background" Margin="0 2" VerticalContentAlignment="Center" IsChecked="{Binding Path=ImgModeArray[2], Mode=TwoWay}"/>
+                </StackPanel>
+            </GroupBox>
             <Border>
                 <Border.RenderTransform>
                     <RotateTransform x:Name="transform" CenterX="100"/>
@@ -76,8 +85,6 @@
                     </TextBlock.Triggers>
                 </TextBlock>
             </Border>
-          
-            
         </StackPanel>
 
         <Grid Grid.Row="2">
@@ -93,5 +100,6 @@
             </Grid>
 
         </Grid>
+
     </Grid>
 </Window>
