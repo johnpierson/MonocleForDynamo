@@ -94,8 +94,8 @@
                     <ColumnDefinition Width="24"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Content="Get Node" Command="{Binding GetNodeCommand}" Background="LightSlateGray" Foreground="White"/>
-                <Button Grid.Column="2" Content="Document" Command="{Binding CreateDocumentation}" Background="LightSlateGray" Foreground="White"/>
+                <Button Grid.Column="0" Content="Get Node" Command="{Binding GetNodeCommand}" Background="LightSlateGray" Foreground="White" IsEnabled="{Binding CanGetNode, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"/>
+                <Button Grid.Column="2" Content="Document" Command="{Binding CreateDocumentation}" Background="LightSlateGray" Foreground="White" IsEnabled="{Binding CanDocumentNode, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"/>
 
             </Grid>
 

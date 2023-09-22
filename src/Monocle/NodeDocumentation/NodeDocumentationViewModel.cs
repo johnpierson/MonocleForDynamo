@@ -73,39 +73,51 @@ namespace MonocleViewExtension.NodeDocumentation
             get { return Array.IndexOf(_imgModeArray, true); }
         }
 
+        private bool _canGetNode;
+        public bool CanGetNode
+        {
+            get => _canGetNode;
+            set { _canGetNode = value; RaisePropertyChanged(nameof(CanGetNode)); }
+        }
+        private bool _canDocumentNode;
+        public bool CanDocumentNode
+        {
+            get => _canDocumentNode;
+            set { _canDocumentNode = value; RaisePropertyChanged(nameof(CanDocumentNode)); }
+        }
+
         private NodeDocumentation _nodeDocumentation;
 
         public NodeDocumentationViewModel(NodeDocumentationModel m)
         {
             Model = m;
 
-            OnGetNode(null);
-
             FileExists = false;
-
             GetNodeCommand = new DelegateCommand(OnGetNode);
             CreateDocumentation = new DelegateCommand(OnCreateDocumentation);
             PickPathCommand = new DelegateCommand(OnPickPath);
+
+            CanGetNode = false;
+            CanDocumentNode = false;
         }
         private void OnGetNode(object o)
         {
             try
             {
                 var selectedNode = Model.DynamoViewModel.CurrentSpace.CurrentSelection.First();
-                string basePath = @"D:\repos_john\DynamoRevit-NodeSamples\src\Documentation";
-
+                
                 _nodeDocumentation =
-                    new NodeDocumentation(basePath, selectedNode.GetType().ToString(), selectedNode.Name)
+                    new NodeDocumentation(Path, selectedNode.GetType().ToString(), selectedNode.Name)
                     {
                         Description = selectedNode.Description
                     };
-
-                Path = $"{basePath}";
+                
                 NodeName = _nodeDocumentation.NodeName;
                 FullNodeName = _nodeDocumentation.FullNodeName;
                 Description = _nodeDocumentation.Description;
                 CheckIfDocsExist();
 
+                CanDocumentNode = true;
             }
             catch (Exception)
             {
@@ -136,6 +148,7 @@ namespace MonocleViewExtension.NodeDocumentation
             if (!string.IsNullOrWhiteSpace(fbd.SelectedPath))
             {
                 Path = fbd.SelectedPath;
+                CanGetNode = true;
             }
 
             CheckIfDocsExist();
