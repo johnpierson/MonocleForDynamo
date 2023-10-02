@@ -7,8 +7,8 @@
     <AssemblyTitle>Monocle</AssemblyTitle>
     <Product>Monocle</Product>
     <Copyright>Copyright©  2023 john pierson</Copyright>
-    <AssemblyVersion>2023.9.1</AssemblyVersion>
-    <FileVersion>2023.9.2</FileVersion>
+    <AssemblyVersion>2023.9.4</AssemblyVersion>
+    <FileVersion>2023.9.4</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

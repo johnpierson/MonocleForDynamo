@@ -6,6 +6,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Dynamo.Graph.Nodes.CustomNodes;
+using Dynamo.Graph.Nodes.ZeroTouch;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
 
@@ -106,8 +108,27 @@ namespace MonocleViewExtension.NodeDocumentation
             {
                 var selectedNode = Model.DynamoViewModel.CurrentSpace.CurrentSelection.First();
                 
+                string nodeFullName;
+
+                
+                switch (selectedNode)
+                {
+                    case DSFunction dsFunction:
+                        string fullSignature = dsFunction.FunctionSignature;
+                        nodeFullName = fullSignature.Split('@')[0];
+                        break;
+                    case Function function:
+                        string fullFunctionSignature = function.FunctionSignature.ToString();
+                        nodeFullName = fullFunctionSignature.Split('@')[0];
+                        break;
+                    default:
+                        nodeFullName = selectedNode.GetType().ToString();
+                        break;
+                }
+
+
                 _nodeDocumentation =
-                    new NodeDocumentation(Path, selectedNode.GetType().ToString(), selectedNode.Name)
+                    new NodeDocumentation(Path, nodeFullName, selectedNode.Name)
                     {
                         Description = selectedNode.Description
                     };

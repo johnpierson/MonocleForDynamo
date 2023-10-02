@@ -102,6 +102,12 @@ namespace MonocleViewExtension.NodeDocumentation
 
         public void ExportMd(string nodeName, string imageName, string path, string content)
         {
+            //replace spacing for markdown referencing
+            if (imageName.Contains(" "))
+            {
+                imageName = imageName.Replace(" ", "%20");
+            }
+
             string documentation = $"## In Depth\n{content}\n___\n## Example File\n\n![{nodeName}](./{imageName})";
 
             File.WriteAllText(path,documentation);
