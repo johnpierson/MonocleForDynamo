@@ -136,6 +136,7 @@ namespace MonocleViewExtension.NodeDocumentation
                 NodeName = _nodeDocumentation.NodeName;
                 FullNodeName = _nodeDocumentation.FullNodeName;
                 Description = _nodeDocumentation.Description;
+
                 CheckIfDocsExist();
 
                 CanDocumentNode = true;

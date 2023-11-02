@@ -5,13 +5,28 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:MonocleViewExtension.NodeDocumentation"
              mc:Ignorable="d" 
-             Height="550"
-             MinHeight="550"
-             Width="400">
+             Height="700"
+             MinHeight="700"
+             Width="400"
+             MinWidth="400" WindowStartupLocation="CenterScreen">
     <Window.Resources>
-        <FontFamily x:Key="Comic">pack://application:,,,/NodeDocumentation/#Comic Neue</FontFamily>
-        <Style TargetType="{x:Type Window}">
-            <Setter Property="FontFamily" Value="Comic Neue" />
+        <Style TargetType="{x:Type Label}">
+            <Setter Property="FontFamily" Value="/Assets/Fonts/#Comic Neue" />
+        </Style>
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="FontFamily" Value="/Assets/Fonts/#Comic Neue" />
+        </Style>
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="FontFamily" Value="/Assets/Fonts/#Comic Neue" />
+        </Style>
+        <Style TargetType="{x:Type Button}">
+            <Setter Property="FontFamily" Value="/Assets/Fonts/#Comic Neue" />
+        </Style>
+        <Style TargetType="{x:Type RadioButton}">
+            <Setter Property="FontFamily" Value="/Assets/Fonts/#Comic Neue" />
+        </Style>
+        <Style TargetType="{x:Type GroupBox}">
+            <Setter Property="FontFamily" Value="/Assets/Fonts/#Comic Neue" />
         </Style>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <Storyboard x:Key="WiggleStoryboard" FillBehavior="Stop">
@@ -32,70 +47,111 @@
     <Grid Margin="8" Name="MainGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="48"/>
+            <RowDefinition Height="64"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="48"/>
         </Grid.RowDefinitions>
-        <Label Content="Mega Ultra Node Documenter™️" FontSize="24" FontWeight="Bold" Foreground="LightSlateGray"/>
+        <Label Content="Mega Ultra Node Documenter™️" FontSize="24" Foreground="LightSlateGray"/>
 
-        <StackPanel Grid.Row="1">
-            <Label Content="Base Path:" FontSize="14" FontFamily="Comic Neue"/>
-            <Grid>
+<TextBlock Grid.Row="1" IsHitTestVisible="False" TextWrapping="Wrap" FontSize="11" Text="This tool assists in the generation of node help files for the Dynamo documentation browser. After selecting a directory path and a single node to document, the current Dynamo graph will be used to generate a markdown file (.md), a .dyn sample and a .jpg preview."></TextBlock>
+
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="24"/>
+                <RowDefinition Height="32"/>
+                <RowDefinition Height="24"/>
+                <RowDefinition Height="32"/>
+                <RowDefinition Height="12"/>
+                <RowDefinition Height="24"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Label Background="LightSlateGray" Foreground="White"  Content="Step 1: Pick a Directory to Document Nodes:" FontSize="14" FontFamily="Comic Neue" Grid.Row="0"/>
+            <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="74"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button Content="Pick Path" Height="18" VerticalAlignment="Bottom" Margin="4 0 0 0" Command="{Binding PickPathCommand}" Background="LightSlateGray" Foreground="White"/>
-                <TextBox Grid.Column="1" Height="18" Name="BasePath" VerticalContentAlignment="Center" Text="{Binding Path, Mode=TwoWay, FallbackValue=C:/}" Margin="4 4  0 0" Padding="8 0 0 0"/>
-
+                <Button Content="Pick Path" Height="18" VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="4 0 0 0" Command="{Binding PickPathCommand}" Background="LightSlateGray" Foreground="White"/>
+                <TextBox Grid.Column="1" Height="18" Name="BasePath" VerticalAlignment="Center" VerticalContentAlignment="Center" Text="{Binding Path, Mode=TwoWay, FallbackValue=C:/}" Margin="4 0  0 0" Padding="8 0 0 0"/>
             </Grid>
 
+            <Label Background="LightSlateGray" Foreground="White"  Content="Step 2: Pick a node to create documentation for*:" FontSize="14" FontFamily="Comic Neue" Grid.Row="2" ToolTip="If multiple nodes are selected the last node will be used."/>
 
-            <Label Content="Full Node Name:" FontSize="14"></Label>
-            <TextBox Name="FullNodeName" VerticalContentAlignment="Center" Text="{Binding FullNodeName, Mode=TwoWay, FallbackValue=NodeName}" Margin="4 4  0 0" Padding="8 0 0 0"/>
+            <Button Grid.Row="3" Content="Get Selected Node" Command="{Binding GetNodeCommand}" Background="LightSlateGray" Foreground="White" IsHitTestVisible="{Binding CanGetNode, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}" Width="120" Margin="4"/>
+
+            <Separator Grid.Row="4" Foreground="LightSlateGray"></Separator>
 
 
-            <Label Content="Node Name:" FontSize="14"></Label>
-            <TextBox Name="NodeName" VerticalContentAlignment="Center" Text="{Binding NodeName, Mode=TwoWay, FallbackValue=NodeName}" Margin="4 4  0 0" Padding="8 0 0 0"/>
+            <Label Background="LightSlateGray" Foreground="White" Content="Step 3: Review/Revise Node Documentation" FontSize="14" FontFamily="Comic Neue" Grid.Row="5" ToolTip="If multiple nodes are selected the last node will be used."/>
 
-            <Label Content="Brief Description:" FontSize="14"></Label>
-            <TextBox Name="BriefDescription" VerticalContentAlignment="Center" Text="{Binding Description, Mode=TwoWay, FallbackValue=Brief}" Margin="4 4  0 0" Padding="8 0 0 0"/>
+            <!--the data-->
+            <Grid Grid.Row="6" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="24"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="24"/>
+                    <RowDefinition Height="24"/>
+                    <RowDefinition Height="24"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="24"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="24"/>
+                </Grid.RowDefinitions>
+                <Label Content="Full Node Name:" FontSize="14"  Grid.Row="0"/>
+                <TextBox Name="FullNodeName" VerticalContentAlignment="Center" Text="{Binding FullNodeName, Mode=TwoWay, FallbackValue=NodeName}" Margin="4 4  0 0" Padding="8 0 0 0"  Grid.Row="1"/>
 
-            <Label Content="Not So Brief Description:" FontSize="14"></Label>
-            <TextBox Name="ExtendedDescription" Height="64"  Text="{Binding ExtendedDescription, Mode=TwoWay, FallbackValue=Brief}" Margin="4 4  0 0" Padding="8 0 0 0"
-                     TextWrapping="Wrap"
-                     AcceptsReturn="True"
-                     VerticalScrollBarVisibility="Visible"/>
-          
-            <GroupBox Header="Image Export Options">
-                <StackPanel>
-                    <RadioButton GroupName="ImgOptions" Content="Workspace" Margin="0 2" VerticalContentAlignment="Center" IsChecked="{Binding Path=ImgModeArray[0], Mode=TwoWay, FallbackValue=True}"/>
-                    <RadioButton GroupName="ImgOptions" Content="Background" Margin="0 2" VerticalContentAlignment="Center" IsChecked="{Binding Path=ImgModeArray[1], Mode=TwoWay}"/>
-                    <RadioButton GroupName="ImgOptions" Content="Workspace Over Background" Margin="0 2" VerticalContentAlignment="Center" IsChecked="{Binding Path=ImgModeArray[2], Mode=TwoWay}"/>
-                </StackPanel>
-            </GroupBox>
-            <Border>
-                <Border.RenderTransform>
-                    <RotateTransform x:Name="transform" CenterX="100"/>
-                </Border.RenderTransform>
-                <TextBlock Text="{Binding NotificationMessage, NotifyOnTargetUpdated=True}"  Foreground="PaleVioletRed" Visibility="{Binding Path=FileExists, Converter={StaticResource BoolToVis}}" IsHitTestVisible="False">
-                    <TextBlock.Triggers>
-                        <EventTrigger RoutedEvent="Binding.TargetUpdated">
-                            <BeginStoryboard Storyboard="{StaticResource WiggleStoryboard}"/>
-                        </EventTrigger>
-                    </TextBlock.Triggers>
-                </TextBlock>
-            </Border>
-        </StackPanel>
 
-        <Grid Grid.Row="2">
+                <Label Content="Node Name:" FontSize="14"  Grid.Row="2"/>
+                <TextBox Name="NodeName" VerticalContentAlignment="Center" Text="{Binding NodeName, Mode=TwoWay, FallbackValue=NodeName}" Margin="4 4  0 0" Padding="8 0 0 0"  Grid.Row="3"/>
+
+                <Label Content="Brief Description:" FontSize="14"  Grid.Row="4"/>
+                <TextBox Name="BriefDescription" VerticalContentAlignment="Center" Text="{Binding Description, Mode=TwoWay, FallbackValue=Brief}" Margin="4 4  0 0" Padding="8 0 0 0" 
+  TextWrapping="Wrap"
+  AcceptsReturn="True"
+  VerticalScrollBarVisibility="Visible"
+  SpellCheck.IsEnabled="True"
+  Grid.Row="5"/>
+
+                <Label Content="Not So Brief Description:" FontSize="14" Grid.Row="6"/>
+                <TextBox Name="ExtendedDescription" Text="{Binding ExtendedDescription, Mode=TwoWay, FallbackValue=NoBrief}" Margin="4 4  0 0" Padding="8 0 0 0"
+  TextWrapping="Wrap"
+  AcceptsReturn="True"
+  VerticalScrollBarVisibility="Visible"
+  SpellCheck.IsEnabled="True"
+  Grid.Row="7"/>
+
+                <GroupBox Header="Image Export Options" Grid.Row="8">
+                    <StackPanel>
+                        <RadioButton GroupName="ImgOptions" Content="Workspace" Margin="0 2" VerticalContentAlignment="Center" IsChecked="{Binding Path=ImgModeArray[0], Mode=TwoWay, FallbackValue=True}"/>
+                        <RadioButton GroupName="ImgOptions" Content="Background" Margin="0 2" VerticalContentAlignment="Center" IsChecked="{Binding Path=ImgModeArray[1], Mode=TwoWay}"/>
+                        <RadioButton GroupName="ImgOptions" Content="Workspace Over Background" Margin="0 2" VerticalContentAlignment="Center" IsChecked="{Binding Path=ImgModeArray[2], Mode=TwoWay}"/>
+                    </StackPanel>
+                </GroupBox>
+                <Border Grid.Row="9">
+                    <Border.RenderTransform>
+                        <RotateTransform x:Name="transform" CenterX="100"/>
+                    </Border.RenderTransform>
+                    <TextBlock Text="{Binding NotificationMessage, NotifyOnTargetUpdated=True}"  Foreground="PaleVioletRed" Visibility="{Binding Path=FileExists, Converter={StaticResource BoolToVis}}" IsHitTestVisible="False">
+                        <TextBlock.Triggers>
+                            <EventTrigger RoutedEvent="Binding.TargetUpdated">
+                                <BeginStoryboard Storyboard="{StaticResource WiggleStoryboard}"/>
+                            </EventTrigger>
+                        </TextBlock.Triggers>
+                    </TextBlock>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="3">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="24"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0" Content="Get Node" Command="{Binding GetNodeCommand}" Background="LightSlateGray" Foreground="White" IsEnabled="{Binding CanGetNode, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"/>
-                <Button Grid.Column="2" Content="Document" Command="{Binding CreateDocumentation}" Background="LightSlateGray" Foreground="White" IsEnabled="{Binding CanDocumentNode, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"/>
+                <Label Grid.Column="0" Content="Step 4 👉" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="18" Background="LightSlateGray" Foreground="White"></Label>
+                <Button Grid.Column="2" Content="Create Documentation!" Command="{Binding CreateDocumentation}" Background="LightSlateGray" Foreground="White" IsHitTestVisible="{Binding CanDocumentNode, Mode=OneWay,UpdateSourceTrigger=PropertyChanged}"/>
 
             </Grid>
 

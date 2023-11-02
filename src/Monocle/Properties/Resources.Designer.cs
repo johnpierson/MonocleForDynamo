@@ -22,7 +22,7 @@ namespace MonocleViewExtension.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    public class Resources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace MonocleViewExtension.Properties {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("MonocleViewExtension.Properties.Resources", typeof(Resources).Assembly);
@@ -51,7 +51,7 @@ namespace MonocleViewExtension.Properties {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to about monocle.
         /// </summary>
-        internal static string AboutMenuItemHeader {
+        public static string AboutMenuItemHeader {
             get {
                 return ResourceManager.GetString("AboutMenuItemHeader", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to about monocle | Update Available! v..
         /// </summary>
-        internal static string AboutMenuItemUpdateHeader {
+        public static string AboutMenuItemUpdateHeader {
             get {
                 return ResourceManager.GetString("AboutMenuItemUpdateHeader", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to There is a new monocle update available. Please update via the package manager..
         /// </summary>
-        internal static string AboutMenuItemUpdateTooltip {
+        public static string AboutMenuItemUpdateTooltip {
             get {
                 return ResourceManager.GetString("AboutMenuItemUpdateTooltip", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Better Save (ᵇʳᵒᵘᵍʰᵗ ᵗᵒ ʸᵒᵘ ᵇʸ ᵐᵒⁿᵒᶜˡᵉ™️).
         /// </summary>
-        internal static string BetterSaveFlyoutHeader {
+        public static string BetterSaveFlyoutHeader {
             get {
                 return ResourceManager.GetString("BetterSaveFlyoutHeader", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Better save options. Because you deserve it. Brought to you by monocle™️.
         /// </summary>
-        internal static string BetterSaveFlyoutTooltip {
+        public static string BetterSaveFlyoutTooltip {
             get {
                 return ResourceManager.GetString("BetterSaveFlyoutTooltip", resourceCulture);
             }
@@ -108,7 +108,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to enable FOCA.
         /// </summary>
-        internal static string FocaMenuItemHeader {
+        public static string FocaMenuItemHeader {
             get {
                 return ResourceManager.GetString("FocaMenuItemHeader", resourceCulture);
             }
@@ -117,7 +117,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to FOCA, formerly known as the &quot;in-canvas align widget&quot;, is the cleaner of your dynamo graphs. this feature includes alignment tools, grouping tools and more..
         /// </summary>
-        internal static string FocaMenuItemTooltip {
+        public static string FocaMenuItemTooltip {
             get {
                 return ResourceManager.GetString("FocaMenuItemTooltip", resourceCulture);
             }
@@ -126,7 +126,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to standard group creation.
         /// </summary>
-        internal static string FocaStandardGroupMenuItemHeader {
+        public static string FocaStandardGroupMenuItemHeader {
             get {
                 return ResourceManager.GetString("FocaStandardGroupMenuItemHeader", resourceCulture);
             }
@@ -135,7 +135,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to graph resizerer.
         /// </summary>
-        internal static string GraphResizererMenuItemHeader {
+        public static string GraphResizererMenuItemHeader {
             get {
                 return ResourceManager.GetString("GraphResizererMenuItemHeader", resourceCulture);
             }
@@ -144,7 +144,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to disable highlighting.
         /// </summary>
-        internal static string HighlightDisableMenuItemHeader {
+        public static string HighlightDisableMenuItemHeader {
             get {
                 return ResourceManager.GetString("HighlightDisableMenuItemHeader", resourceCulture);
             }
@@ -153,7 +153,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to enable highlighting.
         /// </summary>
-        internal static string HighlightEnableMenuItemHeader {
+        public static string HighlightEnableMenuItemHeader {
             get {
                 return ResourceManager.GetString("HighlightEnableMenuItemHeader", resourceCulture);
             }
@@ -162,7 +162,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to mega input identifier.
         /// </summary>
-        internal static string MegaInputIdentifierMenuItem {
+        public static string MegaInputIdentifierMenuItem {
             get {
                 return ResourceManager.GetString("MegaInputIdentifierMenuItem", resourceCulture);
             }
@@ -171,7 +171,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to node identifiers.
         /// </summary>
-        internal static string NodeIndentifierMenuItemHeader {
+        public static string NodeIndentifierMenuItemHeader {
             get {
                 return ResourceManager.GetString("NodeIndentifierMenuItemHeader", resourceCulture);
             }
@@ -180,7 +180,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to node swapper.
         /// </summary>
-        internal static string NodeSwapperMenuItemHeader {
+        public static string NodeSwapperMenuItemHeader {
             get {
                 return ResourceManager.GetString("NodeSwapperMenuItemHeader", resourceCulture);
             }
@@ -189,7 +189,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to please select a node to use as a replacement.
         /// </summary>
-        internal static string NodeSwapperStatusMessageSelectReplacement {
+        public static string NodeSwapperStatusMessageSelectReplacement {
             get {
                 return ResourceManager.GetString("NodeSwapperStatusMessageSelectReplacement", resourceCulture);
             }
@@ -198,7 +198,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to now select the nodes to match to the target node you selected..
         /// </summary>
-        internal static string NodeSwapperStatusMessageSelectToReplace {
+        public static string NodeSwapperStatusMessageSelectToReplace {
             get {
                 return ResourceManager.GetString("NodeSwapperStatusMessageSelectToReplace", resourceCulture);
             }
@@ -207,7 +207,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to package usage boring mode.
         /// </summary>
-        internal static string PackageUsageBoringMenuItemHeader {
+        public static string PackageUsageBoringMenuItemHeader {
             get {
                 return ResourceManager.GetString("PackageUsageBoringMenuItemHeader", resourceCulture);
             }
@@ -216,7 +216,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to package usage doge.
         /// </summary>
-        internal static string PackageUsageDogeMenuItemHeader {
+        public static string PackageUsageDogeMenuItemHeader {
             get {
                 return ResourceManager.GetString("PackageUsageDogeMenuItemHeader", resourceCulture);
             }
@@ -225,7 +225,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to package usage.
         /// </summary>
-        internal static string PackageUsageMenuItemHeader {
+        public static string PackageUsageMenuItemHeader {
             get {
                 return ResourceManager.GetString("PackageUsageMenuItemHeader", resourceCulture);
             }
@@ -234,7 +234,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Quick Save.
         /// </summary>
-        internal static string QuickSaveMenuItemHeader {
+        public static string QuickSaveMenuItemHeader {
             get {
                 return ResourceManager.GetString("QuickSaveMenuItemHeader", resourceCulture);
             }
@@ -243,7 +243,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Ctrl + Alt + S.
         /// </summary>
-        internal static string QuickSaveMenuItemKeyboardShortcut {
+        public static string QuickSaveMenuItemKeyboardShortcut {
             get {
                 return ResourceManager.GetString("QuickSaveMenuItemKeyboardShortcut", resourceCulture);
             }
@@ -252,7 +252,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Provides a quick date/time stamped &quot;snapshot&quot; of the current file..
         /// </summary>
-        internal static string QuickSaveMenuItemTooltip {
+        public static string QuickSaveMenuItemTooltip {
             get {
                 return ResourceManager.GetString("QuickSaveMenuItemTooltip", resourceCulture);
             }
@@ -261,7 +261,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to load settings from path.
         /// </summary>
-        internal static string SettingsLoadMenuItemHeader {
+        public static string SettingsLoadMenuItemHeader {
             get {
                 return ResourceManager.GetString("SettingsLoadMenuItemHeader", resourceCulture);
             }
@@ -270,7 +270,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to monocle settings.
         /// </summary>
-        internal static string SettingsMenuItemHeader {
+        public static string SettingsMenuItemHeader {
             get {
                 return ResourceManager.GetString("SettingsMenuItemHeader", resourceCulture);
             }
@@ -279,7 +279,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to restore default settings.
         /// </summary>
-        internal static string SettingsRestoreMenuItemHeader {
+        public static string SettingsRestoreMenuItemHeader {
             get {
                 return ResourceManager.GetString("SettingsRestoreMenuItemHeader", resourceCulture);
             }
@@ -288,7 +288,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to save current settings to default path.
         /// </summary>
-        internal static string SettingsSaveMenuItemHeader {
+        public static string SettingsSaveMenuItemHeader {
             get {
                 return ResourceManager.GetString("SettingsSaveMenuItemHeader", resourceCulture);
             }
@@ -297,7 +297,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to simple search.
         /// </summary>
-        internal static string SimpleSearchMenuItemHeader {
+        public static string SimpleSearchMenuItemHeader {
             get {
                 return ResourceManager.GetString("SimpleSearchMenuItemHeader", resourceCulture);
             }
@@ -306,7 +306,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Sloppy Save.
         /// </summary>
-        internal static string SloppySaveMenuItemHeader {
+        public static string SloppySaveMenuItemHeader {
             get {
                 return ResourceManager.GetString("SloppySaveMenuItemHeader", resourceCulture);
             }
@@ -315,7 +315,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Quickly save your file to your desktop, because you knew you were going to anyway..
         /// </summary>
-        internal static string SloppySaveMenuItemTooltip {
+        public static string SloppySaveMenuItemTooltip {
             get {
                 return ResourceManager.GetString("SloppySaveMenuItemTooltip", resourceCulture);
             }
@@ -324,7 +324,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to sloppy save to desktop.
         /// </summary>
-        internal static string SloppySaveMessageBoxCaption {
+        public static string SloppySaveMessageBoxCaption {
             get {
                 return ResourceManager.GetString("SloppySaveMessageBoxCaption", resourceCulture);
             }
@@ -333,7 +333,7 @@ namespace MonocleViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized string similar to sloppy save file?.
         /// </summary>
-        internal static string SloppySaveMessageBoxTitle {
+        public static string SloppySaveMessageBoxTitle {
             get {
                 return ResourceManager.GetString("SloppySaveMessageBoxTitle", resourceCulture);
             }

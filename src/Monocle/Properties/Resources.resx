@@ -133,9 +133,6 @@
     <value>Better save options. Because you deserve it. Brought to you by monocle™️</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="ComicNeue-Regular" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\NodeDocumentation\ComicNeue-Regular.ttf;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="FocaMenuItemHeader" xml:space="preserve">
     <value>enable FOCA</value>
   </data>

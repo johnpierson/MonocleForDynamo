@@ -30,9 +30,9 @@ namespace MonocleViewExtension.NodeDocumentation
         {
             var fullText = File.ReadAllText(MarkdownPath);
 
-            var dropFirst = fullText.Split(new string[] { "## In Depth\n" }, StringSplitOptions.None);
+            var dropFirst = fullText.Split(new string[] { "## In Depth" }, StringSplitOptions.None);
 
-            var inDepth = dropFirst[1].Split(new string[] { "\n___" }, StringSplitOptions.None);
+            var inDepth = dropFirst[1].Split(new string[] { "___" }, StringSplitOptions.None);
 
             FullDescription = inDepth[0];
         }

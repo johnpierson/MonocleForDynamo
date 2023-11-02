@@ -7,8 +7,8 @@
     <AssemblyTitle>Monocle</AssemblyTitle>
     <Product>Monocle</Product>
     <Copyright>Copyright©  2023 john pierson</Copyright>
-    <AssemblyVersion>2023.9.4</AssemblyVersion>
-    <FileVersion>2023.9.4</FileVersion>
+    <AssemblyVersion>2023.11.1</AssemblyVersion>
+    <FileVersion>2023.11.1</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -125,7 +125,7 @@
     <Resource Include="Resources\monocleLogoRoundedSquare.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="NodeDocumentation\ComicNeue-Regular.ttf" />
+    <Resource Include="Assets\Fonts\ComicNeue-Regular.ttf" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="PackageUsage\DogeImages\dogePreview.png" />
@@ -254,6 +254,12 @@
     <EmbeddedResource Include="Resources\WpfAnimatedGif.dll" />
     <Resource Include="PackageUsage\DogeImages\dwight-pumpkin.gif" />
     <Resource Include="PackageUsage\DogeImages\david-s-pumpkins.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="if $(ConfigurationName) == Debug copy &quot;$(ProjectDir)bin\Debug\net48\MonocleViewExtension.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\2.18\packages\Monocle\bin&quot;&#xD;&#xA;&#xD;&#xA;if $(ConfigurationName) == Release copy &quot;$(ProjectDir)bin\Release\net48\MonocleViewExtension.dll&quot; &quot;$(AppData)\Dynamo\Dynamo Revit\2.18\packages\Monocle\bin&quot;" />
