@@ -2,7 +2,7 @@
   "license": "BSD 3-Clause License",
   "file_hash": null,
   "name": "Monocle",
-  "version": "2022.10.1",
+  "version": "2022.11.1",
   "description": "Monocle is a View Extension for Dynamo 2.0.x. Monocle contains a set of useful tools for package identification, graph cleanup and more! Monocle is authored by John Pierson (@60secondrevit) of Parallax Team (http://www.parallaxteam.com/) and designtechunraveled.com.  (Note: Dynamo may need to be closed and reopened to see the extension)",
   "group": "",
   "keywords": [

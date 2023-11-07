@@ -149,6 +149,8 @@ namespace MonocleViewExtension.NodeDocumentation
         }
         private void OnCreateDocumentation(object o)
         {
+            if(!CanDocumentNode) return;
+
             _nodeDocumentation.FullDescription = ExtendedDescription;
             //first save dyn
             Model.SaveDyn(_nodeDocumentation.SampleGraph);
