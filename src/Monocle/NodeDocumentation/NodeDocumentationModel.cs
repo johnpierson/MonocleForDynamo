@@ -72,10 +72,19 @@ namespace MonocleViewExtension.NodeDocumentation
                 string graphViewPath = path.Replace("img", "f");
                 DynamoViewModel.SaveImage(graphViewPath);
 
-                var combined = OverlayImages(backgroundPath, graphViewPath,1.5);
+                try
+                {
+                    var combined = OverlayImages(backgroundPath, graphViewPath, 1.5);
 
-                //save the combined as the original filename
-                SaveBitmapToJpg(combined,path);
+                    //save the combined as the original filename
+                    SaveBitmapToJpg(combined, path);
+                }
+                catch (Exception e)
+                {
+                    //it didn't work. sorry
+                    MessageBox.Show(
+                        "Sorry, Dynamo could not export one or more of your images. Which means monocle can't either. This seems to happen when you have ridiculously long code blocks or other file corruption issues.");
+                }
 
                 //delete the other files
                 try
@@ -95,8 +104,6 @@ namespace MonocleViewExtension.NodeDocumentation
                 {
                     //
                 }
-                
-
             }
         }
 
