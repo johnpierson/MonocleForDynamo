@@ -7,21 +7,48 @@
     <AssemblyTitle>Monocle</AssemblyTitle>
     <Product>Monocle</Product>
     <Copyright>Copyright©  2023 john pierson</Copyright>
-    <AssemblyVersion>2023.11.1</AssemblyVersion>
-    <FileVersion>2023.11.1</FileVersion>
+    <AssemblyVersion>2024.3.1</AssemblyVersion>
+    <FileVersion>2024.3.1</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
+	<Configurations>Debug net48;Debug net8;</Configurations>
+    <Configurations>$(Configurations)Release net48;Release net8;</Configurations>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <WarningLevel>1</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <WarningLevel>1</WarningLevel>
-  </PropertyGroup>
-  
+  <PropertyGroup Condition="$(Configuration.Contains('Debug net48'))">
+        <DynamoVersion>2.12</DynamoVersion>
+        <DynamoOutput>2.12</DynamoOutput>
+        <RevitVersion>2022</RevitVersion>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <DefineConstants>$(DefineConstants);net48;net48_OR_GREATER</DefineConstants>
+		<TargetFrameworkVersion>net48</TargetFrameworkVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(Configuration.Contains('Release net48'))">
+        <DynamoVersion>2.12</DynamoVersion>
+        <DynamoOutput>2.12</DynamoOutput>
+        <RevitVersion>2022</RevitVersion>
+        <DefineConstants>$(DefineConstants);net48;net48_OR_GREATER</DefineConstants>
+		<TargetFrameworkVersion>net48</TargetFrameworkVersion>
+    </PropertyGroup>
+	<PropertyGroup Condition="$(Configuration.Contains('Debug net8'))">
+        <DynamoVersion>3.0</DynamoVersion>
+        <DynamoOutput>3.0</DynamoOutput>
+        <RevitVersion>2025</RevitVersion>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <DefineConstants>$(DefineConstants);net8;net8_OR_GREATER</DefineConstants>
+		<TargetFrameworkVersion>net48</TargetFrameworkVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(Configuration.Contains('Release net8'))">
+        <DynamoVersion>3.0</DynamoVersion>
+        <DynamoOutput>3.0</DynamoOutput>
+        <RevitVersion>2025</RevitVersion>
+        <DefineConstants>$(DefineConstants);net8;net8_OR_GREATER</DefineConstants>
+		<TargetFrameworkVersion>net8.0-windows</TargetFrameworkVersion>
+    </PropertyGroup>
+	
+	<PropertyGroup>
+	  <DynVersion>$(DynamoVersion)</DynVersion>
+	</PropertyGroup>
     <PropertyGroup>
         <StartAction>Program</StartAction>
         <StartProgram>C:\Users\johnpierson\Desktop\Autodesk\DynamoCoreRuntime2.19.3\DynamoSandbox.exe</StartProgram>
@@ -33,10 +60,10 @@
   <ItemGroup>
     <PackageReference Include="CommonServiceLocator" Version="2.0.2" />
     <PackageReference Include="Cyotek.Drawing.BitmapFont" Version="2.0.0" />
-    <PackageReference Include="DynamoVisualProgramming.Core" Version="2.12.1.8246" />
-    <PackageReference Include="DynamoVisualProgramming.DynamoServices" Version="2.12.1.8246" />
-    <PackageReference Include="DynamoVisualProgramming.WpfUILibrary" Version="2.12.1.8246" />
-    <PackageReference Include="DynamoVisualProgramming.ZeroTouchLibrary" Version="2.12.1.8246" />
+    <PackageReference Include="DynamoVisualProgramming.Core" Version="$(DynVersion).*" />
+    <PackageReference Include="DynamoVisualProgramming.DynamoServices" Version="$(DynVersion).*" />
+    <PackageReference Include="DynamoVisualProgramming.WpfUILibrary" Version="$(DynVersion).*" />
+    <PackageReference Include="DynamoVisualProgramming.ZeroTouchLibrary" Version="$(DynVersion).*" />
     <PackageReference Include="Extended.Wpf.Toolkit" Version="4.3.0" />
     <PackageReference Include="HelixToolkit" Version="2.16.1" />
     <PackageReference Include="HelixToolkit.Wpf" Version="2.16.1" />
@@ -268,6 +295,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Debug copy &quot;$(ProjectDir)bin\Debug\net48\MonocleViewExtension.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\2.19\packages\Monocle\bin&quot;&#xD;&#xA;&#xD;&#xA;if $(ConfigurationName) == Release copy &quot;$(ProjectDir)bin\Release\net48\MonocleViewExtension.dll&quot; &quot;$(AppData)\Dynamo\Dynamo Revit\2.18\packages\Monocle\bin&quot;" />
+    <Exec Command="copy &quot;$(ProjectDir)bin\Debug net48\net48\MonocleViewExtension.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\2.19\packages\Monocle\bin&quot;&#xD;&#xA;&#xD;&#xA;" />
   </Target>
 </Project>
