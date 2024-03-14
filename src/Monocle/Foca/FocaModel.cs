@@ -17,7 +17,6 @@ using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.NodeSwapper;
 using MonocleViewExtension.Utilities;
-using ProtoCore.AST;
 using Thickness = System.Windows.Thickness;
 
 namespace MonocleViewExtension.Foca

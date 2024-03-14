@@ -1,30 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Dynamo.Graph;
-using Dynamo.Graph.Nodes;
 using Dynamo.Graph.Workspaces;
-using Dynamo.Models;
 using Dynamo.Search.SearchElements;
 using Dynamo.UI.Commands;
-using Dynamo.Utilities;
 using Dynamo.ViewModels;
-using MonocleViewExtension.GraphResizerer;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
 using Button = System.Windows.Controls.Button;
-using Image = System.Drawing.Image;
 using Thickness = System.Windows.Thickness;
 
 namespace MonocleViewExtension.Snippets

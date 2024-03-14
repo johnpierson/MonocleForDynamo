@@ -4,8 +4,6 @@ using System.Windows.Forms;
 using System.Windows.Input;
 using Dynamo.Controls;
 using Dynamo.Graph.Workspaces;
-using Dynamo.Nodes.Prompts;
-using Dynamo.UI.Prompts;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using Dynamo.Wpf.Interfaces;

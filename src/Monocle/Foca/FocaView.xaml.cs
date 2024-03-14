@@ -1,11 +1,8 @@
-﻿using Dynamo.Controls;
-using System;
-using System.Linq;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Shapes;
-using Xceed.Wpf.AvalonDock.Controls;
 
 namespace MonocleViewExtension.Foca
 {

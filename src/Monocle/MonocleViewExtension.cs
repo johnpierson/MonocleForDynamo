@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using Dynamo.Controls;
-using Dynamo.Extensions;
 using Dynamo.PackageManager;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.About;
@@ -22,7 +17,6 @@ using MonocleViewExtension.NodeDocumentation;
 using MonocleViewExtension.NodeSwapper;
 using MonocleViewExtension.PackageUsage;
 using MonocleViewExtension.SimpleSearch;
-using MonocleViewExtension.Snippets;
 using MonocleViewExtension.StandardViews;
 using MonocleViewExtension.Utilities;
 

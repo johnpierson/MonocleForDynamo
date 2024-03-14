@@ -2,7 +2,7 @@
   <PropertyGroup>
     <RootNamespace>MonocleViewExtension</RootNamespace>
     <AssemblyName>MonocleViewExtension</AssemblyName>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFrameworks>net48</TargetFrameworks>
 	<UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
 	<PlatformTarget>x64</PlatformTarget>
@@ -12,49 +12,150 @@
     <AssemblyVersion>2023.11.1</AssemblyVersion>
     <FileVersion>2023.11.1</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
+	<Configurations>Debug 212;Debug 216;Debug 219;Debug 30;</Configurations>
+    <Configurations>$(Configurations)Release 212;Release 216;Release 219;Release 30;</Configurations>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugType>full</DebugType>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <WarningLevel>1</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <WarningLevel>1</WarningLevel>
-  </PropertyGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild" />
-  <ItemGroup>
-    <PackageReference Include="CommonServiceLocator" Version="2.0.2" />
+  
+  	<PropertyGroup Condition="$(Configuration.Contains('Debug 212'))">
+        <DynamoVersion>2.12</DynamoVersion>
+        <DynamoOutput>2.12</DynamoOutput>
+        <RevitVersion>2022</RevitVersion>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <DefineConstants>$(DefineConstants);D212;D212_OR_GREATER</DefineConstants>
+		<TargetFrameworkVersion>net48</TargetFrameworkVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(Configuration.Contains('Release 212'))">
+        <DynamoVersion>2.12</DynamoVersion>
+        <DynamoOutput>2.12</DynamoOutput>
+        <RevitVersion>2022</RevitVersion>
+        <DefineConstants>$(DefineConstants);D212;D212_OR_GREATER</DefineConstants>
+		<TargetFrameworkVersion>net48</TargetFrameworkVersion>
+    </PropertyGroup>
+	<PropertyGroup Condition="$(Configuration.Contains('Debug 216'))">
+        <DynamoVersion>2.16</DynamoVersion>
+        <DynamoOutput>2.16</DynamoOutput>
+        <RevitVersion>2023</RevitVersion>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <DefineConstants>$(DefineConstants);D216;D216_OR_GREATER</DefineConstants>
+		<TargetFrameworkVersion>net48</TargetFrameworkVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(Configuration.Contains('Release 216'))">
+        <DynamoVersion>2.16</DynamoVersion>
+        <DynamoOutput>2.16</DynamoOutput>
+        <RevitVersion>2023</RevitVersion>
+        <DefineConstants>$(DefineConstants);D216;D216_OR_GREATER</DefineConstants>
+		<TargetFrameworkVersion>net48</TargetFrameworkVersion>
+    </PropertyGroup>	
+	<PropertyGroup Condition="$(Configuration.Contains('Debug 219'))">
+        <DynamoVersion>2.19</DynamoVersion>
+        <DynamoOutput>2.19</DynamoOutput>
+        <RevitVersion>2024</RevitVersion>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <DefineConstants>$(DefineConstants);D219;D219_OR_GREATER</DefineConstants>
+		<TargetFrameworkVersion>net48</TargetFrameworkVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(Configuration.Contains('Release 219'))">
+        <DynamoVersion>2.19</DynamoVersion>
+        <DynamoOutput>2.19</DynamoOutput>
+        <RevitVersion>2024</RevitVersion>
+        <DefineConstants>$(DefineConstants);D219;D219_OR_GREATER</DefineConstants>
+		<TargetFrameworkVersion>net48</TargetFrameworkVersion>
+    </PropertyGroup>	
+	<PropertyGroup Condition="$(Configuration.Contains('Debug 30'))">
+        <DynamoVersion>3.0</DynamoVersion>
+        <DynamoOutput>3.0</DynamoOutput>
+        <RevitVersion>2024</RevitVersion>
+        <DebugSymbols>true</DebugSymbols>
+        <DebugType>full</DebugType>
+        <DefineConstants>$(DefineConstants);D30;D30_OR_GREATER</DefineConstants>
+		<TargetFrameworkVersion>net48</TargetFrameworkVersion>
+    </PropertyGroup>
+    <PropertyGroup Condition="$(Configuration.Contains('Release 30'))">
+        <DynamoVersion>3.0</DynamoVersion>
+        <DynamoOutput>3.0</DynamoOutput>
+        <RevitVersion>2025</RevitVersion>
+        <DefineConstants>$(DefineConstants);D30;D30_OR_GREATER</DefineConstants>
+		<TargetFrameworkVersion>net8.0-windows</TargetFrameworkVersion>
+    </PropertyGroup>
+	<PropertyGroup>
+        <DynVersion>$(DynamoVersion)</DynVersion>
+        <BuildOutput>$(DynamoOutput)</BuildOutput>
+        <PublishSingleFile>true</PublishSingleFile>
+        <Copyright>MIT</Copyright>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags>dynamo</PackageTags>
+        <!--<FolderPackages>$(Appdata)\Dynamo\Dynamo Revit\$(BuildOutput)\packages\RhythmRevit\</FolderPackages>-->
+        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <Version>$(RevitVersion).3.1</Version>
+        <Description>Monocle for Dynamo|$(DynamoVersion)</Description>
+        <FileVersion>$(DynamoVersion).3.1</FileVersion>
+        <AssemblyVersion>$(DynamoVersion).3.1</AssemblyVersion>
+        <Title>Monocle for Dynamo</Title>
+        <Product>Monocle for Dynamo</Product>
+    </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug 212|AnyCPU'">
+	   <Optimize>True</Optimize>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug 216|AnyCPU'">
+	   <Optimize>True</Optimize>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug 219|AnyCPU'">
+	   <Optimize>True</Optimize>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug 30|AnyCPU'">
+	   <Optimize>True</Optimize>
+	</PropertyGroup>
+		<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release 212|AnyCPU'">
+	   <Optimize>True</Optimize>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release 216|AnyCPU'">
+	   <Optimize>True</Optimize>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release 219|AnyCPU'">
+	   <Optimize>True</Optimize>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release 30|AnyCPU'">
+	   <Optimize>True</Optimize>
+	</PropertyGroup>
+  
+  
+ <ItemGroup>
     <PackageReference Include="Cyotek.Drawing.BitmapFont" Version="2.0.0" />
-    <PackageReference Include="DynamoVisualProgramming.Core" Version="2.12.1.8246" />
-    <PackageReference Include="DynamoVisualProgramming.DynamoServices" Version="2.12.1.8246" />
-    <PackageReference Include="DynamoVisualProgramming.WpfUILibrary" Version="2.12.1.8246" />
-    <PackageReference Include="DynamoVisualProgramming.ZeroTouchLibrary" Version="2.12.1.8246" />
+    <PackageReference Include="DynamoVisualProgramming.Core" Version="$(DynVersion).*" />
+    <PackageReference Include="DynamoVisualProgramming.DynamoServices" Version="$(DynVersion).*" />
+    <PackageReference Include="DynamoVisualProgramming.WpfUILibrary" Version="$(DynVersion).*" />
+    <PackageReference Include="DynamoVisualProgramming.ZeroTouchLibrary" Version="$(DynVersion).*" />
     <PackageReference Include="Extended.Wpf.Toolkit" Version="4.3.0" />
-    <PackageReference Include="HelixToolkit" Version="2.16.1" />
-    <PackageReference Include="HelixToolkit.Wpf" Version="2.16.1" />
-    <PackageReference Include="HelixToolkit.Wpf.SharpDX" Version="2.16.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="NUnit" Version="2.6.3" />
-    <PackageReference Include="Prism" Version="4.1.0.0" />
-    <PackageReference Include="SharpDX" Version="4.2.0" />
-    <PackageReference Include="SharpDX.D3DCompiler" Version="4.2.0" />
-    <PackageReference Include="SharpDX.Direct2D1" Version="4.2.0" />
-    <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
-    <PackageReference Include="SharpDX.Direct3D9" Version="4.2.0" />
-    <PackageReference Include="SharpDX.DXGI" Version="4.2.0" />
-    <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
     <PackageReference Include="System.Buffers" Version="4.5.1" />
-    <PackageReference Include="System.Collections.Immutable" Version="1.7.1" />
+    
     <PackageReference Include="System.Memory" Version="4.5.5" />
     <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
     <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
   </ItemGroup>
+	<ItemGroup Condition="'$(Configuration)|$(Platform)'!='Release 30|AnyCPU'">
+		<PackageReference Include="CommonServiceLocator" Version="1.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="NUnit" Version="2.6.3" />
+        <PackageReference Include="System.Collections.Immutable" Version="1.7.1" />
+        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.3" />
+		<PackageReference Include="HelixToolkit.Wpf.SharpDX" Version="2.16.1" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release 30|AnyCPU'">
+		<PackageReference Include="CommonServiceLocator" Version="2.0.7" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="NUnit" Version="3.14.0" />
+        <PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
+        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+		<PackageReference Include="HelixToolkit" Version="2.24.0" />
+		<PackageReference Include="HelixToolkit.Wpf" Version="2.24.0" />
+		<PackageReference Include="HelixToolkit.Wpf.SharpDX" Version="2.24.0" />
+	</ItemGroup>
   <ItemGroup>
     <Reference Include="DynamoPackages">
-      <HintPath>C:\Program Files\Autodesk\Revit 2022\AddIns\DynamoForRevit\DynamoPackages.dll</HintPath>
+      <HintPath>C:\Program Files\Autodesk\Revit $(RevitVersion)\AddIns\DynamoForRevit\DynamoPackages.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -86,6 +187,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Debug copy &quot;$(ProjectDir)bin\Debug\net48\MonocleViewExtension.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\2.18\packages\Monocle\bin&quot;&#xD;&#xA;&#xD;&#xA;if $(ConfigurationName) == Release copy &quot;$(ProjectDir)bin\Release\net48\MonocleViewExtension.dll&quot; &quot;$(AppData)\Dynamo\Dynamo Revit\2.18\packages\Monocle\bin&quot;" />
+    <Exec Command="if $(ConfigurationName) == Debug copy &quot;$(ProjectDir)bin\Debug\net48\MonocleViewExtension.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\3.0\packages\Monocle\bin&quot;&#xD;&#xA;&#xD;&#xA;if $(ConfigurationName) == Release copy &quot;$(ProjectDir)bin\Release\net48\MonocleViewExtension.dll&quot; &quot;$(AppData)\Dynamo\Dynamo Revit\2.18\packages\Monocle\bin&quot;" />
   </Target>
 </Project>

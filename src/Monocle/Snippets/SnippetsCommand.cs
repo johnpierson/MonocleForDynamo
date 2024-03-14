@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
-using MonocleViewExtension.About;
 
 namespace MonocleViewExtension.Snippets
 {

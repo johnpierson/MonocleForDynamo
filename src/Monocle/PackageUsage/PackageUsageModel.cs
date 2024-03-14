@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Effects;
 using System.Windows.Shapes;
 using Dynamo.Controls;
 using Dynamo.Graph.Nodes;
@@ -21,9 +17,7 @@ using Dynamo.Utilities;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.Utilities;
-using SharpDX.Direct2D1.Effects;
 using Border = System.Windows.Controls.Border;
-using Path = System.IO.Path;
 using Thickness = System.Windows.Thickness;
 
 namespace MonocleViewExtension.PackageUsage

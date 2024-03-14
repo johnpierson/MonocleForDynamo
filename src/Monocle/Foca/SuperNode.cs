@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Linq;
 using Dynamo.Graph;
-using Dynamo.Graph.Annotations;
 using Dynamo.Graph.Nodes;
 using Dynamo.Graph.Notes;
 using Dynamo.ViewModels;
