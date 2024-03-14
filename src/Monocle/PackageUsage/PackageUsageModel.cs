@@ -316,11 +316,11 @@ namespace MonocleViewExtension.PackageUsage
 
         public List<string> GetCustomPackageList()
         {
-#if D30_OR_GREATER
+#if net8
             List<NodeSearchElement> libraries = DynamoViewModel.Model.SearchModel.Entries.ToList();
 #endif
 
-#if !D30_OR_GREATER
+#if !net8
             List<NodeSearchElement> libraries = DynamoViewModel.Model.SearchModel.SearchEntries.ToList();
 #endif
             List<string> addOns = new List<string>();
