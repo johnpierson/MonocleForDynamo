@@ -1,43 +1,25 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.7.34003.232
+VisualStudioVersion = 17.8.34309.116
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Monocle", "Monocle.csproj", "{2C5F174E-DA7C-44A1-A91B-B519CD595254}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Monocle", "Monocle.csproj", "{5DED5EE5-468D-4BAF-B20F-AFA4F3497609}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug 212|Any CPU = Debug 212|Any CPU
-		Debug 216|Any CPU = Debug 216|Any CPU
-		Debug 219|Any CPU = Debug 219|Any CPU
-		Debug 30|Any CPU = Debug 30|Any CPU
-		Release 212|Any CPU = Release 212|Any CPU
-		Release 216|Any CPU = Release 216|Any CPU
-		Release 219|Any CPU = Release 219|Any CPU
-		Release 30|Any CPU = Release 30|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2C5F174E-DA7C-44A1-A91B-B519CD595254}.Debug 212|Any CPU.ActiveCfg = Debug 212|Any CPU
-		{2C5F174E-DA7C-44A1-A91B-B519CD595254}.Debug 212|Any CPU.Build.0 = Debug 212|Any CPU
-		{2C5F174E-DA7C-44A1-A91B-B519CD595254}.Debug 216|Any CPU.ActiveCfg = Debug 216|Any CPU
-		{2C5F174E-DA7C-44A1-A91B-B519CD595254}.Debug 216|Any CPU.Build.0 = Debug 216|Any CPU
-		{2C5F174E-DA7C-44A1-A91B-B519CD595254}.Debug 219|Any CPU.ActiveCfg = Debug 219|Any CPU
-		{2C5F174E-DA7C-44A1-A91B-B519CD595254}.Debug 219|Any CPU.Build.0 = Debug 219|Any CPU
-		{2C5F174E-DA7C-44A1-A91B-B519CD595254}.Debug 30|Any CPU.ActiveCfg = Debug 30|Any CPU
-		{2C5F174E-DA7C-44A1-A91B-B519CD595254}.Debug 30|Any CPU.Build.0 = Debug 30|Any CPU
-		{2C5F174E-DA7C-44A1-A91B-B519CD595254}.Release 212|Any CPU.ActiveCfg = Release 212|Any CPU
-		{2C5F174E-DA7C-44A1-A91B-B519CD595254}.Release 212|Any CPU.Build.0 = Release 212|Any CPU
-		{2C5F174E-DA7C-44A1-A91B-B519CD595254}.Release 216|Any CPU.ActiveCfg = Release 216|Any CPU
-		{2C5F174E-DA7C-44A1-A91B-B519CD595254}.Release 216|Any CPU.Build.0 = Release 216|Any CPU
-		{2C5F174E-DA7C-44A1-A91B-B519CD595254}.Release 219|Any CPU.ActiveCfg = Release 219|Any CPU
-		{2C5F174E-DA7C-44A1-A91B-B519CD595254}.Release 219|Any CPU.Build.0 = Release 219|Any CPU
-		{2C5F174E-DA7C-44A1-A91B-B519CD595254}.Release 30|Any CPU.ActiveCfg = Release 30|Any CPU
-		{2C5F174E-DA7C-44A1-A91B-B519CD595254}.Release 30|Any CPU.Build.0 = Release 30|Any CPU
+		{5DED5EE5-468D-4BAF-B20F-AFA4F3497609}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DED5EE5-468D-4BAF-B20F-AFA4F3497609}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DED5EE5-468D-4BAF-B20F-AFA4F3497609}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DED5EE5-468D-4BAF-B20F-AFA4F3497609}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {38913F80-9F0F-4B3B-9E4E-4C9AE366FDC6}
+		SolutionGuid = {7C79D97C-7049-4331-AE1F-AD8BA14890FF}
 	EndGlobalSection
 EndGlobal
