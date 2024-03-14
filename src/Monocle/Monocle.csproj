@@ -21,6 +21,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningLevel>1</WarningLevel>
   </PropertyGroup>
+  
+    <PropertyGroup>
+        <StartAction>Program</StartAction>
+        <StartProgram>C:\Users\johnpierson\Desktop\Autodesk\DynamoCoreRuntime2.19.3\DynamoSandbox.exe</StartProgram>
+    </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild" />
   <ItemGroup>
     <None Remove="About\Resources\nonica.png" />
@@ -53,6 +58,7 @@
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
     <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
   </ItemGroup>
+
   <ItemGroup>
     <Reference Include="DynamoPackages">
       <HintPath>C:\Program Files\Autodesk\Revit 2022\AddIns\DynamoForRevit\DynamoPackages.dll</HintPath>
@@ -262,6 +268,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Debug copy &quot;$(ProjectDir)bin\Debug\net48\MonocleViewExtension.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\2.18\packages\Monocle\bin&quot;&#xD;&#xA;&#xD;&#xA;if $(ConfigurationName) == Release copy &quot;$(ProjectDir)bin\Release\net48\MonocleViewExtension.dll&quot; &quot;$(AppData)\Dynamo\Dynamo Revit\2.18\packages\Monocle\bin&quot;" />
+    <Exec Command="if $(ConfigurationName) == Debug copy &quot;$(ProjectDir)bin\Debug\net48\MonocleViewExtension.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\2.19\packages\Monocle\bin&quot;&#xD;&#xA;&#xD;&#xA;if $(ConfigurationName) == Release copy &quot;$(ProjectDir)bin\Release\net48\MonocleViewExtension.dll&quot; &quot;$(AppData)\Dynamo\Dynamo Revit\2.18\packages\Monocle\bin&quot;" />
   </Target>
 </Project>
