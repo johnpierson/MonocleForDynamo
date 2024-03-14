@@ -18,7 +18,7 @@ namespace MonocleViewExtension.NodeSwapper
             var NodeSwapperMenu = new MenuItem { Header = Properties.Resources.ResourceManager.GetString("NodeSwapperMenuItemHeader") };
 
             NodeSwapperMenu.Click += (sender, args) =>
-            {
+            {   
                 var m = new NodeSwapperModel(dvm, p);
                 var viewModel = new NodeSwapperViewModel(m);
 
