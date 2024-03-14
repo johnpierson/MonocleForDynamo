@@ -229,8 +229,8 @@
     <Resource Include="Resources\PaintBrushIcon.svg" />
     <Resource Include="Resources\PaintBrushIcon.xaml" />
     <Resource Include="Resources\smalls.JPG" />
-    <Resource Include="Resources\WpfAnimatedGif.dll" />
-    <Resource Include="Resources\Xceed.Wpf.AvalonDock.dll" />
+    <EmbeddedResource Include="Resources\WpfAnimatedGif.dll" />
+    <EmbeddedResource Include="Resources\Xceed.Wpf.AvalonDock.dll" />
     <Resource Include="SimpleSearch\Resources\magnifyingGlass.png" />
     <Resource Include="SimpleSearch\Resources\monocle.png" />
     <Resource Include="StandardViews\Resources\3d_menu.png" />

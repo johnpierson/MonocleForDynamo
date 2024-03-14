@@ -95,6 +95,7 @@
     <None Remove="Resources\smalls.JPG" />
     <None Remove="Resources\WpfAnimatedGif.dll" />
     <None Remove="Resources\Xceed.Wpf.AvalonDock.dll" />
+    <None Remove="Resources\Xceed.Wpf.AvalonDock.NET5.dll" />
     <None Remove="SimpleSearch\Resources\magnifyingGlass.png" />
     <None Remove="SimpleSearch\Resources\monocle.png" />
     <None Remove="StandardViews\Resources\3d_menu.png" />
@@ -116,6 +117,7 @@
     <Page Remove="Resources\PaintBrushIcon.xaml" />
   </ItemGroup>
    <ItemGroup>
+    <EmbeddedResource Include="Resources\Xceed.Wpf.AvalonDock.NET5.dll" />
     <EmbeddedResource Include="Resources\Xceed.Wpf.Toolkit.NET5.dll" />
   </ItemGroup>
   <ItemGroup>
@@ -227,8 +229,8 @@
     <Resource Include="Resources\PaintBrushIcon.svg" />
     <Resource Include="Resources\PaintBrushIcon.xaml" />
     <Resource Include="Resources\smalls.JPG" />
-    <Resource Include="Resources\WpfAnimatedGif.dll" />
-    <Resource Include="Resources\Xceed.Wpf.AvalonDock.dll" />
+    <EmbeddedResource Include="Resources\WpfAnimatedGif.dll" />
+    <EmbeddedResource Include="Resources\Xceed.Wpf.AvalonDock.dll" />
     <Resource Include="SimpleSearch\Resources\magnifyingGlass.png" />
     <Resource Include="SimpleSearch\Resources\monocle.png" />
     <Resource Include="StandardViews\Resources\3d_menu.png" />

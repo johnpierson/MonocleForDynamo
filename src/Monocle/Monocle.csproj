@@ -2,7 +2,8 @@
   <PropertyGroup>
     <RootNamespace>MonocleViewExtension</RootNamespace>
     <AssemblyName>MonocleViewExtension</AssemblyName>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
+	<!--<TargetFramework>net8.0-windows</TargetFramework>-->
 	<UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
 	<PlatformTarget>x64</PlatformTarget>
@@ -53,8 +54,8 @@
 	</PropertyGroup>
     <PropertyGroup>
         <StartAction>Program</StartAction>
-        <StartProgram>C:\Users\johnpierson\Desktop\Autodesk\DynamoCoreRuntime3.0.4\DynamoSandbox.exe</StartProgram>
-		<!--<StartProgram>C:\Users\johnpierson\Desktop\Autodesk\DynamoCoreRuntime2.19.3\DynamoSandbox.exe</StartProgram>-->
+        <!--<StartProgram>C:\Users\johnpierson\Desktop\Autodesk\DynamoCoreRuntime3.0.4\DynamoSandbox.exe</StartProgram>-->
+		<StartProgram>C:\Users\johnpierson\Desktop\Autodesk\DynamoCoreRuntime2.19.3\DynamoSandbox.exe</StartProgram>
     </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild" />
   <ItemGroup>
@@ -95,7 +96,6 @@
     <None Remove="Resources\smalls.JPG" />
     <None Remove="Resources\WpfAnimatedGif.dll" />
     <None Remove="Resources\Xceed.Wpf.AvalonDock.dll" />
-    <None Remove="Resources\Xceed.Wpf.AvalonDock.NET5.dll" />
     <None Remove="SimpleSearch\Resources\magnifyingGlass.png" />
     <None Remove="SimpleSearch\Resources\monocle.png" />
     <None Remove="StandardViews\Resources\3d_menu.png" />
@@ -116,7 +116,7 @@
     <Page Remove="Resources\IconDictionary.xaml" />
     <Page Remove="Resources\PaintBrushIcon.xaml" />
   </ItemGroup>
-   <ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Resources\Xceed.Wpf.AvalonDock.NET5.dll" />
     <EmbeddedResource Include="Resources\Xceed.Wpf.Toolkit.NET5.dll" />
   </ItemGroup>
@@ -229,8 +229,8 @@
     <Resource Include="Resources\PaintBrushIcon.svg" />
     <Resource Include="Resources\PaintBrushIcon.xaml" />
     <Resource Include="Resources\smalls.JPG" />
-    <Resource Include="Resources\WpfAnimatedGif.dll" />
-    <Resource Include="Resources\Xceed.Wpf.AvalonDock.dll" />
+    <EmbeddedResource Include="Resources\WpfAnimatedGif.dll" />
+    <EmbeddedResource Include="Resources\Xceed.Wpf.AvalonDock.dll" />
     <Resource Include="SimpleSearch\Resources\magnifyingGlass.png" />
     <Resource Include="SimpleSearch\Resources\monocle.png" />
     <Resource Include="StandardViews\Resources\3d_menu.png" />
@@ -254,6 +254,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy &quot;$(ProjectDir)bin\Debug net8\net8.0-windows\MonocleViewExtension.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\3.0\packages\Monocle\bin&quot;&#xD;&#xA;&#xD;&#xA;" />
+    <!--<Exec Command="copy &quot;$(ProjectDir)bin\Debug net8\net8.0-windows\MonocleViewExtension.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\3.0\packages\Monocle\bin&quot;&#xD;&#xA;&#xD;&#xA;" />-->
+    <Exec Command="copy &quot;$(ProjectDir)bin\Debug net48\net48\MonocleViewExtension.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\2.19\packages\Monocle\bin&quot;&#xD;&#xA;&#xD;&#xA;" />
+
   </Target>
 </Project>
