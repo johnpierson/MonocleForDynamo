@@ -2,7 +2,10 @@
   <PropertyGroup>
     <RootNamespace>MonocleViewExtension</RootNamespace>
     <AssemblyName>MonocleViewExtension</AssemblyName>
-    <TargetFramework>net48</TargetFramework>
+    <!--<TargetFrameworks>net48</TargetFrameworks>-->
+	<TargetFrameworks>net8.0-windows</TargetFrameworks>
+	<UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
 	<PlatformTarget>x64</PlatformTarget>
     <AssemblyTitle>Monocle</AssemblyTitle>
     <Product>Monocle</Product>
@@ -10,6 +13,8 @@
     <AssemblyVersion>2023.11.1</AssemblyVersion>
     <FileVersion>2023.11.1</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
+	<Configurations>Debug 212;Debug 216;Debug 219;Debug 30;</Configurations>
+    <Configurations>$(Configurations)Release 212;Release 216;Release 219;Release 30;</Configurations>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -33,10 +38,10 @@
   <ItemGroup>
     <PackageReference Include="CommonServiceLocator" Version="2.0.2" />
     <PackageReference Include="Cyotek.Drawing.BitmapFont" Version="2.0.0" />
-    <PackageReference Include="DynamoVisualProgramming.Core" Version="2.12.1.8246" />
-    <PackageReference Include="DynamoVisualProgramming.DynamoServices" Version="2.12.1.8246" />
-    <PackageReference Include="DynamoVisualProgramming.WpfUILibrary" Version="2.12.1.8246" />
-    <PackageReference Include="DynamoVisualProgramming.ZeroTouchLibrary" Version="2.12.1.8246" />
+    <PackageReference Include="DynamoVisualProgramming.Core" Version="$(DynVersion).*" />
+    <PackageReference Include="DynamoVisualProgramming.DynamoServices" Version="$(DynVersion).*" />
+    <PackageReference Include="DynamoVisualProgramming.WpfUILibrary" Version="$(DynVersion).*" />
+    <PackageReference Include="DynamoVisualProgramming.ZeroTouchLibrary" Version="$(DynVersion).*" />
     <PackageReference Include="Extended.Wpf.Toolkit" Version="4.3.0" />
     <PackageReference Include="HelixToolkit" Version="2.16.1" />
     <PackageReference Include="HelixToolkit.Wpf" Version="2.16.1" />
@@ -58,10 +63,9 @@
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
     <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="DynamoPackages">
-      <HintPath>C:\Program Files\Autodesk\Revit 2022\AddIns\DynamoForRevit\DynamoPackages.dll</HintPath>
+      <HintPath>C:\Program Files\Autodesk\Revit $(RevitVersion)\AddIns\DynamoForRevit\DynamoPackages.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -77,189 +81,14 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="About\AboutView.xaml.cs">
-      <DependentUpon>AboutView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="About\ContributorUserControl.xaml.cs">
-      <DependentUpon>ContributorUserControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="FancyPaste\ExamineClipboardView.xaml.cs">
-      <DependentUpon>ExamineClipboardView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Foca\ColorCodeView.xaml.cs">
-      <DependentUpon>ColorCodeView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Foca\FocaView.xaml.cs">
-      <DependentUpon>FocaView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="GraphResizerer\GraphResizererView.xaml.cs">
-      <DependentUpon>GraphResizererView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="NodeDocumentation\NodeDocumentationView.xaml.cs">
-      <DependentUpon>NodeDocumentationView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="NodeSwapper\NodeSwapperPaintBrush.xaml.cs">
-      <DependentUpon>NodeSwapperPaintBrush.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="NodeSwapper\NodeSwapperView.xaml.cs">
-      <DependentUpon>NodeSwapperView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="PackageUsage\PackageUsageDogeView.xaml.cs">
-      <DependentUpon>PackageUsageDogeView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="PackageUsage\PackageUsageView.xaml.cs">
-      <DependentUpon>PackageUsageView.xaml</DependentUpon>
-    </Compile>
     <Compile Update="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Update="SimpleSearch\SimpleSearchView.xaml.cs">
-      <DependentUpon>SimpleSearchView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Snippets\SnippetsView.xaml.cs">
-      <DependentUpon>SnippetsView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="StandardViews\StandardViews.xaml.cs">
-      <DependentUpon>StandardViews.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\about_john.png" />
-    <Resource Include="Resources\about_github.png" />
-    <Resource Include="Resources\monocleLogoRoundedSquare.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Assets\Fonts\ComicNeue-Regular.ttf" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="PackageUsage\DogeImages\dogePreview.png" />
-    <Resource Include="PackageUsage\DogeImages\doge_dapper.jpg" />
-    <Resource Include="PackageUsage\DogeImages\doge_business.jpg" />
-    <Resource Include="PackageUsage\DogeImages\doge_christmas.jpg" />
-    <Resource Include="PackageUsage\DogeImages\doge_halloween.gif" />
-    <Resource Include="PackageUsage\DogeImages\doge_summer.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="About\AboutView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="About\ContributorUserControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="FancyPaste\ExamineClipboardView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Foca\ColorCodeView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Foca\FocaView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="GraphResizerer\GraphResizererView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="NodeDocumentation\NodeDocumentationView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="NodeSwapper\NodeSwapperPaintBrush.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="NodeSwapper\NodeSwapperView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="PackageUsage\PackageUsageDogeView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="PackageUsage\PackageUsageView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Resources\IconDictionary.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="SimpleSearch\SimpleSearchView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Snippets\SnippetsView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="StandardViews\StandardViews.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="PackageUsage\DogeImages\doge_newyear.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Foca\Resources\button-alignBottomBlack.png" />
-    <Resource Include="Foca\Resources\button-alignHorizontalCenterBlack.png" />
-    <Resource Include="Foca\Resources\button-alignLeftBlack.png" />
-    <Resource Include="Foca\Resources\button-alignRightBlack.png" />
-    <Resource Include="Foca\Resources\button-alignTopBlack.png" />
-    <Resource Include="Foca\Resources\button-alignVerticalCenterBlack.png" />
-    <Resource Include="Foca\Resources\button-distributeHorizontalBlack.png" />
-    <Resource Include="Foca\Resources\button-distributeVerticalBlack.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Foca\Resources\ColorCodeHeader.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="StandardViews\Resources\3d_menu.png" />
-    <Resource Include="StandardViews\Resources\back_hover.png" />
-    <Resource Include="StandardViews\Resources\back_normal.png" />
-    <Resource Include="StandardViews\Resources\bottom_hover.png" />
-    <Resource Include="StandardViews\Resources\bottom_normal.png" />
-    <Resource Include="StandardViews\Resources\front_hover.png" />
-    <Resource Include="StandardViews\Resources\front_normal.png" />
-    <Resource Include="StandardViews\Resources\left_hover.png" />
-    <Resource Include="StandardViews\Resources\left_normal.png" />
-    <Resource Include="StandardViews\Resources\right_hover.png" />
-    <Resource Include="StandardViews\Resources\right_normal.png" />
-    <Resource Include="StandardViews\Resources\top_hover.png" />
-    <Resource Include="StandardViews\Resources\top_normal.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Foca\Resources\action.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="SimpleSearch\Resources\magnifyingGlass.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="SimpleSearch\Resources\monocle.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Foca\Resources\customnode-64.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="PackageUsage\DogeImages\cheems_heaven.jpg" />
-    <Resource Include="PackageUsage\DogeImages\doge_heaven.jpg" />
-    <Resource Include="About\Resources\andydandy74.jpg" />
-    <Resource Include="About\Resources\chuongmep.jpg" />
-    <Resource Include="About\Resources\svenamiet.png" />
-    <Resource Include="About\Resources\eml-henn.png" />
-    <Resource Include="PackageUsage\DogeImages\doge-comfort.png" />
-    <Resource Include="About\Resources\nonica.png" />
-    <EmbeddedResource Include="Resources\Xceed.Wpf.AvalonDock.dll" />
-    <EmbeddedResource Include="Resources\smalls.JPG" />
-    <EmbeddedResource Include="Resources\WpfAnimatedGif.dll" />
-    <Resource Include="PackageUsage\DogeImages\dwight-pumpkin.gif" />
-    <Resource Include="PackageUsage\DogeImages\david-s-pumpkins.gif" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">
@@ -268,6 +97,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Debug copy &quot;$(ProjectDir)bin\Debug\net48\MonocleViewExtension.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\2.19\packages\Monocle\bin&quot;&#xD;&#xA;&#xD;&#xA;if $(ConfigurationName) == Release copy &quot;$(ProjectDir)bin\Release\net48\MonocleViewExtension.dll&quot; &quot;$(AppData)\Dynamo\Dynamo Revit\2.18\packages\Monocle\bin&quot;" />
+    <Exec Command="if $(ConfigurationName) == Debug copy &quot;$(ProjectDir)bin\Debug\net48\MonocleViewExtension.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\2.18\packages\Monocle\bin&quot;&#xD;&#xA;&#xD;&#xA;if $(ConfigurationName) == Release copy &quot;$(ProjectDir)bin\Release\net48\MonocleViewExtension.dll&quot; &quot;$(AppData)\Dynamo\Dynamo Revit\2.18\packages\Monocle\bin&quot;" />
   </Target>
 </Project>

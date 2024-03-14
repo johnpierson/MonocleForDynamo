@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Effects;
 using System.Windows.Shapes;
 using Dynamo.Controls;
 using Dynamo.Graph.Nodes;
@@ -21,9 +17,7 @@ using Dynamo.Utilities;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.Utilities;
-using SharpDX.Direct2D1.Effects;
 using Border = System.Windows.Controls.Border;
-using Path = System.IO.Path;
 using Thickness = System.Windows.Thickness;
 
 namespace MonocleViewExtension.PackageUsage
@@ -322,7 +316,13 @@ namespace MonocleViewExtension.PackageUsage
 
         public List<string> GetCustomPackageList()
         {
+#if D30_OR_GREATER
+            List<NodeSearchElement> libraries = DynamoViewModel.Model.SearchModel.Entries.ToList();
+#endif
+
+#if !D30_OR_GREATER
             List<NodeSearchElement> libraries = DynamoViewModel.Model.SearchModel.SearchEntries.ToList();
+#endif
             List<string> addOns = new List<string>();
             foreach (var element in libraries)
             {
@@ -343,29 +343,29 @@ namespace MonocleViewExtension.PackageUsage
             }
             return addOns.Distinct().ToList();
         }
-        public string AllCustomNodes()
-        {
-            List<NodeSearchElement> libraries = DynamoViewModel.Model.SearchModel.SearchEntries.ToList();
-            List<string> addOns = new List<string>();
-            foreach (var element in libraries)
-            {
-                // Only include packages and custom nodes
-                if (element.ElementType.HasFlag(ElementTypes.Packaged) || element.ElementType.HasFlag(ElementTypes.CustomNode))
-                {
-                    // Ordered list of all categories for the search element including all nested categories
-                    var allAddOns = element.Categories.ToList();
-                    // Construct all categories levels for the element starting at the top level
-                    for (int i = 0; i < allAddOns.Count; i++)
-                    {
-                        if (i == 0 && !allAddOns[i].StartsWith("Core"))
-                        {
-                            addOns.Add("{" + "\"" + element.CreationName.Split('@').First() + "\"" + "," + "\"" + allAddOns[i] + "\"" + "},");
-                        }
-                    }
-                }
-            }
-            return string.Join("\n", addOns.Distinct().ToList());
-        }
+        //public string AllCustomNodes()
+        //{
+        //    List<NodeSearchElement> libraries = DynamoViewModel.Model.SearchModel.SearchEntries.ToList();
+        //    List<string> addOns = new List<string>();
+        //    foreach (var element in libraries)
+        //    {
+        //        // Only include packages and custom nodes
+        //        if (element.ElementType.HasFlag(ElementTypes.Packaged) || element.ElementType.HasFlag(ElementTypes.CustomNode))
+        //        {
+        //            // Ordered list of all categories for the search element including all nested categories
+        //            var allAddOns = element.Categories.ToList();
+        //            // Construct all categories levels for the element starting at the top level
+        //            for (int i = 0; i < allAddOns.Count; i++)
+        //            {
+        //                if (i == 0 && !allAddOns[i].StartsWith("Core"))
+        //                {
+        //                    addOns.Add("{" + "\"" + element.CreationName.Split('@').First() + "\"" + "," + "\"" + allAddOns[i] + "\"" + "},");
+        //                }
+        //            }
+        //        }
+        //    }
+        //    return string.Join("\n", addOns.Distinct().ToList());
+        //}
         public bool IsCustomNode(NodeModel node)
         {
             bool result = GetCustomPackageList().Any(x => node.Category.StartsWith(x, StringComparison.OrdinalIgnoreCase));

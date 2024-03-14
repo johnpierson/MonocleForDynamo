@@ -1,6 +1,5 @@
 ﻿using System;
 using Dynamo.Core;
-using Dynamo.Extensions;
 using Dynamo.Wpf.Extensions;
 
 namespace MonocleViewExtension.About

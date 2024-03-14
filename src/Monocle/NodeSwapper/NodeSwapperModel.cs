@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autodesk.DesignScript.Geometry;
 using Dynamo.Controls;
-using Dynamo.Graph;
-using Dynamo.Graph.Annotations;
 using Dynamo.Models;
-using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 

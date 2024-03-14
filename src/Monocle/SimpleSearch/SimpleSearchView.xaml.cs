@@ -7,7 +7,6 @@ using Dynamo.Graph.Nodes;
 using Dynamo.Models;
 using Dynamo.Search.SearchElements;
 using Dynamo.ViewModels;
-using MonocleViewExtension.Utilities;
 
 namespace MonocleViewExtension.SimpleSearch
 {

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
 using Dynamo.Search.SearchElements;
@@ -16,8 +17,13 @@ namespace MonocleViewExtension.SimpleSearch
         public SimpleSearchViewModel(DynamoViewModel dvm)
         {
             dynamoViewModel = dvm;
+#if D30_OR_GREATER
+            var myNodes = dvm.Model.SearchModel.Entries.Where(s => s.IsVisibleInSearch).OrderBy(n => n.Name);
+#endif
 
-            var myNodes = dvm.Model.SearchModel.SearchEntries.Where(s => s.IsVisibleInSearch).OrderBy(n => n.Name);
+#if !D30_OR_GREATER
+              var myNodes = dvm.Model.SearchModel.SearchEntries.Where(s => s.IsVisibleInSearch).OrderBy(n => n.Name);
+#endif
             
             this.nodes = CollectionViewSource.GetDefaultView(myNodes);
 

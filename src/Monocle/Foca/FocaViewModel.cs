@@ -215,7 +215,7 @@ namespace MonocleViewExtension.Foca
 
                 
             }
-            catch (Exception exception)
+            catch (Exception)
             {
                 ResetColorWheel();
                 UpdateColors();
@@ -268,45 +268,45 @@ namespace MonocleViewExtension.Foca
         public Brush Color1
         {
             get => _color1;
-            set { _color1 = value; RaisePropertyChanged(() => Color1); }
+            set { _color1 = value; RaisePropertyChanged(nameof(Color1));}
         }
 
         private Brush _color2;
         public Brush Color2
         {
             get => _color2;
-            set { _color2 = value; RaisePropertyChanged(() => Color2); }
+            set { _color2 = value; RaisePropertyChanged(nameof(Color2)); }
         }
 
         private Brush _color3;
         public Brush Color3
         {
             get => _color3;
-            set { _color3 = value; RaisePropertyChanged(() => Color3); }
+            set { _color3 = value; RaisePropertyChanged(nameof(Color3)); }
         }
         private Brush _color4;
         public Brush Color4
         {
             get => _color4;
-            set { _color4 = value; RaisePropertyChanged(() => Color4); }
+            set { _color4 = value; RaisePropertyChanged(nameof(Color4)); }
         }
         private Brush _color5;
         public Brush Color5
         {
             get => _color5;
-            set { _color5 = value; RaisePropertyChanged(() => Color5); }
+            set { _color5 = value; RaisePropertyChanged(nameof(Color5)); }
         }
         private Brush _color6;
         public Brush Color6
         {
             get => _color6;
-            set { _color6 = value; RaisePropertyChanged(() => Color6); }
+            set { _color6 = value; RaisePropertyChanged(nameof(Color6)); }
         }
         private List<Settings.GroupSetting> _groupSettings;
         public List<Settings.GroupSetting> GroupSettings
         {
             get => _groupSettings;
-            set { _groupSettings = value; RaisePropertyChanged(() => GroupSettings); }
+            set { _groupSettings = value; RaisePropertyChanged(nameof(GroupSettings)); }
         }
 
 
