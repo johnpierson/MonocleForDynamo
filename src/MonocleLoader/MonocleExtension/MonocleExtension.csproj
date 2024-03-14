@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+   <TargetFramework>net48</TargetFramework>
+	<!--<TargetFramework>net8.0-windows</TargetFramework>-->
+	<UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+	<PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="MonocleDLLs\net48\Monocle48.dll" />
+    <None Remove="MonocleDLLs\net8\Monocle8.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="MonocleDLLs\net48\Monocle48.dll" />
+    <EmbeddedResource Include="MonocleDLLs\net8\Monocle8.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DynamoVisualProgramming.Core" Version="2.12.1.8246" />
+    <PackageReference Include="DynamoVisualProgramming.DynamoServices" Version="2.12.1.8246" />
+    <PackageReference Include="DynamoVisualProgramming.WpfUILibrary" Version="2.12.1.8246" />
+  </ItemGroup>
+
+</Project>
