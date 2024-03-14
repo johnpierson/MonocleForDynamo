@@ -2,7 +2,8 @@
   <PropertyGroup>
     <RootNamespace>MonocleViewExtension</RootNamespace>
     <AssemblyName>MonocleViewExtension</AssemblyName>
-    <TargetFrameworks>net48</TargetFrameworks>
+    <!--<TargetFrameworks>net48</TargetFrameworks>-->
+	<TargetFrameworks>net8.0-windows</TargetFrameworks>
 	<UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
 	<PlatformTarget>x64</PlatformTarget>
@@ -88,7 +89,7 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>dynamo</PackageTags>
         <!--<FolderPackages>$(Appdata)\Dynamo\Dynamo Revit\$(BuildOutput)\packages\RhythmRevit\</FolderPackages>-->
-        <GenerateDocumentationFile>True</GenerateDocumentationFile>
+        <GenerateDocumentationFile>False</GenerateDocumentationFile>
         <Version>$(RevitVersion).3.1</Version>
         <Description>Monocle for Dynamo|$(DynamoVersion)</Description>
         <FileVersion>$(DynamoVersion).3.1</FileVersion>
@@ -129,19 +130,16 @@
     <PackageReference Include="DynamoVisualProgramming.WpfUILibrary" Version="$(DynVersion).*" />
     <PackageReference Include="DynamoVisualProgramming.ZeroTouchLibrary" Version="$(DynVersion).*" />
     <PackageReference Include="Extended.Wpf.Toolkit" Version="4.3.0" />
-    <PackageReference Include="System.Buffers" Version="4.5.1" />
-    
-    <PackageReference Include="System.Memory" Version="4.5.5" />
-    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
     <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
   </ItemGroup>
 	<ItemGroup Condition="'$(Configuration)|$(Platform)'!='Release 30|AnyCPU'">
 		<PackageReference Include="CommonServiceLocator" Version="1.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="NUnit" Version="2.6.3" />
-        <PackageReference Include="System.Collections.Immutable" Version="1.7.1" />
-        <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="4.5.3" />
-		<PackageReference Include="HelixToolkit.Wpf.SharpDX" Version="2.16.1" />
+		<PackageReference Include="HelixToolkit" Version="2.17.0" />
+		<PackageReference Include="HelixToolkit.Wpf" Version="2.17.0" />
+		<PackageReference Include="HelixToolkit.Wpf.SharpDX" Version="2.17.0" />
+		<PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release 30|AnyCPU'">
 		<PackageReference Include="CommonServiceLocator" Version="2.0.7" />
@@ -186,7 +184,4 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Debug copy &quot;$(ProjectDir)bin\Debug\net48\MonocleViewExtension.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\3.0\packages\Monocle\bin&quot;&#xD;&#xA;&#xD;&#xA;if $(ConfigurationName) == Release copy &quot;$(ProjectDir)bin\Release\net48\MonocleViewExtension.dll&quot; &quot;$(AppData)\Dynamo\Dynamo Revit\2.18\packages\Monocle\bin&quot;" />
-  </Target>
 </Project>

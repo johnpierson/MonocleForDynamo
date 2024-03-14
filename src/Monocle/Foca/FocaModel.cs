@@ -435,9 +435,18 @@ namespace MonocleViewExtension.Foca
                 }
                 if (caseSwitch.Contains("NodeModel"))
                 {
-                    annotationCommand =
+
+#if !D30_OR_GREATER
+annotationCommand =
                         new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
                             currentSelection.CenterX, currentSelection.CenterY, false);
+#endif
+#if D30_OR_GREATER
+                    //TODO: Implement group descriptions in monocle
+                    annotationCommand =
+                        new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,string.Empty,
+                            currentSelection.CenterX, currentSelection.CenterY, false);
+#endif
                     DynamoViewModel.Model.ExecuteCommand(annotationCommand);
                     DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().FontSize = fontSize;
                     DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().Background = colorToUse;
@@ -446,9 +455,17 @@ namespace MonocleViewExtension.Foca
                 {
                     try
                     {
+#if !D30_OR_GREATER
+annotationCommand =
+                        new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
+                            currentSelection.CenterX, currentSelection.CenterY, false);
+#endif
+#if D30_OR_GREATER
+                        //TODO: Implement group descriptions in monocle
                         annotationCommand =
-                            new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
+                            new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText, string.Empty,
                                 currentSelection.CenterX, currentSelection.CenterY, false);
+#endif
                         DynamoViewModel.Model.ExecuteCommand(annotationCommand);
                         DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().FontSize = fontSize;
                         DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().Background = colorToUse;
@@ -463,8 +480,15 @@ namespace MonocleViewExtension.Foca
             {
                 try
                 {
-                    var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
+#if !D30_OR_GREATER
+var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
                         0, 0, false);
+#endif
+#if D30_OR_GREATER
+                    var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,string.Empty,
+                        0, 0, false);
+#endif
+
                     DynamoViewModel.Model.ExecuteCommand(annotationCommand);
                     DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().FontSize = 24;
                     DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().Background = colorToUse;
@@ -736,7 +760,7 @@ namespace MonocleViewExtension.Foca
                 if (anno.PreviewState.Equals(PreviewState.Selection))
                 {
                     //add the group
-                    wrappedNodes.Add(new SuperNode() {GUID = anno.AnnotationModel.GUID.ToString(), CenterX = anno.AnnotationModel.CenterX, CenterY = anno.AnnotationModel.CenterY, X = anno.AnnotationModel.X, Y = anno.AnnotationModel.Y});
+                    wrappedNodes.Add(new SuperNode() {Guid = anno.AnnotationModel.GUID.ToString(), CenterX = anno.AnnotationModel.CenterX, CenterY = anno.AnnotationModel.CenterY, X = anno.AnnotationModel.X, Y = anno.AnnotationModel.Y});
 
                     foreach (var node in anno.Nodes)
                     {
@@ -763,7 +787,7 @@ namespace MonocleViewExtension.Foca
                 if (!nodeModel.IsSelected) continue;
                 if (!objectsInGroups.Contains(nodeModel.GUID.ToString()))
                 {
-                    wrappedNodes.Add(new SuperNode() { Object = nodeModel, GUID = nodeModel.GUID.ToString(), CenterX = nodeModel.CenterX, CenterY = nodeModel.CenterY, X = nodeModel.X, Y = nodeModel.Y });
+                    wrappedNodes.Add(new SuperNode() { Object = nodeModel, Guid = nodeModel.GUID.ToString(), CenterX = nodeModel.CenterX, CenterY = nodeModel.CenterY, X = nodeModel.X, Y = nodeModel.Y });
                 }
             }
 
@@ -772,12 +796,12 @@ namespace MonocleViewExtension.Foca
                 if (!noteModel.IsSelected) continue;
                 if (!objectsInGroups.Contains(noteModel.GUID.ToString()))
                 {
-                    wrappedNodes.Add(new SuperNode() { Object = noteModel, GUID = noteModel.GUID.ToString(), CenterX = noteModel.CenterX, CenterY = noteModel.CenterY, X = noteModel.X, Y = noteModel.Y });
+                    wrappedNodes.Add(new SuperNode() { Object = noteModel, Guid = noteModel.GUID.ToString(), CenterX = noteModel.CenterX, CenterY = noteModel.CenterY, X = noteModel.X, Y = noteModel.Y });
                 }
             }
 
             //ensure unique selection
-            List<SuperNode> uniqueSuperNodes = wrappedNodes.GroupBy(s => s.GUID.ToString())
+            List<SuperNode> uniqueSuperNodes = wrappedNodes.GroupBy(s => s.Guid.ToString())
                 .Select(group => group.First()).ToList();
 
             return uniqueSuperNodes;
