@@ -44,4 +44,5 @@
   </CustomNodeIdentifierSettings>
   <CustomNodeNotePrefix>Custom Node: </CustomNodeNotePrefix>
   <IsFocaEnabled>true</IsFocaEnabled>
+  <InCanvasSearchEnabled>true</InCanvasSearchEnabled>
 </MonocleSettings>

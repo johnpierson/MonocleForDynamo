@@ -39,9 +39,11 @@
     </GroupSetting>
   </GroupSettings>
   <CustomNodeIdentifierSettings>
-    <Color>#FFFF0000</Color>
+    <Color>#FFADE4DE</Color>
     <BorderThickness>4</BorderThickness>
   </CustomNodeIdentifierSettings>
   <CustomNodeNotePrefix>Custom Node: </CustomNodeNotePrefix>
   <IsFocaEnabled>true</IsFocaEnabled>
+  <InCanvasSearchEnabled>true</InCanvasSearchEnabled>
+  <QuickSaveDateFormat>-yyyy.MM.dd_HH.mm.ss</QuickSaveDateFormat>
 </MonocleSettings>
