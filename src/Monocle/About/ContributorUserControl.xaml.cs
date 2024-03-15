@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Security.Policy;
 using System.Windows.Controls;
 using System.Windows.Navigation;
 
@@ -20,7 +21,9 @@ namespace MonocleViewExtension.About
         public string Contribution { get; set; }
         private void Hyperlink_OnRequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
+            Process.Start("explorer", e.Uri.AbsoluteUri);
+
+            //Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri));
             e.Handled = true;
         }
     }

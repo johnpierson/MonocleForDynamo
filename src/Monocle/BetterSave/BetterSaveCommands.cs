@@ -21,15 +21,15 @@ namespace MonocleViewExtension.BetterSave
 
             var flyout = new MenuItem
             {
-                Header = Properties.Resources.ResourceManager.GetString("BetterSaveFlyoutHeader"),
-                ToolTip = Properties.Resources.ResourceManager.GetString("BetterSaveFlyoutTooltip")
+                Header = Properties.Resources.BetterSaveFlyoutHeader,
+                ToolTip = Properties.Resources.BetterSaveFlyoutTooltip
             };
             //quick save with timestamp
             var quickSave = new MenuItem
             {
-                Header = Properties.Resources.ResourceManager.GetString("QuickSaveMenuItemHeader"),
-                InputGestureText = Properties.Resources.ResourceManager.GetString("QuickSaveMenuItemKeyboardShortcut"),
-                ToolTip = Properties.Resources.ResourceManager.GetString("QuickSaveMenuItemTooltip")
+                Header = Properties.Resources.QuickSaveMenuItemHeader,
+                InputGestureText = Properties.Resources.QuickSaveMenuItemKeyboardShortcut,
+                ToolTip = Properties.Resources.QuickSaveMenuItemTooltip
             };
 
             quickSave.Click += (sender, args) =>
@@ -43,8 +43,8 @@ namespace MonocleViewExtension.BetterSave
             //sloppy save with random words
             var sloppySave = new MenuItem
             {
-                Header = Properties.Resources.ResourceManager.GetString("SloppySaveMenuItemHeader"),
-                ToolTip = Properties.Resources.ResourceManager.GetString("SloppySaveMenuItemTooltip")
+                Header = Properties.Resources.SloppySaveMenuItemHeader,
+                ToolTip = Properties.Resources.SloppySaveMenuItemTooltip
             };
 
             sloppySave.Click += (sender, args) =>
@@ -77,7 +77,7 @@ namespace MonocleViewExtension.BetterSave
             //Dynamo.UI.Prompts.GenericTaskDialog dialog = new GenericTaskDialog();
             //dialog.ShowDialog(); tODO: Make this dialog dynamo-ey
 
-            var result = MessageBox.Show(Properties.Resources.ResourceManager.GetString("SloppySaveMessageBoxTitle"), Properties.Resources.ResourceManager.GetString("SloppySaveMessageBoxCaption"), MessageBoxButtons.YesNo);
+            var result = MessageBox.Show(Properties.Resources.SloppySaveMessageBoxTitle, Properties.Resources.SloppySaveMessageBoxCaption, MessageBoxButtons.YesNo);
 
             if (result == DialogResult.Yes)
             {
