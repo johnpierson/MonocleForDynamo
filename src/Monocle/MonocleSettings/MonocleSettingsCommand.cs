@@ -13,9 +13,9 @@ namespace MonocleViewExtension.MonocleSettings
         {
             menuItem.Items.Add(new Separator());
 
-            var settingsFlyout = new MenuItem { Header = Properties.Resources.ResourceManager.GetString("SettingsMenuItemHeader") };
+            var settingsFlyout = new MenuItem { Header = Properties.Resources.SettingsMenuItemHeader };
 
-            var saveSettings = new MenuItem { Header = Properties.Resources.ResourceManager.GetString("SettingsSaveMenuItemHeader") };
+            var saveSettings = new MenuItem { Header = Properties.Resources.SettingsSaveMenuItemHeader };
 
             saveSettings.Click += (sender, args) =>
             {
@@ -25,7 +25,7 @@ namespace MonocleViewExtension.MonocleSettings
 
 
 
-            var loadSettings = new MenuItem{ Header = Properties.Resources.ResourceManager.GetString("SettingsLoadMenuItemHeader") };
+            var loadSettings = new MenuItem{ Header = Properties.Resources.SettingsLoadMenuItemHeader };
 
             loadSettings.Click += (sender, args) =>
             {
@@ -41,7 +41,7 @@ namespace MonocleViewExtension.MonocleSettings
             settingsFlyout.Items.Add(loadSettings);
 
             settingsFlyout.Items.Add(new Separator());
-            var restoreSettings = new MenuItem { Header = Properties.Resources.ResourceManager.GetString("SettingsRestoreMenuItemHeader") };
+            var restoreSettings = new MenuItem { Header = Properties.Resources.SettingsRestoreMenuItemHeader };
 
             restoreSettings.Click += (sender, args) =>
             {

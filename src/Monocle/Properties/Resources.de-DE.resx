@@ -151,7 +151,10 @@
     <value>Hervorhebung aktivieren</value>
   </data>
   <data name="MegaInputIdentifierMenuItem" xml:space="preserve">
-    <value>mega input identifier</value>
+    <value>Identifikation Eingang</value>
+  </data>
+  <data name="NodeDocumentationMenuItemHeader" xml:space="preserve">
+    <value>Blockdokumentation</value>
   </data>
   <data name="NodeIndentifierMenuItemHeader" xml:space="preserve">
     <value>Blockbezeichner</value>

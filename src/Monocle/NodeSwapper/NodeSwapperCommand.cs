@@ -15,7 +15,7 @@ namespace MonocleViewExtension.NodeSwapper
         {
             var dvm = p.DynamoWindow.DataContext as DynamoViewModel;
             
-            var NodeSwapperMenu = new MenuItem { Header = Properties.Resources.ResourceManager.GetString("NodeSwapperMenuItemHeader") };
+            var NodeSwapperMenu = new MenuItem { Header = Properties.Resources.NodeSwapperMenuItemHeader };
 
             NodeSwapperMenu.Click += (sender, args) =>
             {   

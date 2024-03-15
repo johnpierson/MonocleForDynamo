@@ -153,6 +153,9 @@
   <data name="MegaInputIdentifierMenuItem" xml:space="preserve">
     <value>Mega identificateur d'entrées</value>
   </data>
+  <data name="NodeDocumentationMenuItemHeader" xml:space="preserve">
+    <value>Documentation de noued</value>
+  </data>
   <data name="NodeIndentifierMenuItemHeader" xml:space="preserve">
     <value>Identificateur de noeud</value>
   </data>

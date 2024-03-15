@@ -6,6 +6,8 @@ using Dynamo.Logging;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using Dynamo.Wpf.Interfaces;
+using MonocleViewExtension.PackageUsage;
+using SharpDX.Direct2D1;
 
 namespace MonocleViewExtension.PackageUsage
 {
@@ -19,7 +21,7 @@ namespace MonocleViewExtension.PackageUsage
         public static void AddMenuItem(MenuItem menuItem, ViewLoadedParams p)
         {
             //add the flyout first
-            var packageFlyout = new MenuItem {Header = Properties.Resources.ResourceManager.GetString("PackageUsageMenuItemHeader") };
+            var packageFlyout = new MenuItem {Header = Properties.Resources.PackageUsageMenuItemHeader };
             menuItem.Items.Add(packageFlyout);
 
             var dvm = p.DynamoWindow.DataContext as DynamoViewModel;
@@ -27,7 +29,7 @@ namespace MonocleViewExtension.PackageUsage
 
             #region DogeWindow
 
-            var packageUsageDoge = new MenuItem { Header = Properties.Resources.ResourceManager.GetString("PackageUsageDogeMenuItemHeader") };
+            var packageUsageDoge = new MenuItem { Header = Properties.Resources.PackageUsageDogeMenuItemHeader };
 
             packageUsageDoge.Click += (sender, args) =>
             {
@@ -52,7 +54,7 @@ namespace MonocleViewExtension.PackageUsage
 
             #region BoringWindow
             
-            var packageUsageBoring = new MenuItem { Header = Properties.Resources.ResourceManager.GetString("PackageUsageBoringMenuItemHeader") };
+            var packageUsageBoring = new MenuItem { Header = Properties.Resources.PackageUsageBoringMenuItemHeader };
 
             packageUsageBoring.Click += (sender, args) =>
             {
@@ -91,12 +93,12 @@ namespace MonocleViewExtension.PackageUsage
         private static void AddCustomNodeHighlighter(MenuItem menuItem, PackageUsageModel m)
         {
             //add the flyout first
-            var highlightFlyout = new MenuItem { Header = Properties.Resources.ResourceManager.GetString("NodeIndentifierMenuItemHeader") };
+            var highlightFlyout = new MenuItem { Header = Properties.Resources.NodeIndentifierMenuItemHeader };
             menuItem.Items.Add(highlightFlyout);
 
 
             //add highlight
-            var highlightCustomNodes = new MenuItem { Header = Properties.Resources.ResourceManager.GetString("HighlightEnableMenuItemHeader") };
+            var highlightCustomNodes = new MenuItem { Header = Properties.Resources.HighlightEnableMenuItemHeader };
             highlightCustomNodes.Click += (sender, args) =>
             {
                 m.HighlightCustomNodes();
@@ -105,7 +107,7 @@ namespace MonocleViewExtension.PackageUsage
 
             highlightFlyout.Items.Add(highlightCustomNodes);
             //remove highlight
-            var removeHighlightCustomNodes = new MenuItem { Header = Properties.Resources.ResourceManager.GetString("HighlightDisableMenuItemHeader") };
+            var removeHighlightCustomNodes = new MenuItem { Header = Properties.Resources.HighlightDisableMenuItemHeader };
             removeHighlightCustomNodes.Click += (sender, args) =>
             {
                 m.ResetCustomNodeHighlights();
@@ -115,7 +117,7 @@ namespace MonocleViewExtension.PackageUsage
             highlightFlyout.Items.Add(removeHighlightCustomNodes);
 
             //mega input identifier
-            var inputIdentifier = new MenuItem { Header = Properties.Resources.ResourceManager.GetString("MegaInputIdentifierMenuItem") };
+            var inputIdentifier = new MenuItem { Header = Properties.Resources.MegaInputIdentifierMenuItem };
             inputIdentifier.Click += (sender, args) =>
             {
                 m.RevealInputs();

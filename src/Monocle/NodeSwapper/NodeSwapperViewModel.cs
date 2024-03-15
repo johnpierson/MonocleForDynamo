@@ -65,7 +65,7 @@ namespace MonocleViewExtension.NodeSwapper
             _workspaceView = Model.dynamoView.FindVisualChildren<WorkspaceView>().First();
 
             //set paint brush settings
-            PaintStatusMessage =  Properties.Resources.ResourceManager.GetString("NodeSwapperStatusMessageSelectReplacement");
+            PaintStatusMessage =  Properties.Resources.NodeSwapperStatusMessageSelectReplacement;
 
             //set to manual run mode
             Model.SetRunStatus();
@@ -105,7 +105,7 @@ namespace MonocleViewExtension.NodeSwapper
             ImageMode = false;
 
             //set the message
-            PaintStatusMessage = Properties.Resources.ResourceManager.GetString("NodeSwapperStatusMessageSelectToReplace");
+            PaintStatusMessage = Properties.Resources.NodeSwapperStatusMessageSelectToReplace;
 
 
             _paintBrush = new NodeSwapperPaintBrush()
@@ -262,7 +262,7 @@ namespace MonocleViewExtension.NodeSwapper
                     ImageMode = false;
 
                     //set the message
-                    PaintStatusMessage = Properties.Resources.ResourceManager.GetString("NodeSwapperStatusMessageSelectToReplace");
+                    PaintStatusMessage = Properties.Resources.NodeSwapperStatusMessageSelectToReplace;
                 }
                 else
                 {

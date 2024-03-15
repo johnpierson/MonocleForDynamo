@@ -52,8 +52,8 @@ namespace MonocleViewExtension.Foca
             var focaMenuItem = new MenuItem
             {
                 IsCheckable = true,
-                Header = $"{Properties.Resources.ResourceManager.GetString("FocaMenuItemHeader")} | ᶘ ᵒᴥᵒᶅ",
-                ToolTip = Properties.Resources.ResourceManager.GetString("FocaMenuItemTooltip"),
+                Header = $"{Properties.Resources.FocaMenuItemHeader} | ᶘ ᵒᴥᵒᶅ",
+                ToolTip = Properties.Resources.FocaMenuItemTooltip,
                 IsChecked = Globals.IsFocaEnabled
             };
 
@@ -71,7 +71,7 @@ namespace MonocleViewExtension.Foca
 
             RegisterKeyboardShortcuts(p, m);
 
-            var colorCodeMenuItem = new MenuItem { Header = Properties.Resources.ResourceManager.GetString("FocaStandardGroupMenuItemHeader") };
+            var colorCodeMenuItem = new MenuItem { Header = Properties.Resources.FocaStandardGroupMenuItemHeader };
 
             colorCodeMenuItem.Click += (sender, args) =>
             {

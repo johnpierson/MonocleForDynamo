@@ -3,7 +3,6 @@
     <RootNamespace>MonocleViewExtension</RootNamespace>
     <AssemblyName>MonocleViewExtension</AssemblyName>
     <TargetFramework>net48</TargetFramework>
-	<!--<TargetFramework>net8.0-windows</TargetFramework>-->
 	<UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
 	<PlatformTarget>x64</PlatformTarget>
@@ -96,6 +95,7 @@
     <None Remove="Resources\smalls.JPG" />
     <None Remove="Resources\WpfAnimatedGif.dll" />
     <None Remove="Resources\Xceed.Wpf.AvalonDock.dll" />
+    <None Remove="Resources\Xceed.Wpf.AvalonDock.NET5.dll" />
     <None Remove="SimpleSearch\Resources\magnifyingGlass.png" />
     <None Remove="SimpleSearch\Resources\monocle.png" />
     <None Remove="StandardViews\Resources\3d_menu.png" />
@@ -116,7 +116,7 @@
     <Page Remove="Resources\IconDictionary.xaml" />
     <Page Remove="Resources\PaintBrushIcon.xaml" />
   </ItemGroup>
-  <ItemGroup>
+   <ItemGroup>
     <EmbeddedResource Include="Resources\Xceed.Wpf.AvalonDock.NET5.dll" />
     <EmbeddedResource Include="Resources\Xceed.Wpf.Toolkit.NET5.dll" />
   </ItemGroup>
@@ -248,12 +248,33 @@
     <Resource Include="StandardViews\Resources\top_normal.png" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.de-DE.resx">
+      <Generator></Generator>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\Resources.en-US.resx">
+      <Generator></Generator>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\Resources.es-ES.resx">
+      <Generator></Generator>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\Resources.fr-FR.resx">
+      <Generator></Generator>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\Resources.it-IT.resx">
+      <Generator></Generator>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+ <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <!--<Exec Command="copy &quot;$(ProjectDir)bin\Debug net8\net8.0-windows\MonocleViewExtension.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\3.0\packages\Monocle\bin&quot;&#xD;&#xA;&#xD;&#xA;" />-->
     <Exec Command="copy &quot;$(ProjectDir)bin\Debug net48\net48\MonocleViewExtension.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\2.19\packages\Monocle\bin&quot;&#xD;&#xA;&#xD;&#xA;" />
 

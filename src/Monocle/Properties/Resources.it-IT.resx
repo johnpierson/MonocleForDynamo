@@ -155,6 +155,9 @@ La FOCA è una collezione di strumenti per allineare, raggruppare e mettere ordi
   <data name="MegaInputIdentifierMenuItem" xml:space="preserve">
     <value>Mega identificatore di Input</value>
   </data>
+  <data name="NodeDocumentationMenuItemHeader" xml:space="preserve">
+    <value>documentazione nodi</value>
+  </data>
   <data name="NodeIndentifierMenuItemHeader" xml:space="preserve">
     <value>Identifica nodi</value>
   </data>

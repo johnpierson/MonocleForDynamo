@@ -153,6 +153,9 @@
   <data name="MegaInputIdentifierMenuItem" xml:space="preserve">
     <value>mega identificador de inputs</value>
   </data>
+  <data name="NodeDocumentationMenuItemHeader" xml:space="preserve">
+    <value>documentación de nodos</value>
+  </data>
   <data name="NodeIndentifierMenuItemHeader" xml:space="preserve">
     <value>identificador de nodos</value>
   </data>

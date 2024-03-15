@@ -16,7 +16,7 @@ namespace MonocleViewExtension.NodeDocumentation
 
             var dvm = p.DynamoWindow.DataContext as DynamoViewModel;
 
-            var docMenu = new MenuItem { Header = $"node documentation" };
+            var docMenu = new MenuItem { Header = Properties.Resources.NodeDocumentationMenuItemHeader };
 
             docMenu.Click += (sender, args) =>
             {

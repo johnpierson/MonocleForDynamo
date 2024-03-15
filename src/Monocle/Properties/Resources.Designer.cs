@@ -169,6 +169,15 @@ namespace MonocleViewExtension.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to node documentation.
+        /// </summary>
+        public static string NodeDocumentationMenuItemHeader {
+            get {
+                return ResourceManager.GetString("NodeDocumentationMenuItemHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to node identifiers.
         /// </summary>
         public static string NodeIndentifierMenuItemHeader {
