@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Dynamo.PackageManager;
 using Dynamo.Wpf.Extensions;
+using Dynamo.Wpf.Utilities;
 using MonocleViewExtension.About;
 using MonocleViewExtension.BetterSave;
 using MonocleViewExtension.FancyPaste;

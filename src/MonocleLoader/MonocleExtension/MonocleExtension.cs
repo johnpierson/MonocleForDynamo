@@ -1,7 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Windows;
+using Dynamo.Configuration;
 using Dynamo.Extensions;
+using Dynamo.Logging;
+using Dynamo.Models;
+using Dynamo.ViewModels;
+using ProtoCore.AST;
 
 namespace MonocleExtension
 {
@@ -14,7 +21,7 @@ namespace MonocleExtension
 
         public void Ready(ReadyParams rp)
         {
-           this.ReadyCalled = true;
+            this.ReadyCalled = true;
         }
 
         public void Dispose()
@@ -23,6 +30,7 @@ namespace MonocleExtension
 
         public void Startup(StartupParams sp)
         {
+            
             //only try to run this if the view extension DLL is missing (first run after install)
             if (!File.Exists(Global.MonocleViewExtensionDll))
             {
@@ -56,15 +64,19 @@ namespace MonocleExtension
 
                 //write the view extension XML
                 File.WriteAllText(Global.ViewExtensionXml, Global.ViewExtensionXmlText);
+
+
+                //now try to load the view extension
+                MessageBox.Show("monocle view extension downloaded, please restart Dynamo to finish loading it.",
+                    "monocle for dynamo");
             }
         }
 
-      
 
         public void Shutdown()
         {
         }
 
-       
+
     }
 }
