@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>MonocleViewExtension</RootNamespace>
-    <AssemblyName>MonocleViewExtension</AssemblyName>
+    <AssemblyName>Monocle8</AssemblyName>
     <TargetFramework>net8.0-windows</TargetFramework>
 	<UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
 	<PlatformTarget>x64</PlatformTarget>
     <AssemblyTitle>Monocle</AssemblyTitle>
     <Product>Monocle</Product>
-    <Copyright>Copyright©  2023 john pierson</Copyright>
-    <AssemblyVersion>2024.3.1</AssemblyVersion>
-    <FileVersion>2024.3.1</FileVersion>
+    <Copyright>Copyright©  2024 john pierson</Copyright>
+    <AssemblyVersion>2024.3.3</AssemblyVersion>
+    <FileVersion>2024.3.3</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
 	<Configurations>Debug net48;Debug net8;</Configurations>
     <Configurations>$(Configurations)Release net48;Release net8;</Configurations>

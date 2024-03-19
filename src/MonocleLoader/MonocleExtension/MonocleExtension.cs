@@ -1,14 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
-using Dynamo.Configuration;
 using Dynamo.Extensions;
-using Dynamo.Logging;
-using Dynamo.Models;
-using Dynamo.ViewModels;
-using ProtoCore.AST;
 
 namespace MonocleExtension
 {

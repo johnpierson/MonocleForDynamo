@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Dynamo.Logging;
 using Dynamo.PackageManager;
 using Dynamo.Wpf.Extensions;
 using Dynamo.Wpf.Utilities;
@@ -74,6 +76,15 @@ namespace MonocleViewExtension
             */
             if (Keyboard.IsKeyDown(Key.LeftShift)) return;
 
+            //check if the last used settings file exists, if so, use it instead of the defaults.
+            if (File.Exists(Properties.UserSettings.Default.MonocleSettingsFile))
+            {
+                Globals.SettingsFile = Properties.UserSettings.Default.MonocleSettingsFile;
+            }
+            else
+            {
+                Dynamo.Logging.LogMessage.Warning($"Failed to load settings file from, {Properties.UserSettings.Default.MonocleSettingsFile}. Please check if the file exists. Using default settings instead,", WarningLevel.Mild);
+            }
             //load monocle settings from xml
             Settings.LoadMonocleSettings();
 

@@ -95,6 +95,10 @@ namespace MonocleViewExtension.Utilities
                 Globals.InCanvasSearchEnabled = newSettings.InCanvasSearchEnabled;
 
                 Globals.QuickSaveDateFormat = newSettings.QuickSaveDateFormat;
+
+                //now store the settings file in the user settings
+                Properties.UserSettings.Default.MonocleSettingsFile = Globals.SettingsFile;
+                Properties.UserSettings.Default.Save();
             }
             catch (Exception)
             {
