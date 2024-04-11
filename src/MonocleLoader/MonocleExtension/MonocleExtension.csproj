@@ -9,7 +9,12 @@
 	<AssemblyVersion>2024.3.3</AssemblyVersion>
 	<FileVersion>2024.3.3</FileVersion>
   </PropertyGroup>
-
+  
+ <PropertyGroup>
+        <StartAction>Program</StartAction>
+        <!--<StartProgram>C:\Users\johnpierson\Desktop\Autodesk\DynamoCoreRuntime3.0.4\DynamoSandbox.exe</StartProgram>-->
+		<StartProgram>C:\Users\johnpierson\Desktop\Autodesk\DynamoCoreRuntime2.19.3\DynamoSandbox.exe</StartProgram>
+    </PropertyGroup>
   <ItemGroup>
     <None Remove="MonocleDLLs\net48\Monocle48.dll" />
     <None Remove="MonocleDLLs\net8\Monocle8.dll" />
@@ -21,6 +26,10 @@
   </ItemGroup>
 
   <ItemGroup>
+      <Reference Include="DynamoPackages">
+      <HintPath>C:\Program Files\Autodesk\Revit 2022\AddIns\DynamoForRevit\DynamoPackages.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <PackageReference Include="DynamoVisualProgramming.Core" Version="2.12.1.8246" />
     <PackageReference Include="DynamoVisualProgramming.DynamoServices" Version="2.12.1.8246" />
     <PackageReference Include="DynamoVisualProgramming.WpfUILibrary" Version="2.12.1.8246" />

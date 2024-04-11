@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -6,8 +7,11 @@ using System.Reflection;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Dynamo.Controls;
+using Dynamo.Extensions;
 using Dynamo.Logging;
 using Dynamo.PackageManager;
+using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using Dynamo.Wpf.Utilities;
 using MonocleViewExtension.About;
@@ -30,13 +34,14 @@ namespace MonocleViewExtension
         public string UniqueId => "5A256B35-BD09-423C-82A1-372957143927";
         public string Name => "Monocle View Extension";
 
-      
+
         public void Dispose()
         {
         }
 
         public void Startup(ViewStartupParams viewStartupParams)
         {
+
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainOnAssemblyResolve;
 
             //for testing localization
@@ -70,6 +75,7 @@ namespace MonocleViewExtension
         {
             //store the package manager extension for getting package versions
             Globals.PmExtension = p.ViewStartupParams.ExtensionManager.Extensions.OfType<PackageManagerExtension>().FirstOrDefault();
+           
 
             /*if the user is holding down the left shift key, don't load monocle. I added this because I needed it for when I record videos that shouldn't have packages loaded.
             And yes. this is a deep reference to my roots in AutoCAD, https://knowledge.autodesk.com/support/autocad/learn-explore/caas/sfdcarticles/sfdcarticles/How-to-reset-AutoCAD-to-defaults.html
@@ -98,8 +104,8 @@ namespace MonocleViewExtension
             p.dynamoMenu.Items.Insert(6, monocleMenuItem);
 
             //add all of our various tools
-            AboutCommand.AddMenuItem(monocleMenuItem,p);
-            PackageUsageCommand.AddMenuItem(monocleMenuItem,p);
+            AboutCommand.AddMenuItem(monocleMenuItem, p);
+            PackageUsageCommand.AddMenuItem(monocleMenuItem, p);
             GraphResizererCommand.AddMenuItem(monocleMenuItem, p);
             NodeSwapperCommand.AddMenuItem(monocleMenuItem, p);
             FocaCommand.EnableFoca(p, monocleMenuItem);
@@ -110,7 +116,7 @@ namespace MonocleViewExtension
             BetterSaveCommand.AddMenuItem(p);
             ScaffoldTheJacobSmallSpecial(p);
 
-            NodeDocumentationCommand.AddMenuItem(monocleMenuItem,p);
+            NodeDocumentationCommand.AddMenuItem(monocleMenuItem, p);
 
 
             /*if the user has plugins loaded in Revit (or otherwise) that use a toolkit called "DevExpress",
@@ -122,7 +128,7 @@ namespace MonocleViewExtension
             Compatibility.FixThemesForDevExpress(p.DynamoWindow);
         }
 
-        
+
 
         public void Shutdown()
         {

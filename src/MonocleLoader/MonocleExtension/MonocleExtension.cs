@@ -1,8 +1,16 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using Dynamo.Extensions;
+using Dynamo.Interfaces;
+using Dynamo.Logging;
+using Dynamo.PackageManager;
+using Dynamo.Wpf.Extensions;
+using ProtoCore.AST;
 
 namespace MonocleExtension
 {
@@ -16,6 +24,7 @@ namespace MonocleExtension
         public void Ready(ReadyParams rp)
         {
             this.ReadyCalled = true;
+           
         }
 
         public void Dispose()
@@ -55,6 +64,9 @@ namespace MonocleExtension
                         File.WriteAllBytes(Global.MonocleViewExtensionDll, bytes);
                     }
                 }
+                
+
+                
 
                 //write the view extension XML
                 File.WriteAllText(Global.ViewExtensionXml, Global.ViewExtensionXmlText);
@@ -62,7 +74,7 @@ namespace MonocleExtension
 
                 //now try to load the view extension
                 MessageBox.Show("monocle view extension downloaded, please restart Dynamo to finish loading it.",
-                    "monocle for dynamo");
+                "monocle for dynamo");
             }
         }
 
