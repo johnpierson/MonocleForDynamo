@@ -9,8 +9,8 @@
     <AssemblyTitle>Monocle</AssemblyTitle>
     <Product>Monocle</Product>
     <Copyright>Copyright©  2024 john pierson</Copyright>
-    <AssemblyVersion>2024.3.3</AssemblyVersion>
-    <FileVersion>2024.3.3</FileVersion>
+    <AssemblyVersion>2024.4.1</AssemblyVersion>
+    <FileVersion>2024.4.1</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
 	<Configurations>Debug net48;Debug net8;</Configurations>
     <Configurations>$(Configurations)Release net48;Release net8;</Configurations>

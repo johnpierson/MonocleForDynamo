@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>MonocleViewExtension</RootNamespace>
-    <AssemblyName>Monocle48</AssemblyName>
-    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>Monocle8</AssemblyName>
+    <TargetFramework>net8.0-windows</TargetFramework>
 	<UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
 	<PlatformTarget>x64</PlatformTarget>
     <AssemblyTitle>Monocle</AssemblyTitle>
     <Product>Monocle</Product>
     <Copyright>Copyright©  2024 john pierson</Copyright>
-    <AssemblyVersion>2024.3.3</AssemblyVersion>
-    <FileVersion>2024.3.3</FileVersion>
+    <AssemblyVersion>2024.4.1</AssemblyVersion>
+    <FileVersion>2024.4.1</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
 	<Configurations>Debug net48;Debug net8;</Configurations>
     <Configurations>$(Configurations)Release net48;Release net8;</Configurations>
@@ -53,8 +53,8 @@
 	</PropertyGroup>
     <PropertyGroup>
         <StartAction>Program</StartAction>
-        <!--<StartProgram>C:\Users\johnpierson\Desktop\Autodesk\DynamoCoreRuntime3.0.4\DynamoSandbox.exe</StartProgram>-->
-		<StartProgram>C:\Users\johnpierson\Desktop\Autodesk\DynamoCoreRuntime2.19.3\DynamoSandbox.exe</StartProgram>
+        <StartProgram>C:\Users\johnpierson\Desktop\Autodesk\DynamoCoreRuntime3.0.4\DynamoSandbox.exe</StartProgram>
+		<!--<StartProgram>C:\Users\johnpierson\Desktop\Autodesk\DynamoCoreRuntime2.19.3\DynamoSandbox.exe</StartProgram>-->
     </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild" />
   <ItemGroup>
@@ -96,7 +96,6 @@
     <None Remove="Resources\WpfAnimatedGif.dll" />
     <None Remove="Resources\Xceed.Wpf.AvalonDock.dll" />
     <None Remove="Resources\Xceed.Wpf.AvalonDock.NET5.dll" />
-    <None Remove="Resources\Xceed.Wpf.Toolkit.dll" />
     <None Remove="SimpleSearch\Resources\magnifyingGlass.png" />
     <None Remove="SimpleSearch\Resources\monocle.png" />
     <None Remove="StandardViews\Resources\3d_menu.png" />
@@ -119,7 +118,6 @@
   </ItemGroup>
    <ItemGroup>
     <EmbeddedResource Include="Resources\Xceed.Wpf.AvalonDock.NET5.dll" />
-    <EmbeddedResource Include="Resources\Xceed.Wpf.Toolkit.dll" />
     <EmbeddedResource Include="Resources\Xceed.Wpf.Toolkit.NET5.dll" />
   </ItemGroup>
   <ItemGroup>
@@ -155,7 +153,7 @@
 		<PackageReference Include="HelixToolkit.Wpf" Version="2.17.0" />
 		<PackageReference Include="HelixToolkit.Wpf.SharpDX" Version="2.17.0" />
 		<PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
-		<PackageReference Include="Extended.Wpf.Toolkit" Version="2.2.0" />
+		<PackageReference Include="Extended.Wpf.Toolkit" Version="4.3.0" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
 		<PackageReference Include="CommonServiceLocator" Version="2.0.7" />
@@ -276,9 +274,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
- <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <!--<Exec Command="copy &quot;$(ProjectDir)bin\Debug net8\net8.0-windows\MonocleViewExtension.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\3.0\packages\Monocle\bin&quot;&#xD;&#xA;&#xD;&#xA;" />-->
-    <Exec Command="copy &quot;$(ProjectDir)bin\Debug net48\net48\Monocle48.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\2.19\packages\Monocle\bin\MonocleViewExtension.dll&quot;&#xD;&#xA;&#xD;&#xA;" />
-
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy &quot;$(ProjectDir)bin\Debug net8\net8.0-windows\Monocle8.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\3.0\packages\Monocle\bin\MonocleViewExtension.dll&quot;&#xD;&#xA;&#xD;&#xA;" />
   </Target>
 </Project>

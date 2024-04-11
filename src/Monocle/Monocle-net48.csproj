@@ -9,8 +9,8 @@
     <AssemblyTitle>Monocle</AssemblyTitle>
     <Product>Monocle</Product>
     <Copyright>Copyright©  2024 john pierson</Copyright>
-    <AssemblyVersion>2024.3.3</AssemblyVersion>
-    <FileVersion>2024.3.3</FileVersion>
+    <AssemblyVersion>2024.4.1</AssemblyVersion>
+    <FileVersion>2024.4.1</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
 	<Configurations>Debug net48;Debug net8;</Configurations>
     <Configurations>$(Configurations)Release net48;Release net8;</Configurations>
@@ -96,6 +96,7 @@
     <None Remove="Resources\WpfAnimatedGif.dll" />
     <None Remove="Resources\Xceed.Wpf.AvalonDock.dll" />
     <None Remove="Resources\Xceed.Wpf.AvalonDock.NET5.dll" />
+    <None Remove="Resources\Xceed.Wpf.Toolkit.dll" />
     <None Remove="SimpleSearch\Resources\magnifyingGlass.png" />
     <None Remove="SimpleSearch\Resources\monocle.png" />
     <None Remove="StandardViews\Resources\3d_menu.png" />
@@ -118,6 +119,7 @@
   </ItemGroup>
    <ItemGroup>
     <EmbeddedResource Include="Resources\Xceed.Wpf.AvalonDock.NET5.dll" />
+    <EmbeddedResource Include="Resources\Xceed.Wpf.Toolkit.dll" />
     <EmbeddedResource Include="Resources\Xceed.Wpf.Toolkit.NET5.dll" />
   </ItemGroup>
   <ItemGroup>
@@ -276,7 +278,7 @@
   </ItemGroup>
  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <!--<Exec Command="copy &quot;$(ProjectDir)bin\Debug net8\net8.0-windows\MonocleViewExtension.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\3.0\packages\Monocle\bin&quot;&#xD;&#xA;&#xD;&#xA;" />-->
-    <Exec Command="copy &quot;$(ProjectDir)bin\Debug net48\net48\MonocleViewExtension.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\2.19\packages\Monocle\bin&quot;&#xD;&#xA;&#xD;&#xA;" />
+    <Exec Command="copy &quot;$(ProjectDir)bin\Debug net48\net48\Monocle48.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\2.19\packages\Monocle\bin\MonocleViewExtension.dll&quot;&#xD;&#xA;&#xD;&#xA;" />
 
   </Target>
 </Project>
