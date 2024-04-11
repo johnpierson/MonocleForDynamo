@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml;
 using Dynamo.Graph;
 using Dynamo.Graph.Nodes;
 using Dynamo.Graph.Notes;
@@ -7,7 +8,7 @@ using Dynamo.ViewModels;
 
 namespace MonocleViewExtension.Foca
 {
-    public class SuperNode
+    public class SuperNode : ModelBase
     {
         public object Object { get; set; }
         public string ObjectType => this.Object.GetType().ToString();
@@ -15,13 +16,13 @@ namespace MonocleViewExtension.Foca
         public DynamoViewModel Dvm { get; set; }
         private double _x;
         private double _y;
-        private double _centerX;
-        private double _centerY;
+        //private double _centerX;
+        //private double _centerY;
         //private double _width;
         //private double _height;
 
         
-        public double Width
+        public override double Width
         {
             get
             {
@@ -30,12 +31,12 @@ namespace MonocleViewExtension.Foca
                     case "Dynamo.ViewModels.AnnotationViewModel":
                         AnnotationViewModel group = this.Object as AnnotationViewModel;
                         return group.Width;
-                    case "Dynamo.Graph.Notes.NoteModel":
-                        NoteModel note = this.Object as NoteModel;
-                        return note.Width;
-                    case "Dynamo.ViewModels.NodeModel":
-                        NodeModel node = this.Object as NodeModel;
-                        return node.Width;
+                    case "Dynamo.ViewModels.NoteViewModel":
+                        NoteViewModel note = this.Object as NoteViewModel;
+                        return note.Model.Width;
+                    case "Dynamo.ViewModels.NodeViewModel":
+                        NodeViewModel node = this.Object as NodeViewModel;
+                        return node.NodeModel.Width;
                     default:
                         try
                         {
@@ -48,7 +49,7 @@ namespace MonocleViewExtension.Foca
                 }
             }
         }
-        public double Height
+        public override double Height
         {
             get
             {
@@ -57,12 +58,12 @@ namespace MonocleViewExtension.Foca
                     case "Dynamo.ViewModels.AnnotationViewModel":
                         AnnotationViewModel group = this.Object as AnnotationViewModel;
                         return group.Height;
-                    case "Dynamo.Graph.Notes.NoteModel":
-                        NoteModel note = this.Object as NoteModel;
-                        return note.Height;
-                    case "Dynamo.ViewModels.NodeModel":
-                        NodeModel node = this.Object as NodeModel;
-                        return node.Height;
+                    case "Dynamo.ViewModels.NoteViewModel":
+                        NoteViewModel note = this.Object as NoteViewModel;
+                        return note.Model.Height;
+                    case "Dynamo.ViewModels.NodeViewModel":
+                        NodeViewModel node = this.Object as NodeViewModel;
+                        return node.NodeModel.Height;
                     default:
                         try
                         {
@@ -76,7 +77,7 @@ namespace MonocleViewExtension.Foca
             }
         }
 
-        public double X
+        public new double X
         {
             get => this._x;
             set
@@ -94,20 +95,20 @@ namespace MonocleViewExtension.Foca
                         }
                         _x = value;
                         break;
-                    case "Dynamo.Graph.Notes.NoteModel":
-                        NoteModel note = this.Object as NoteModel;
-                        note.X = value;
+                    case "Dynamo.ViewModels.NoteViewModel":
+                        NoteViewModel note = this.Object as NoteViewModel;
+                        note.Left = value;
                         _x = value;
                         break;
                     default:
-                        NodeModel node = this.Object as NodeModel;
+                        NodeViewModel node = this.Object as NodeViewModel;
                         node.X = value;
                         _x = value;
                         break;
                 }
             }
         }
-        public double Y
+        public new double Y
         {
             get => this._y;
             set
@@ -126,82 +127,93 @@ namespace MonocleViewExtension.Foca
                         }
                         _y = value + buffer;
                         break;
-                    case "Dynamo.Graph.Notes.NoteModel":
-                        NoteModel note = this.Object as NoteModel;
-                        note.Y = value;
+                    case "Dynamo.ViewModels.NoteViewModel":
+                        NoteViewModel note = this.Object as NoteViewModel;
+                        note.Top = (value + (note.Model.Height/2));
                         _y = value;
                         break;
                     default:
-                        NodeModel node = this.Object as NodeModel;
+                        NodeViewModel node = this.Object as NodeViewModel;
                         node.Y = value;
                         _y = value;
                         break;
                 }
             }
         }
-        public double CenterY
-        {
-            get => this._centerY;
-            set
-            {
-                switch (this.ObjectType)
-                {
-                    case "Dynamo.ViewModels.AnnotationViewModel":
-                        AnnotationViewModel group = this.Object as AnnotationViewModel;
-                        double ogGroupLocation = group.AnnotationModel.CenterY;
-                        group.AnnotationModel.CenterY = value;
-                        double translation = ogGroupLocation - (value);
-                        foreach (var n in group.Nodes)
-                        {
-                            n.CenterY = n.CenterY - translation;
-                        }
+        //public new double CenterY
+        //{
+        //    get => this._centerY;
+        //    set
+        //    {
+        //        switch (this.ObjectType)
+        //        {
+        //            case "Dynamo.ViewModels.AnnotationViewModel":
+        //                AnnotationViewModel group = this.Object as AnnotationViewModel;
+        //                double ogGroupLocation = group.AnnotationModel.CenterY;
+        //                group.AnnotationModel.CenterY = value;
+        //                double translation = ogGroupLocation - (value);
+        //                foreach (var n in group.Nodes)
+        //                {
+        //                    n.CenterY = n.CenterY - translation;
+        //                }
 
-                        _centerY = value;
-                        break;
-                    case "Dynamo.Graph.Notes.NoteModel":
-                        NoteModel note = this.Object as NoteModel;
-                        note.CenterY = value;
-                        _centerY = value;
-                        break;
-                    default:
-                        NodeModel node = this.Object as NodeModel;
-                        node.CenterY = value;
-                        _centerY = value;
-                        break;
-                }
-            }
-        }
-        public double CenterX
+        //                _centerY = value;
+        //                break;
+        //            case "Dynamo.Graph.Notes.NoteModel":
+        //                NoteModel note = this.Object as NoteModel;
+        //                note.CenterY = value;
+        //                _centerY = value;
+        //                break;
+        //            default:
+        //                NodeModel node = this.Object as NodeModel;
+        //                node.CenterY = value;
+        //                _centerY = value;
+        //                break;
+        //        }
+        //    }
+        //}
+
+        protected override void SerializeCore(XmlElement element, SaveContext context)
         {
-            get => this._centerX;
-            set
-            {
-                switch (this.ObjectType)
-                {
-                    case "Dynamo.ViewModels.AnnotationViewModel":
-                        AnnotationViewModel group = this.Object as AnnotationViewModel;
-                        double ogGroupLocation = group.AnnotationModel.CenterX;
-                        group.AnnotationModel.CenterX = value;
-                        double translation = ogGroupLocation - (value);
-                        foreach (var n in group.Nodes)
-                        {
-                            n.CenterX = n.CenterX - translation;
-                        }
-                        _centerX = value;
-                        break;
-                    case "Dynamo.Graph.Notes.NoteModel":
-                        NoteModel note = this.Object as NoteModel;
-                        note.CenterX = value;
-                        _centerX = value;
-                        break;
-                    default:
-                        NodeModel node = this.Object as NodeModel;
-                        node.CenterX = value;
-                        _centerX = value;
-                        break;
-                }
-            }
+            throw new NotImplementedException();
         }
+
+        protected override void DeserializeCore(XmlElement nodeElement, SaveContext context)
+        {
+            throw new NotImplementedException();
+        }
+
+        //public new double CenterX
+        //{
+        //    get => this._centerX;
+        //    set
+        //    {
+        //        switch (this.ObjectType)
+        //        {
+        //            case "Dynamo.ViewModels.AnnotationViewModel":
+        //                AnnotationViewModel group = this.Object as AnnotationViewModel;
+        //                double ogGroupLocation = group.AnnotationModel.CenterX;
+        //                group.AnnotationModel.CenterX = value;
+        //                double translation = ogGroupLocation - (value);
+        //                foreach (var n in group.Nodes)
+        //                {
+        //                    n.CenterX = n.CenterX - translation;
+        //                }
+        //                _centerX = value;
+        //                break;
+        //            case "Dynamo.Graph.Notes.NoteModel":
+        //                NoteModel note = this.Object as NoteModel;
+        //                note.CenterX = value;
+        //                _centerX = value;
+        //                break;
+        //            default:
+        //                NodeModel node = this.Object as NodeModel;
+        //                node.CenterX = value;
+        //                _centerX = value;
+        //                break;
+        //        }
+        //    }
+        //}
     }
 
 

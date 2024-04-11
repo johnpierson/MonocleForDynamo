@@ -699,11 +699,12 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
                         {
                             var xMin = GetSelectionMinX();
                             var xMax = GetSelectionMaxX();
-                            var spacing = 20.0;
+                            var spacing = 0.0;
                             var span = xMax - xMin;
 
 
                             var nodeWidthSum = GetSelectionWidth();
+
                             if (span > nodeWidthSum)
                             {
                                 spacing = (span - nodeWidthSum)
@@ -716,8 +717,9 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
                             foreach (var superNode in sortedSuperNodes)
                             {
                                 superNode.X = cursor;
-                                cursor += (superNode.Width) + spacing;
+                                cursor += superNode.Width + spacing;
                             }
+                            superNodes.ForEach(s => s.ReportPosition());
                         }
                         else
                         {
@@ -760,7 +762,7 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
                 if (anno.PreviewState.Equals(PreviewState.Selection))
                 {
                     //add the group
-                    wrappedNodes.Add(new SuperNode() {Guid = anno.AnnotationModel.GUID.ToString(), CenterX = anno.AnnotationModel.CenterX, CenterY = anno.AnnotationModel.CenterY, X = anno.AnnotationModel.X, Y = anno.AnnotationModel.Y});
+                    wrappedNodes.Add(new SuperNode() {Object = anno, Guid = anno.AnnotationModel.GUID.ToString(), CenterX = anno.AnnotationModel.CenterX, CenterY = anno.AnnotationModel.CenterY, X = anno.AnnotationModel.X, Y = anno.AnnotationModel.Y});
 
                     foreach (var node in anno.Nodes)
                     {
@@ -782,21 +784,21 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
                 }
             }
             //add nodes and notes to list that are not in groups
-            foreach (var nodeModel in DynamoViewModel.CurrentSpace.CurrentSelection)
+            foreach (var nodeViewModel in DynamoViewModel.CurrentSpaceViewModel.Nodes.Where(n => n.IsSelected).ToList())
             {
-                if (!nodeModel.IsSelected) continue;
-                if (!objectsInGroups.Contains(nodeModel.GUID.ToString()))
+                if (!nodeViewModel.IsSelected) continue;
+                if (!objectsInGroups.Contains(nodeViewModel.NodeModel.GUID.ToString()))
                 {
-                    wrappedNodes.Add(new SuperNode() { Object = nodeModel, Guid = nodeModel.GUID.ToString(), CenterX = nodeModel.CenterX, CenterY = nodeModel.CenterY, X = nodeModel.X, Y = nodeModel.Y });
+                    wrappedNodes.Add(new SuperNode() { Object = nodeViewModel, Guid = nodeViewModel.NodeModel.GUID.ToString(), CenterX = nodeViewModel.X, CenterY = nodeViewModel.Y, X = nodeViewModel.X, Y = nodeViewModel.Y });
                 }
             }
 
-            foreach (var noteModel in DynamoViewModel.CurrentSpace.Notes)
+            foreach (var noteViewModel in DynamoViewModel.CurrentSpaceViewModel.Notes)
             {
-                if (!noteModel.IsSelected) continue;
-                if (!objectsInGroups.Contains(noteModel.GUID.ToString()))
+                if (!noteViewModel.IsSelected) continue;
+                if (!objectsInGroups.Contains(noteViewModel.Model.GUID.ToString()))
                 {
-                    wrappedNodes.Add(new SuperNode() { Object = noteModel, Guid = noteModel.GUID.ToString(), CenterX = noteModel.CenterX, CenterY = noteModel.CenterY, X = noteModel.X, Y = noteModel.Y });
+                    wrappedNodes.Add(new SuperNode() { Object = noteViewModel, Guid = noteViewModel.Model.GUID.ToString(), CenterX = noteViewModel.Left, CenterY = noteViewModel.Top, X = noteViewModel.Left, Y = noteViewModel.Top });
                 }
             }
 
@@ -804,7 +806,8 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
             List<SuperNode> uniqueSuperNodes = wrappedNodes.GroupBy(s => s.Guid.ToString())
                 .Select(group => group.First()).ToList();
 
-            return uniqueSuperNodes;
+
+            return uniqueSuperNodes.TrueForAll(s => s.ObjectType.Equals("Dynamo.ViewModels.NodeViewModel")) ? new List<SuperNode>() : uniqueSuperNodes;
         }
         #region SelectionAverages
         public double GetSelectionAverageX()

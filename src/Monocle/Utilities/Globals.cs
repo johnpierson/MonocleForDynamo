@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Windows.Media;
+using Dynamo.Events;
 using Dynamo.PackageManager;
 
 namespace MonocleViewExtension.Utilities
@@ -12,6 +14,8 @@ namespace MonocleViewExtension.Utilities
         public static PackageManagerExtension PmExtension { get; set; }
         public static Assembly ExecutingAssembly = Assembly.GetExecutingAssembly();
         public static readonly string Version = ExecutingAssembly.GetName().Version.ToString();
+
+
         public static string ExecutingPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         public static string ExtraFolder = ExecutingPath.Replace("bin", "extra");
         public static string SettingsFile = Path.Combine(ExtraFolder, "MonocleSettings.xml");
