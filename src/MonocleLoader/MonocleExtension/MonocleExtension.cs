@@ -5,12 +5,15 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using Dynamo.Controls;
+using System.Windows.Forms;
 using Dynamo.Extensions;
 using Dynamo.Interfaces;
 using Dynamo.Logging;
 using Dynamo.PackageManager;
 using Dynamo.Wpf.Extensions;
 using ProtoCore.AST;
+using MessageBox = System.Windows.MessageBox;
 
 namespace MonocleExtension
 {
@@ -24,7 +27,7 @@ namespace MonocleExtension
         public void Ready(ReadyParams rp)
         {
             this.ReadyCalled = true;
-           
+            WriteFiles();
         }
 
         public void Dispose()
@@ -33,7 +36,14 @@ namespace MonocleExtension
 
         public void Startup(StartupParams sp)
         {
-            
+            if (!ReadyCalled)
+            {
+                WriteFiles();
+            }
+        }
+
+        internal void WriteFiles()
+        {
             //only try to run this if the view extension DLL is missing (first run after install)
             if (!File.Exists(Global.MonocleViewExtensionDll))
             {
@@ -64,20 +74,14 @@ namespace MonocleExtension
                         File.WriteAllBytes(Global.MonocleViewExtensionDll, bytes);
                     }
                 }
-                
 
-                
+
+                Thread.Sleep(10 * 1000);
 
                 //write the view extension XML
-                File.WriteAllText(Global.ViewExtensionXml, Global.ViewExtensionXmlText);
-
-
-                //now try to load the view extension
-                MessageBox.Show("monocle view extension downloaded, please restart Dynamo to finish loading it.",
-                "monocle for dynamo");
+                //File.WriteAllText(Global.ViewExtensionXml, Global.ViewExtensionXmlText);
             }
         }
-
 
         public void Shutdown()
         {

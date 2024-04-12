@@ -26,7 +26,7 @@
             <RowDefinition Height="36"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Image Grid.Column="0" Grid.ColumnSpan="3" Source="/MonocleViewExtension;component/PackageUsage/DogeImages/doge-comfort.png"/>
+        <Image Grid.Column="0" Grid.ColumnSpan="3" Source="/Monocle8;component/PackageUsage/DogeImages/doge-comfort.png"/>
 
         <Label Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" HorizontalAlignment="Center" Content="monocle for Dynamo" Foreground="White" FontFamily="Comic Sans MS" FontWeight="Bold" FontSize="18"/>
         <Label Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="2" HorizontalAlignment="Center" Content="{Binding MonocleVersion}" Foreground="White" FontFamily="Comic Sans MS" FontStyle="Italic" FontSize="10"/>
