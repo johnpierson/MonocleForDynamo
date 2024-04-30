@@ -241,7 +241,31 @@ namespace MonocleViewExtension.NodeSwapper
              
             }
 
+            //if the original node was in a group, put the new node in it now
+            var groups = Model.dynamoViewModel.CurrentSpaceViewModel.Annotations.ToList();
 
+            if (groups.Any())
+            {
+                var originalNodeGuid = NodeToSwap.NodeModel.GUID;
+
+                foreach (var group in groups)
+                {
+                    if (group.Nodes.Any(n => n.GUID.Equals(originalNodeGuid)))
+                    {
+                        DynamoModel.AddModelToGroupCommand addToGroup =
+                            new DynamoModel.AddModelToGroupCommand(replacementNode.NodeModel.GUID);
+
+
+                        DynamoModel.SelectModelCommand selectModel =
+                            new DynamoModel.SelectModelCommand(group.AnnotationModel.GUID, ModifierKeys.None);
+
+                        Model.dynamoViewModel.ExecuteCommand(selectModel);
+
+                        Model.dynamoViewModel.ExecuteCommand(addToGroup);
+                    }
+                }
+            }
+           
             DynamoModel.DeleteModelCommand delete = new DynamoModel.DeleteModelCommand(NodeToSwap.NodeModel.GUID);
 
 
