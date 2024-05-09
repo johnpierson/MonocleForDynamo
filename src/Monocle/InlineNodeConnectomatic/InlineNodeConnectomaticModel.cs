@@ -9,9 +9,6 @@ using System.Linq;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Shapes;
-using System.IO;
 using Path = System.Windows.Shapes.Path;
 
 namespace MonocleViewExtension.InlineNodeConnectomatic
@@ -112,9 +109,7 @@ namespace MonocleViewExtension.InlineNodeConnectomatic
             {
                 // do nothin
             }
-           
-
-
+            
         }
 
         internal List<DependencyObject> HitResultsList = new List<DependencyObject>();
