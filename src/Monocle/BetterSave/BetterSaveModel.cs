@@ -4,14 +4,16 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Dynamo.Controls;
+using Dynamo.Core;
 using Dynamo.Graph;
+using Dynamo.Models;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.Utilities;
 
 namespace MonocleViewExtension.BetterSave
 {
-    internal class BetterSaveModel
+    internal class BetterSaveModel : NotificationObject
     {
         public DynamoView dynamoView { get; }
         public DynamoViewModel dynamoViewModel { get; }
@@ -129,6 +131,38 @@ namespace MonocleViewExtension.BetterSave
             dynamoViewModel.SaveAs(Path.Combine(userDesktop,sloppyFileName), SaveContext.SaveAs,true);
         }
 
+        internal void CreateGraphThumbnail()
+        {
+            if(string.IsNullOrWhiteSpace(dynamoViewModel.CurrentSpaceViewModel.FileName))return;
+
+            string dynPath = dynamoViewModel.CurrentSpaceViewModel.FileName;
+
+            dynamoViewModel.CurrentSpaceViewModel.RunSettingsViewModel.Model.RunType = RunType.Manual;
+
+            dynamoViewModel.ZoomOutCommand.Execute(null);
+
+            string imagePath = Path.Combine(Globals.TempPath, dynamoViewModel.CurrentSpaceViewModel.Name);
+
+            dynamoViewModel.SaveImageCommand.Execute(imagePath);
+
+            //if the export worked, convert to base64 and set it to the thumbnail
+            if (File.Exists(imagePath))
+            {
+                byte[] imageArray = System.IO.File.ReadAllBytes(imagePath);
+                string base64ImageRepresentation = Convert.ToBase64String(imageArray);
+
+                
+                dynamoViewModel.HomeSpace.Thumbnail = base64ImageRepresentation;
+
+                dynamoViewModel.CurrentSpaceViewModel.HasUnsavedChanges = true;
+                dynamoViewModel.SaveCommand.Execute(dynPath);
+                dynamoViewModel.CloseHomeWorkspaceCommand.Execute(null);
+                dynamoViewModel.OpenCommand.Execute(dynPath);
+            }
+
+
+           
+        }
 
     }
 }

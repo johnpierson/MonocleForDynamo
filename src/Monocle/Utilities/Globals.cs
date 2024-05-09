@@ -15,7 +15,7 @@ namespace MonocleViewExtension.Utilities
         public static Assembly ExecutingAssembly = Assembly.GetExecutingAssembly();
         public static readonly string Version = ExecutingAssembly.GetName().Version.ToString();
 
-
+        public static string TempPath = Path.GetTempPath();
         public static string ExecutingPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         public static string ExtraFolder = ExecutingPath.Replace("bin", "extra");
         public static string SettingsFile = Path.Combine(ExtraFolder, "MonocleSettings.xml");

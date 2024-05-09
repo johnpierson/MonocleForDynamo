@@ -54,12 +54,25 @@ namespace MonocleViewExtension.BetterSave
 
             flyout.Items.Add(sloppySave);
 
+            //graph thumbnail maker
+            //quick save with timestamp
+            var graphThumb = new MenuItem
+            {
+                Header = "Quick Graph Thumbnail (ᵇʳᵒᵘᵍʰᵗ ᵗᵒ ʸᵒᵘ ᵇʸ ᵐᵒⁿᵒᶜˡᵉ™️)",
+
+            };
+            graphThumb.Click += (sender, args) =>
+            {
+                betterSaveModel.CreateGraphThumbnail();
+            };
 
             foreach (MenuItem menu in p.dynamoMenu.Items)
             {
                 if (menu.Name.Equals("fileMenu"))
                 {
                     menu.Items.Insert(7, flyout);
+
+                    menu.Items.Insert(8, graphThumb);
                 }
             }
 
