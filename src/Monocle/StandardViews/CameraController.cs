@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Windows.Media.Media3D;
+
+
 using HelixToolkit.Wpf.SharpDX;
+
 
 namespace MonocleViewExtension.StandardViews
 {

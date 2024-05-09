@@ -106,6 +106,7 @@ namespace MonocleViewExtension
             FocaCommand.EnableFoca(p, monocleMenuItem);
             InlineNodeConnectomaticCommand.AddMenuItem(p, monocleMenuItem);
             SimpleSearchCommand.AddMenuItem(p, monocleMenuItem, this);
+            //TODO: Check if standard views consistently loads on different file changes
             StandardViewsCommand.EnableStandardViews(p);
             MonocleSettingsCommand.AddMenuItem(monocleMenuItem);
             FancyPasteCommand.AddMenuItem(p);

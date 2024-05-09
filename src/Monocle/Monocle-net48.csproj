@@ -151,9 +151,6 @@
 		<PackageReference Include="CommonServiceLocator" Version="1.0" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
         <PackageReference Include="NUnit" Version="2.6.3" />
-		<PackageReference Include="HelixToolkit" Version="2.17.0" />
-		<PackageReference Include="HelixToolkit.Wpf" Version="2.17.0" />
-		<PackageReference Include="HelixToolkit.Wpf.SharpDX" Version="2.17.0" />
 		<PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
 		<PackageReference Include="Extended.Wpf.Toolkit" Version="2.2.0" />
 	</ItemGroup>
@@ -163,10 +160,39 @@
         <PackageReference Include="NUnit" Version="3.14.0" />
         <PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
         <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
-		<PackageReference Include="HelixToolkit" Version="2.24.0" />
-		<PackageReference Include="HelixToolkit.Wpf" Version="2.24.0" />
-		<PackageReference Include="HelixToolkit.Wpf.SharpDX" Version="2.24.0" />
 		<PackageReference Include="Extended.Wpf.Toolkit" Version="4.6.0" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
+		<Reference Include="HelixToolkit">
+			<HintPath>..\..\dynamoResources\net8\HelixToolkit.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="HelixToolkit.Core.Wpf">
+			<HintPath>..\..\dynamoResources\net8\HelixToolkit.Core.Wpf.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="HelixToolkit.SharpDX.Core">
+			<HintPath>..\..\dynamoResources\net8\HelixToolkit.SharpDX.Core.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="HelixToolkit.SharpDX.Core.WPF">
+			<HintPath>..\..\dynamoResources\net8\HelixToolkit.SharpDX.Core.WPF.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+		<Reference Include="HelixToolkit">
+			<HintPath>..\..\dynamoResources\netFramework48\HelixToolkit.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="HelixToolkit.Wpf">
+			<HintPath>..\..\dynamoResources\netFramework48\HelixToolkit.Wpf.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
+		<Reference Include="HelixToolkit.Wpf.SharpDX">
+			<HintPath>..\..\dynamoResources\netFramework48\HelixToolkit.Wpf.SharpDX.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
 	</ItemGroup>
   <ItemGroup>
     <Reference Include="DynamoPackages">

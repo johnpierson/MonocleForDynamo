@@ -400,12 +400,12 @@ namespace MonocleViewExtension.Foca
                 if (caseSwitch.Contains("NodeModel"))
                 {
 
-#if !D30_OR_GREATER
+#if !net8_OR_GREATER
 annotationCommand =
                         new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
                             currentSelection.CenterX, currentSelection.CenterY, false);
 #endif
-#if D30_OR_GREATER
+#if net8_OR_GREATER
                     //TODO: Implement group descriptions in monocle
                     annotationCommand =
                         new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,string.Empty,
@@ -419,12 +419,12 @@ annotationCommand =
                 {
                     try
                     {
-#if !D30_OR_GREATER
+#if !net8_OR_GREATER
 annotationCommand =
                         new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
                             currentSelection.CenterX, currentSelection.CenterY, false);
 #endif
-#if D30_OR_GREATER
+#if net8_OR_GREATER
                         //TODO: Implement group descriptions in monocle
                         annotationCommand =
                             new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText, string.Empty,
@@ -444,11 +444,11 @@ annotationCommand =
             {
                 try
                 {
-#if !D30_OR_GREATER
+#if !net8_OR_GREATER
 var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
                         0, 0, false);
 #endif
-#if D30_OR_GREATER
+#if net8_OR_GREATER
                     var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,string.Empty,
                         0, 0, false);
 #endif
