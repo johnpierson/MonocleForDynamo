@@ -1,15 +1,58 @@
-﻿using System;
+﻿using Dynamo.Controls;
+using Dynamo.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace MonocleViewExtension.Utilities
 {
+    internal static class NodeUtils
+    {
+        internal static Rect GetBoundingRectangle(List<NodeView> nodeViews)
+        {
+            List<double> yAxis = new List<double>();
+            List<double> xAxis = new List<double>();
+
+            foreach (var nv in nodeViews)
+            {
+                NodeViewModel nvm = nv.DataContext as NodeViewModel;
+
+                if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
+                {
+                    var border = (Border)nv.FindName("selectionBorder");
+                    var geo = border.RenderSize;
+
+                    xAxis.Add(nvm.Left);
+                    xAxis.Add(nvm.Left + geo.Width);
+                    yAxis.Add(nvm.Top);
+                    yAxis.Add(nvm.Top + geo.Height);
+                }
+                else
+                {
+                    var border = (System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder");
+                    var geo = border.RenderedGeometry.Bounds;
+
+                    xAxis.Add(nvm.Left);
+                    xAxis.Add(nvm.Left + geo.Width);
+                    yAxis.Add(nvm.Top);
+                    yAxis.Add(nvm.Top + geo.Height);
+                }
+            }
+
+            double xMin = xAxis.Min() - 14;
+            double yMin = yAxis.Min() - 14;
+            double xMax = xAxis.Max() + 14;
+            double yMax = yAxis.Max() + 14;
+            return new Rect(xMin, yMin, xMax - xMin, yMax - yMin);
+        }
+    }
     internal static class ImageUtils
     {
         public static BitmapImage LoadImage(Assembly a, string name)

@@ -321,7 +321,7 @@ namespace MonocleViewExtension.Foca
         {
             var nodeViews = Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0 ? FindVisualChildren<NodeView>(DynamoView).Where(nv => ((Border)nv.FindName("selectionBorder")).IsVisible).ToList() : FindVisualChildren<NodeView>(DynamoView).Where(nv => ((System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder")).IsVisible).ToList();
 
-            return GetBoundingRectangle(nodeViews);
+            return NodeUtils.GetBoundingRectangle(nodeViews);
         }
 
         public Canvas GetExpansionBay()
@@ -348,43 +348,7 @@ namespace MonocleViewExtension.Foca
                 14);
         }
 
-        internal Rect GetBoundingRectangle(List<NodeView> nodeViews)
-        {
-            List<double> yAxis = new List<double>();
-            List<double> xAxis = new List<double>();
-
-            foreach (var nv in nodeViews)
-            {
-                NodeViewModel nvm = nv.DataContext as NodeViewModel;
-
-                if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
-                {
-                    var border = (Border)nv.FindName("selectionBorder");
-                    var geo = border.RenderSize;
-
-                    xAxis.Add(nvm.Left);
-                    xAxis.Add(nvm.Left + geo.Width);
-                    yAxis.Add(nvm.Top);
-                    yAxis.Add(nvm.Top + geo.Height);
-                }
-                else
-                {
-                    var border = (System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder");
-                    var geo = border.RenderedGeometry.Bounds;
-
-                    xAxis.Add(nvm.Left);
-                    xAxis.Add(nvm.Left + geo.Width);
-                    yAxis.Add(nvm.Top);
-                    yAxis.Add(nvm.Top + geo.Height);
-                }
-            }
-
-            double xMin = xAxis.Min() - 14;
-            double yMin = yAxis.Min() - 14;
-            double xMax = xAxis.Max() + 14;
-            double yMax = yAxis.Max() + 14;
-            return new Rect(xMin, yMin, xMax - xMin, yMax - yMin);
-        }
+       
         private AnnotationViewModel GetGroup(NodeModel nodeModel)
         {
             var annotations = DynamoViewModel.CurrentSpaceViewModel.Annotations;
