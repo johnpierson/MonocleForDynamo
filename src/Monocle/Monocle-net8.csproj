@@ -9,8 +9,8 @@
     <AssemblyTitle>Monocle</AssemblyTitle>
     <Product>Monocle</Product>
     <Copyright>Copyright©  2024 john pierson</Copyright>
-    <AssemblyVersion>2024.4.1</AssemblyVersion>
-    <FileVersion>2024.4.1</FileVersion>
+    <AssemblyVersion>2024.5.1</AssemblyVersion>
+    <FileVersion>2024.5.1</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
 	<Configurations>Debug net48;Debug net8;</Configurations>
     <Configurations>$(Configurations)Release net48;Release net8;</Configurations>
@@ -215,6 +215,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Update="Properties\UserSettings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>UserSettings.settings</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="About\Resources\andydandy74.jpg" />
@@ -300,7 +305,13 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\UserSettings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>UserSettings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy &quot;$(ProjectDir)bin\Debug net8\net8.0-windows\MonocleViewExtension.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\3.0\packages\Monocle\bin&quot;&#xD;&#xA;&#xD;&#xA;" />
+    <Exec Command="copy &quot;$(ProjectDir)bin\Debug net8\net8.0-windows\Monocle8.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\3.0\packages\Monocle\bin\MonocleViewExtension.dll&quot;&#xD;&#xA;&#xD;&#xA;" />
   </Target>
 </Project>

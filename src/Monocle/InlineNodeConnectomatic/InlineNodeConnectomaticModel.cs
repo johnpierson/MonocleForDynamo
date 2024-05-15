@@ -33,6 +33,8 @@ namespace MonocleViewExtension.InlineNodeConnectomatic
         {
             if (!Globals.IsConnectoEnabled) return;
 
+            if (!Keyboard.IsKeyDown(Key.LeftAlt)) return;
+
             try
             {
                 var pt = e.GetPosition((UIElement)sender);
