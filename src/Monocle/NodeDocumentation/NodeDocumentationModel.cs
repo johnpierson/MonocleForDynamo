@@ -60,7 +60,7 @@ namespace MonocleViewExtension.NodeDocumentation
 
             if (mode == 2)
             {
-                DynamoViewModel.BackgroundPreviewViewModel.ZoomToFitCommand.Execute(null);
+                //DynamoViewModel.BackgroundPreviewViewModel.ZoomToFitCommand.Execute(null);
 
                 //rename to indicate background
                 string backgroundPath = path.Replace("img", "b");
