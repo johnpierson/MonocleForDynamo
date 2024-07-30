@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MonocleSettings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <GroupSettings>
+    <GroupSetting>
+      <GroupId>1</GroupId>
+      <Text>Update this Input</Text>
+      <Color>#FFFFB8D8</Color>
+      <FontSize>36</FontSize>
+    </GroupSetting>
+    <GroupSetting>
+      <GroupId>2</GroupId>
+      <Text>Update these Inputs</Text>
+      <Color>#FFFFB8D8</Color>
+      <FontSize>36</FontSize>
+    </GroupSetting>
+    <GroupSetting>
+      <GroupId>3</GroupId>
+      <Text>Actions</Text>
+      <Color>#FFB9F9E1</Color>
+      <FontSize>36</FontSize>
+    </GroupSetting>
+    <GroupSetting>
+      <GroupId>4</GroupId>
+      <Text>Outputs</Text>
+      <Color>#FFFFC999</Color>
+      <FontSize>36</FontSize>
+    </GroupSetting>
+    <GroupSetting>
+      <GroupId>5</GroupId>
+      <Text>Review</Text>
+      <Color>#FFA4E1FF</Color>
+      <FontSize>36</FontSize>
+    </GroupSetting>
+    <GroupSetting>
+      <GroupId>6</GroupId>
+      <Text>Info</Text>
+      <Color>#FFFFE4C4</Color>
+      <FontSize>36</FontSize>
+    </GroupSetting>
+  </GroupSettings>
+  <CustomNodeIdentifierSettings>
+    <Color>#FFADE4DE</Color>
+    <BorderThickness>4</BorderThickness>
+  </CustomNodeIdentifierSettings>
+  <CustomNodeNotePrefix>Custom Node: </CustomNodeNotePrefix>
+  <IsFocaEnabled>true</IsFocaEnabled>
+  <IsConnectoEnabled>true</IsConnectoEnabled>
+  <InCanvasSearchEnabled>true</InCanvasSearchEnabled>
+  <QuickSaveDateFormat>-yyyy.MM.dd_HH.mm.ss</QuickSaveDateFormat>
+</MonocleSettings>

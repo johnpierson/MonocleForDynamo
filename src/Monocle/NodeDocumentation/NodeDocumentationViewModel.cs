@@ -154,8 +154,16 @@ namespace MonocleViewExtension.NodeDocumentation
             //now save image
             Model.ExportImage(SelectedImgMode,_nodeDocumentation.SampleGraphImagePath);
             
-            //then save md
-            Model.ExportMd(NodeName, _nodeDocumentation.SampleGraphImage, _nodeDocumentation.MarkdownPath, ExtendedDescription);
+            //then save md if an extended description exists
+            if (!string.IsNullOrWhiteSpace(ExtendedDescription.Trim()))
+            {
+                Model.ExportMd(NodeName, _nodeDocumentation.SampleGraphImage, _nodeDocumentation.MarkdownPath, ExtendedDescription);
+            }
+            else
+            {
+                Model.ExportMdForSampleOnly(NodeName, _nodeDocumentation.SampleGraphImage, _nodeDocumentation.MarkdownPath);
+            }
+           
         }
 
         private void OnPickPath(object o)

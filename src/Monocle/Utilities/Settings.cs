@@ -19,7 +19,7 @@ namespace MonocleViewExtension.Utilities
             [XmlElement("Color")]
             public string GroupColor { get; set; }
             [XmlElement("FontSize")]
-            public int FontSize { get; set; } = 24;
+            public int FontSize { get; set; } = 36;
         }
 
         public class CustomNodeIdentifierSettings

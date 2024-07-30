@@ -7,6 +7,7 @@
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
              Width="270" Height="300"
+             MinWidth="270" MinHeight="300"
              WindowStartupLocation="CenterOwner">
     <Grid Name="MainGrid">
         <Grid.RowDefinitions>

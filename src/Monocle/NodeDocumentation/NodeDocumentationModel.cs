@@ -113,6 +113,18 @@ namespace MonocleViewExtension.NodeDocumentation
             File.WriteAllText(path,documentation);
         }
 
+        public void ExportMdForSampleOnly(string nodeName, string imageName, string path)
+        {
+            //replace spacing for markdown referencing
+            if (imageName.Contains(" "))
+            {
+                imageName = imageName.Replace(" ", "%20");
+            }
+
+            string documentation = $"## Example File\n\n![{nodeName}](./{imageName})";
+
+            File.WriteAllText(path, documentation);
+        }
         #region ExporterUtils
         //thanks to https://github.com/DynamoDS/ExportSampleImagesViewExtension
 

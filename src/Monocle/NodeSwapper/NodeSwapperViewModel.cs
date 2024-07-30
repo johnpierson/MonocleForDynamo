@@ -272,6 +272,15 @@ namespace MonocleViewExtension.NodeSwapper
             Model.dynamoViewModel.ExecuteCommand(delete);
 
             NodeToSwap = null;
+
+            if (Keyboard.IsKeyDown(Key.LeftAlt))
+            {
+                DynamoModel.DeleteModelCommand delete2 = new DynamoModel.DeleteModelCommand(NodeToSwapTo.NodeModel.GUID);
+
+
+                Model.dynamoViewModel.ExecuteCommand(delete2);
+            }
+
         }
 
         private void WsViewOnMouseUp(object sender, MouseButtonEventArgs e)
