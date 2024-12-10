@@ -1,19 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using Dynamo.Controls;
-using System.Windows.Forms;
 using Dynamo.Extensions;
-using Dynamo.Interfaces;
-using Dynamo.Logging;
-using Dynamo.PackageManager;
-using Dynamo.Wpf.Extensions;
-using ProtoCore.AST;
-using MessageBox = System.Windows.MessageBox;
 using System.Net;
 
 namespace MonocleExtension
@@ -53,6 +42,12 @@ namespace MonocleExtension
                 var dynamoCore = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.FullName.Contains("DynamoCore"));
 
                 Global.DynamoVersion = dynamoCore.GetName().Version;
+
+
+                //download the correct Monocle dll for the Dynamo version TODO: test this
+                DownloadFile(Global.TruncatedDynVersion, Global.MonocleViewExtensionDll);
+
+                return;
 
                 //if we are in a 3.0 version or higher, load the .net8 version of monocle
                 if (Global.DynamoVersion.CompareTo(Global.DotNet8Version) >= 0)

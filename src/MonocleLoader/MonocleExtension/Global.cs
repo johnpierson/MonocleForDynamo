@@ -23,7 +23,8 @@ namespace MonocleExtension
         internal static string ViewExtensionXmlText => "<ViewExtensionDefinition>\r\n  <AssemblyPath>..\\bin\\MonocleViewExtension.dll</AssemblyPath>\r\n  <TypeName>MonocleViewExtension.MonocleViewExtension</TypeName>\r\n</ViewExtensionDefinition>\r\n";
 
 
-        internal static Version DynamoVersion { get; set; }
+        internal static Version DynamoVersion { get; set; } = new Version(3, 0, 0);
+        internal static string TruncatedDynVersion => $"{DynamoVersion.Major}{DynamoVersion.Minor}";
         internal static Version DotNet8Version => new Version(3, 0, 0);
 
     }
