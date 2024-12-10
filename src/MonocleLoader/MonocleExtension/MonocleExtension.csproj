@@ -6,8 +6,8 @@
 	<UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
 	<PlatformTarget>x64</PlatformTarget>
-	<AssemblyVersion>2024.7.2</AssemblyVersion>
-	<FileVersion>2024.7.2</FileVersion>
+	<AssemblyVersion>2024.12.1</AssemblyVersion>
+	<FileVersion>2024.12.1</FileVersion>
   </PropertyGroup>
   
  <PropertyGroup>
@@ -15,16 +15,6 @@
         <!--<StartProgram>C:\Users\johnpierson\Desktop\Autodesk\DynamoCoreRuntime3.0.4\DynamoSandbox.exe</StartProgram>-->
 		<StartProgram>C:\Users\johnpierson\Desktop\Autodesk\DynamoCoreRuntime3.1.0\DynamoSandbox.exe</StartProgram>
     </PropertyGroup>
-  
- <ItemGroup>
-   <None Remove="MonocleDLLs\net48\Monocle48.dll" />
-   <None Remove="MonocleDLLs\net8\Monocle8.dll" />
- </ItemGroup>
-  
- <ItemGroup>
-   <EmbeddedResource Include="MonocleDLLs\net48\Monocle48.dll" />
-   <EmbeddedResource Include="MonocleDLLs\net8\Monocle8.dll" />
- </ItemGroup>
 
   <ItemGroup>
       <Reference Include="DynamoPackages">

@@ -8,11 +8,6 @@ namespace MonocleExtension
     internal class Global
     {
         internal static Assembly ExecutingAssembly = Assembly.GetExecutingAssembly();
-        internal static string[] EmbeddedLibraries =
-            ExecutingAssembly.GetManifestResourceNames().Where(x => x.EndsWith(".dll")).ToArray();
-
-        internal static string MonocleForNet48 => EmbeddedLibraries.First(l => l.Contains("Monocle48"));
-        internal static string MonocleForNet8 => EmbeddedLibraries.First(l => l.Contains("Monocle8"));
 
         internal static string PackageBinFolder => Path.GetDirectoryName(ExecutingAssembly.Location);
         internal static string PackageExtraFolder => PackageBinFolder.Replace("bin", "extra");

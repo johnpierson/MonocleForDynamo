@@ -46,36 +46,6 @@ namespace MonocleExtension
                 //download the correct Monocle dll for the Dynamo version TODO: test this
                 DownloadFile(Global.TruncatedDynVersion, Global.MonocleViewExtensionDll);
 
-                return;
-
-                //if we are in a 3.0 version or higher, load the .net8 version of monocle
-                if (Global.DynamoVersion.CompareTo(Global.DotNet8Version) >= 0)
-                {
-                    using (var stream = Global.ExecutingAssembly.GetManifestResourceStream(Global.MonocleForNet8))
-                    {
-                        var bytes = new byte[stream.Length];
-                        stream.Read(bytes, 0, bytes.Length);
-
-                        File.WriteAllBytes(Global.MonocleViewExtensionDll, bytes);
-                    }
-                }
-                //otherwise load the .net4.8 version
-                else
-                {
-                    using (var stream = Global.ExecutingAssembly.GetManifestResourceStream(Global.MonocleForNet48))
-                    {
-                        var bytes = new byte[stream.Length];
-                        stream.Read(bytes, 0, bytes.Length);
-
-                        File.WriteAllBytes(Global.MonocleViewExtensionDll, bytes);
-                    }
-                }
-
-
-                Thread.Sleep(10 * 1000);
-
-                //write the view extension XML
-                //File.WriteAllText(Global.ViewExtensionXml, Global.ViewExtensionXmlText);
             }
         }
         internal void DownloadFile(string version, string fileLocation)
