@@ -113,9 +113,12 @@ namespace MonocleViewExtension.Foca
             {
                 return;
             }
-
+#if !D26_OR_GREATER
+            string creationName = nodeView.ViewModel.Name;
+#endif
+#if D26_OR_GREATER
             string creationName = nodeView.ViewModel.OriginalName;
-
+#endif
             //to build our code block and connect it
             CodeBlockNodeModel codeBlock = null;
             List<ConnectorModel> outports;
@@ -297,7 +300,7 @@ namespace MonocleViewExtension.Foca
                 codeBlock.Name = "💣";
             }
         }
-        #endregion
+#endregion
 
         public bool ShowWidget()
         {
@@ -400,12 +403,12 @@ namespace MonocleViewExtension.Foca
                 if (caseSwitch.Contains("NodeModel"))
                 {
 
-#if !net8_OR_GREATER
+#if !net8
 annotationCommand =
                         new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
                             currentSelection.CenterX, currentSelection.CenterY, false);
 #endif
-#if net8_OR_GREATER
+#if net8
                     //TODO: Implement group descriptions in monocle
                     annotationCommand =
                         new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,string.Empty,
@@ -419,12 +422,12 @@ annotationCommand =
                 {
                     try
                     {
-#if !net8_OR_GREATER
+#if !net8
 annotationCommand =
                         new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
                             currentSelection.CenterX, currentSelection.CenterY, false);
 #endif
-#if net8_OR_GREATER
+#if net8
                         //TODO: Implement group descriptions in monocle
                         annotationCommand =
                             new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText, string.Empty,
@@ -444,11 +447,11 @@ annotationCommand =
             {
                 try
                 {
-#if !net8_OR_GREATER
+#if !net8
 var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
                         0, 0, false);
 #endif
-#if net8_OR_GREATER
+#if net8
                     var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,string.Empty,
                         0, 0, false);
 #endif

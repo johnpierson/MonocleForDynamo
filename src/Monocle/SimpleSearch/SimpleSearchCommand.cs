@@ -43,14 +43,12 @@ namespace MonocleViewExtension.SimpleSearch
 
             ssMenuItem.Checked += (sender, args) =>
             {
-                if (Globals.DynamoVersion.CompareTo(Globals.SidebarMinVersion) >= 0)
-                {
-                    SimpleSearchSideBar(p, m);
-                }
-                else
-                {
-                    SimpleSearchWindow(p, m);
-                }
+#if D25_OR_GREATER
+ SimpleSearchSideBar(p, m);
+#endif
+#if !D25_OR_GREATER
+                SimpleSearchWindow(p, m);
+#endif
             };
 
             ssMenuItem.Unchecked += (sender, args) =>
@@ -119,26 +117,29 @@ namespace MonocleViewExtension.SimpleSearch
         {
             try
             {
-                p.CloseExtensioninInSideBar(m);
+#if D25_OR_GREATER
+                 p.CloseExtensioninInSideBar(m);
+#endif
             }
             catch (Exception)
             {
                 //suppress this for now. this run is in a pretty old dynamo.
             }
         }
-
-        private static void SimpleSearchSideBar(ViewLoadedParams p, MonocleViewExtension m)
+#if D25_OR_GREATER
+                private static void SimpleSearchSideBar(ViewLoadedParams p, MonocleViewExtension m)
         {
             var dvm = p.DynamoWindow.DataContext as DynamoViewModel;
             ssView = new SimpleSearchView(dvm);
 
             //ssView.Unloaded += ViewOnUnloaded;
+
             p.AddToExtensionsSideBar(m, ssView);
-
-
         }
-        
-        
+#endif
+
+
+
         private static Window ssWindow;
         private static void SimpleSearchWindow(ViewLoadedParams p, MonocleViewExtension m)
         {

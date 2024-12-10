@@ -31,9 +31,12 @@ namespace MonocleViewExtension.NodeDocumentation
         {
             //dynamoViewModel.DoGraphAutoLayout("");
 
-
+#if !D212_OR_GREATER
+            DynamoViewModel.SaveAs(path, false);
+#endif
+#if D212_OR_GREATER
             DynamoViewModel.SaveAs(path, SaveContext.Save, false);
-
+#endif
             try
             {
                 DynamoViewModel.CurrentSpace.CurrentSelection.First().Deselect();
