@@ -24,7 +24,7 @@ namespace MonocleExtension
 
 
         internal static Version DynamoVersion { get; set; } = new Version(3, 0, 0);
-        internal static string TruncatedDynVersion => $"{DynamoVersion.Major}{DynamoVersion.Minor}";
+        internal static string TruncatedDynVersion => $"{DynamoVersion.Major}.{DynamoVersion.Minor}";
         internal static Version DotNet8Version => new Version(3, 0, 0);
 
     }
