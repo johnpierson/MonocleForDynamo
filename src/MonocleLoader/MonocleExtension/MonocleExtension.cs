@@ -14,6 +14,7 @@ using Dynamo.PackageManager;
 using Dynamo.Wpf.Extensions;
 using ProtoCore.AST;
 using MessageBox = System.Windows.MessageBox;
+using System.Net;
 
 namespace MonocleExtension
 {
@@ -22,6 +23,7 @@ namespace MonocleExtension
         public bool ReadyCalled = false;
         public string UniqueId => "53301BE8-BDA9-47CA-9EF0-2B70808B13A5";
         public string Name => "MonocleExtension";
+        internal string GitHubUrl => "https://raw.githubusercontent.com/johnpierson/MonocleForDynamo/master/deploy/";
 
 
         public void Ready(ReadyParams rp)
@@ -82,7 +84,27 @@ namespace MonocleExtension
                 //File.WriteAllText(Global.ViewExtensionXml, Global.ViewExtensionXmlText);
             }
         }
+        internal void DownloadFile(string version, string fileLocation)
+        {
+            FileInfo fileInfo = new FileInfo(fileLocation);
 
+            string fileName = fileInfo.Name;
+
+            var url = string.IsNullOrWhiteSpace(version) ? $"{GitHubUrl}/{fileName}" : $"{GitHubUrl}{version}/{fileName}";
+
+            using (WebClient wc = new WebClient())
+            {
+                wc.Headers.Add("a", "a");
+                try
+                {
+                    wc.DownloadFile(url, fileLocation);
+                }
+                catch (Exception ex)
+                {
+                    //
+                }
+            }
+        }
         public void Shutdown()
         {
         }

@@ -44,7 +44,7 @@
   </CustomNodeIdentifierSettings>
   <CustomNodeNotePrefix>Custom Node: </CustomNodeNotePrefix>
   <IsFocaEnabled>true</IsFocaEnabled>
-  <IsConnectoEnabled>false</IsConnectoEnabled>
+  <IsConnectoEnabled>true</IsConnectoEnabled>
   <InCanvasSearchEnabled>true</InCanvasSearchEnabled>
   <QuickSaveDateFormat>-yyyy.MM.dd_HH.mm.ss</QuickSaveDateFormat>
 </MonocleSettings>
