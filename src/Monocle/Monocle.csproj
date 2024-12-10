@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<RootNamespace>MonocleViewExtension</RootNamespace>
-		<AssemblyName>Monocle</AssemblyName>
+		<AssemblyName>MonocleViewExtension</AssemblyName>
 		<UseWindowsForms>true</UseWindowsForms>
 		<UseWPF>true</UseWPF>
 		<PlatformTarget>x64</PlatformTarget>
@@ -526,7 +526,7 @@
 	<Target Name="CopyFiles" AfterTargets="CoreBuild" Condition="'$(OS)' =='Windows_NT'">
 		<Message Text="Build Version $(DynVersion)" Importance="high" />
 		<ItemGroup>
-			<AssemblyFiles Include="$(TargetDir)\Monocle.dll" />
+			<AssemblyFiles Include="$(TargetDir)\MonocleViewExtension.dll" />
 		</ItemGroup>
 		<Message Text="Copying From $(TargetDir) To $(FolderPackages)" Importance="high" />
 		<Copy SourceFiles="@(AssemblyFiles)" DestinationFolder="$(FolderPackages)" />
