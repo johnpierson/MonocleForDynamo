@@ -13,7 +13,7 @@ namespace MonocleExtension
         public string UniqueId => "53301BE8-BDA9-47CA-9EF0-2B70808B13A5";
         public string Name => "MonocleExtension";
 
-        internal string GitHubUrl => "https://github.com/johnpierson/MonocleForDynamo/blob/master/deploy"; 
+        internal string GitHubUrl => "https://raw.githubusercontent.com/johnpierson/MonocleForDynamo/master/deploy/"; 
         public void Ready(ReadyParams rp)   
         {
             this.ReadyCalled = true;
