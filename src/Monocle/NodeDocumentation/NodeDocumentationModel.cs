@@ -30,7 +30,9 @@ namespace MonocleViewExtension.NodeDocumentation
         public void SaveDyn(string path)
         {
             //dynamoViewModel.DoGraphAutoLayout("");
-            DynamoViewModel.SaveAs(path,SaveContext.Save,false);
+
+
+            DynamoViewModel.SaveAs(path, SaveContext.Save, false);
 
             try
             {
