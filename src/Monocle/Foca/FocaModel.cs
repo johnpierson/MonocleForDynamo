@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -17,6 +18,8 @@ using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.NodeSwapper;
 using MonocleViewExtension.Utilities;
+using OpenAI.Assistants;
+using OpenAI.Chat;
 using Thickness = System.Windows.Thickness;
 
 namespace MonocleViewExtension.Foca
@@ -366,8 +369,9 @@ namespace MonocleViewExtension.Foca
 
             return null;
         }
-        public void CreateGroup(string groupName)
+        public async Task CreateGroup(string groupName)
         {
+
             Globals.MonocleGroupSettings.TryGetValue(groupName, out Settings.GroupSetting groupSetting);
 
             var colorToUse = (Color)ColorConverter.ConvertFromString(groupSetting.GroupColor);
@@ -465,41 +469,53 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
                     //silent fail
                 }
             }
-        }
 
-        public void FixHeaderColors()
-        {
-            //cleanup darker group colors
-            var annotations = MiscUtils.FindVisualChildren<AnnotationView>(DynamoView);
 
-            foreach (var annotation in annotations)
+            //cool ai stuff
+            var newGroup = DynamoViewModel.CurrentSpaceViewModel.Annotations.Last();
+
+            List<string> nodeNames = new List<string>();
+
+            foreach (var modelBase in newGroup.Nodes)
             {
-                try
-                {
-                    var originalColor = annotation.ViewModel.Background;
+                var node = DynamoViewModel.CurrentSpaceViewModel.Nodes.First(n => n.NodeModel.GUID.Equals(modelBase.GUID));
 
-                    System.Drawing.Color color = System.Drawing.Color.FromArgb(originalColor.A, originalColor.R, originalColor.G, originalColor.B);
-
-                    var brightness = color.GetBrightness();
-
-                    if (brightness <= 0.5)
-                    {
-                        TextBlock textBlock = annotation.FindName("GroupTextBlock") as TextBlock;
-
-                        textBlock.Foreground = new SolidColorBrush(Colors.White);
-
-                        TextBlock textBlock2 = annotation.FindName("GroupDescriptionTextBlock") as TextBlock;
-
-                        textBlock2.Foreground = new SolidColorBrush(Colors.White);
-                    }
-                }
-                catch (Exception)
-                {
-                    //suppress
-                }
-              
+                nodeNames.Add(node.OriginalName);
             }
+            string prompt =
+                $"Given the following nodes from the Dynamo visual programming tool: {string.Join(',', nodeNames)}. What would you title a grouping of these nodes as, in a few words? and what would you add as a more detailed description? Please provide the response as xml, with open and close for title and description.";
+
+            FocaAI focaAi =
+                new FocaAI(
+                    "");
+
+            await focaAi.SendMessageToGPT(prompt);
+
+
+            var result = focaAi.response;   
+
+
+            newGroup.AnnotationDescriptionText = FindTextBetween(result,"<description>","</description>");
+            newGroup.AnnotationText = FindTextBetween(result, "<title>", "</title>");
         }
+
+        public string FindTextBetween(string text, string left, string right)
+        {
+            // TODO: Validate input arguments
+
+            int beginIndex = text.IndexOf(left); // find occurence of left delimiter
+            if (beginIndex == -1)
+                return string.Empty; // or throw exception?
+
+            beginIndex += left.Length;
+
+            int endIndex = text.IndexOf(right, beginIndex); // find occurence of right delimiter
+            if (endIndex == -1)
+                return string.Empty; // or throw exception?
+
+            return text.Substring(beginIndex, endIndex - beginIndex).Trim();
+        }
+
 
 
         public void AlignSelected(string alignment)
