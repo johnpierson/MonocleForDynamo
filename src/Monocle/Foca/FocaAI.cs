@@ -34,7 +34,7 @@ namespace MonocleViewExtension.Foca
         public FocaAI(string apiKey)
         {
             // Create a ChatGPTClient instance with the API key
-            chatGPTClient = new(model: "gpt-4o", apiKey);
+            chatGPTClient = new(model: "gpt-4o-mini", apiKey);
 
             // Create a ChatGPTAssistantClient instance with the API key
             //assistantClient = new(apiKey);

@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Dynamo.Controls;
 using Dynamo.Logging;
+using Dynamo.UI.Prompts;
 using Dynamo.Wpf.Extensions;
 using Dynamo.Wpf.Interfaces;
 using MonocleViewExtension.Utilities;
@@ -48,6 +49,15 @@ namespace MonocleViewExtension.Foca
 
             menuItem.Items.Add(new Separator());
 
+            //main menu
+            var focaMainMenuItem = new MenuItem
+            {
+                Header = "foca | ᶘ ᵒᴥᵒᶅ"
+            };
+
+            // add menu
+            menuItem.Items.Add(focaMainMenuItem);
+
             //foca menu item for enable / disable
             var focaMenuItem = new MenuItem
             {
@@ -66,10 +76,50 @@ namespace MonocleViewExtension.Foca
                 Globals.IsFocaEnabled = false;
             };
 
-            // add the about menu and a separator
-            menuItem.Items.Add(focaMenuItem);
+            // add enable menu to foca flyout
+            focaMainMenuItem.Items.Add(focaMenuItem);
 
             RegisterKeyboardShortcuts(p, m);
+
+            //foca menu item for ai enable / disable
+
+            var focaAiMenuItem = new MenuItem
+            {
+                IsCheckable = true,
+                Header = "enable foca ai ✨",
+                ToolTip = Properties.Resources.FocaMenuItemTooltip,
+                IsChecked = Globals.IsFocaAiEnabled
+            };
+
+            focaAiMenuItem.Checked += (sender, args) =>
+            {
+                Globals.IsFocaAiEnabled = true;
+
+                //check if the environment variable already exists
+                string? apiKey = Environment.GetEnvironmentVariable("OpenAIApiKey");
+
+                if (!string.IsNullOrEmpty(apiKey))
+                {
+                    Globals.OpenAIApiKey = apiKey;
+                }
+
+                else
+                {
+                    var inputBox = Microsoft.VisualBasic.Interaction.InputBox("enter open ai api key. this never leaves your machine and is stored under environment variable, OpenAIApiKey.",
+                        "open ai api key not found",
+                        "");
+                    
+                    Environment.SetEnvironmentVariable("OpenAIApiKey",inputBox.Trim(),EnvironmentVariableTarget.User);
+
+                    Globals.OpenAIApiKey = inputBox;
+                }
+            };
+            focaAiMenuItem.Unchecked += (sender, args) =>
+            {
+                Globals.IsFocaAiEnabled = false;
+            };
+            focaMainMenuItem.Items.Add(focaAiMenuItem);
+
 
             var colorCodeMenuItem = new MenuItem { Header = Properties.Resources.FocaStandardGroupMenuItemHeader };
 

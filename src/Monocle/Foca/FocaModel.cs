@@ -11,6 +11,7 @@ using Dynamo.Controls;
 using Dynamo.Graph;
 using Dynamo.Graph.Connectors;
 using Dynamo.Graph.Nodes;
+using Dynamo.Graph.Notes;
 using Dynamo.Models;
 using Dynamo.Nodes;
 using Dynamo.Utilities;
@@ -472,22 +473,35 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
 
 
             //cool ai stuff
+            if (!Globals.IsFocaAiEnabled) return;
+
             var newGroup = DynamoViewModel.CurrentSpaceViewModel.Annotations.Last();
 
             List<string> nodeNames = new List<string>();
+            List<string> noteText = new List<string>();
 
             foreach (var modelBase in newGroup.Nodes)
             {
-                var node = DynamoViewModel.CurrentSpaceViewModel.Nodes.First(n => n.NodeModel.GUID.Equals(modelBase.GUID));
+                if (modelBase is not NoteModel nodeModel)
+                {
+                    var node = DynamoViewModel.CurrentSpaceViewModel.Nodes.First(n => n.NodeModel.GUID.Equals(modelBase.GUID));
 
-                nodeNames.Add(node.OriginalName);
+                    nodeNames.Add(node.Name);
+                }
+
+                if (modelBase is NoteModel noteModel)
+                {
+                    noteText.Add(noteModel.Text);
+                }
             }
             string prompt =
-                $"Given the following nodes from the Dynamo visual programming tool: {string.Join(',', nodeNames)}. What would you title a grouping of these nodes as, in a few words? and what would you add as a more detailed description? Please provide the response as xml, with open and close for title and description.";
+                $"Given the following nodes from the Dynamo visual programming tool: {string.Join(',', nodeNames)} and notes with descriptive text of {string.Join(',', noteText)}. " +
+                $"What would you title a grouping of these nodes as, in a few words? and what would you add as a more detailed description, in about 40 words or less? Please provide the response as xml, with open and close for title and description.";
+
+            var apiKey = Globals.OpenAIApiKey;
 
             FocaAI focaAi =
-                new FocaAI(
-                    "");
+                new FocaAI(apiKey);
 
             await focaAi.SendMessageToGPT(prompt);
 
