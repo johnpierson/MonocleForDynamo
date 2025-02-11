@@ -12,6 +12,7 @@ using Dynamo.Graph;
 using Dynamo.Graph.Connectors;
 using Dynamo.Graph.Nodes;
 using Dynamo.Graph.Notes;
+using Dynamo.Logging;
 using Dynamo.Models;
 using Dynamo.Nodes;
 using Dynamo.Utilities;
@@ -477,59 +478,18 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
 
             var newGroup = DynamoViewModel.CurrentSpaceViewModel.Annotations.Last();
 
-            List<string> nodeNames = new List<string>();
-            List<string> noteText = new List<string>();
-
-            foreach (var modelBase in newGroup.Nodes)
+            try
             {
-                if (modelBase is not NoteModel nodeModel)
-                {
-                    var node = DynamoViewModel.CurrentSpaceViewModel.Nodes.First(n => n.NodeModel.GUID.Equals(modelBase.GUID));
-
-                    nodeNames.Add(node.Name);
-                }
-
-                if (modelBase is NoteModel noteModel)
-                {
-                    noteText.Add(noteModel.Text);
-                }
+                await FocaAI.SetGroupTitleAndDescription(newGroup);
             }
-            string prompt =
-                $"Given the following nodes from the Dynamo visual programming tool: {string.Join(',', nodeNames)} and notes with descriptive text of {string.Join(',', noteText)}. " +
-                $"What would you title a grouping of these nodes as, in a few words? and what would you add as a more detailed description, in about 40 words or less? Please provide the response as xml, with open and close for title and description.";
-
-            var apiKey = Globals.OpenAIApiKey;
-
-            FocaAI focaAi =
-                new FocaAI(apiKey);
-
-            await focaAi.SendMessageToGPT(prompt);
-
-
-            var result = focaAi.response;   
-
-
-            newGroup.AnnotationDescriptionText = FindTextBetween(result,"<description>","</description>");
-            newGroup.AnnotationText = FindTextBetween(result, "<title>", "</title>");
+            catch (Exception e)
+            {
+                Dynamo.Logging.LogMessage.Error($"Failed to call OpenAI - {e.Message}");
+            }
+           
         }
 
-        public string FindTextBetween(string text, string left, string right)
-        {
-            // TODO: Validate input arguments
-
-            int beginIndex = text.IndexOf(left); // find occurence of left delimiter
-            if (beginIndex == -1)
-                return string.Empty; // or throw exception?
-
-            beginIndex += left.Length;
-
-            int endIndex = text.IndexOf(right, beginIndex); // find occurence of right delimiter
-            if (endIndex == -1)
-                return string.Empty; // or throw exception?
-
-            return text.Substring(beginIndex, endIndex - beginIndex).Trim();
-        }
-
+       
 
 
         public void AlignSelected(string alignment)

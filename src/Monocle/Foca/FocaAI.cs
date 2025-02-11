@@ -4,6 +4,9 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dynamo.Graph.Notes;
+using Dynamo.ViewModels;
+using MonocleViewExtension.Utilities;
 using OpenAI.Assistants;
 using OpenAI.Chat;
 
@@ -50,5 +53,47 @@ namespace MonocleViewExtension.Foca
             response = completion.Content[0].Text;
         }
 
+
+        #region commands
+        internal static async Task SetGroupTitleAndDescription(AnnotationViewModel newGroup)
+        {
+            List<string> nodeNames = new List<string>();
+            List<string> noteText = new List<string>();
+
+            foreach (var modelBase in newGroup.Nodes)
+            {
+                if (modelBase is not NoteModel)
+                {
+                    var node = newGroup.WorkspaceViewModel.Nodes.FirstOrDefault(n => n.NodeModel.GUID.Equals(modelBase.GUID));
+
+                    if (node is null) continue;
+
+                    nodeNames.Add(node.Name);
+                }
+
+                if (modelBase is NoteModel noteModel)
+                {
+                    noteText.Add(noteModel.Text);
+                }
+            }
+            string prompt =
+                $"Given the following nodes from the Dynamo visual programming tool: {string.Join(',', nodeNames)} and notes with descriptive text of {string.Join(',', noteText)}. " +
+                $"What would you title a grouping of these nodes as, in a few words? and what would you add as a more detailed description, in about 40 words or less? Please provide the response as xml, with open and close for title and description.";
+
+            var apiKey = Globals.OpenAIApiKey;
+
+            FocaAI focaAi =
+                new FocaAI(apiKey);
+
+            await focaAi.SendMessageToGPT(prompt);
+
+
+            var result = focaAi.response;
+
+
+            newGroup.AnnotationDescriptionText = Utilities.StringUtils.FindTextBetween(result, "<description>", "</description>");
+            newGroup.AnnotationText = Utilities.StringUtils.FindTextBetween(result, "<title>", "</title>");
+        }
+        #endregion
     }
 }
