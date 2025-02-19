@@ -168,7 +168,7 @@ namespace MonocleViewExtension.NodeSwapper
                 else
                 {
                     DynamoModel.CreateNodeCommand replacementCommand =
-                        new DynamoModel.CreateNodeCommand(Guid.NewGuid().ToString(), NodeToSwapTo.Name, NodeToSwap.X, NodeToSwap.Y, false, false);
+                        new DynamoModel.CreateNodeCommand(Guid.NewGuid().ToString(), NodeToSwapTo.NodeModel.CreationName, NodeToSwap.X, NodeToSwap.Y, false, false);
                     Model.dynamoViewModel.ExecuteCommand(replacementCommand);
                 }
             }

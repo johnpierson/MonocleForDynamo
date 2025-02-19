@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Dynamo.Graph.Nodes;
 using Dynamo.Graph.Notes;
+using Dynamo.Models;
 using Dynamo.ViewModels;
 using MonocleViewExtension.Utilities;
 using OpenAI.Assistants;
@@ -94,6 +97,9 @@ namespace MonocleViewExtension.Foca
             newGroup.AnnotationDescriptionText = Utilities.StringUtils.FindTextBetween(result, "<description>", "</description>");
             newGroup.AnnotationText = Utilities.StringUtils.FindTextBetween(result, "<title>", "</title>");
         }
+
+       
+
         #endregion
     }
 }

@@ -96,7 +96,7 @@ namespace MonocleViewExtension.Foca
                 Globals.IsFocaAiEnabled = true;
 
                 //check if the environment variable already exists
-                string? apiKey = Environment.GetEnvironmentVariable("OpenAIApiKey");
+                string? apiKey = Environment.GetEnvironmentVariable("OpenAIApiKey", EnvironmentVariableTarget.User);
 
                 if (!string.IsNullOrEmpty(apiKey))
                 {
