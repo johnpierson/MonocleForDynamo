@@ -121,7 +121,7 @@ namespace MonocleViewExtension.PackageUsage
             _readyParams = m.LoadedParams;
 
             ActiveCustomNodes = Model.GetCustomNodeInfos();
-            PackagesInUse = string.Join("\n", ActiveCustomNodes.Select(c => c.PackageName).Distinct());
+            PackagesInUse = string.Join("\n", ActiveCustomNodes.OrderBy(c => c.PackageName).Select(c => c.PackageName).Distinct());
 
             _readyParams.CurrentWorkspaceModel.NodeAdded += CurrentWorkspaceModel_NodesChanged;
             _readyParams.CurrentWorkspaceModel.NodeRemoved += CurrentWorkspaceModel_NodesChanged;
@@ -161,7 +161,7 @@ namespace MonocleViewExtension.PackageUsage
         {
             if (ActiveCustomNodes.Any())
             {
-                Clipboard.SetText(string.Join("\n", ActiveCustomNodes.Select(c => $"{c.PackageName} | {c.PackageVersion}")));
+                Clipboard.SetText(string.Join("\n", ActiveCustomNodes.OrderBy(c => c.PackageName).Select(c => $"{c.PackageName} | {c.PackageVersion}")));
             }
         }
 

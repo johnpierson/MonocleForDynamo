@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Input;
 using Dynamo.Graph.Nodes;
 using Dynamo.Logging;
@@ -167,9 +168,20 @@ namespace MonocleViewExtension.NodeSwapper
                 }
                 else
                 {
-                    DynamoModel.CreateNodeCommand replacementCommand =
-                        new DynamoModel.CreateNodeCommand(Guid.NewGuid().ToString(), NodeToSwapTo.Name, NodeToSwap.X, NodeToSwap.Y, false, false);
-                    Model.dynamoViewModel.ExecuteCommand(replacementCommand);
+#if D30_OR_GREATER
+                    var nse = Model.dynamoViewModel.Model.SearchModel.Entries.Where(n => n.IsVisibleInSearch).FirstOrDefault(s =>
+                        s.CreationName.Contains(NodeToSwapTo.OriginalName));
+#endif
+#if !D30_OR_GREATER
+                    var nse = Model.dynamoViewModel.Model.SearchModel.SearchEntries.Where(n => n.IsVisibleInSearch).FirstOrDefault(s =>
+                        s.CreationName.Contains(NodeToSwapTo.OriginalName));
+#endif
+
+                    var dynMethod = nse.GetType().GetMethod("ConstructNewNodeModel",
+                        BindingFlags.NonPublic | BindingFlags.Instance);
+                    var obj = dynMethod.Invoke(nse, new object[] { });
+                    var nM = obj as NodeModel;
+                    Model.dynamoViewModel.ExecuteCommand(new DynamoModel.CreateNodeCommand(nM, NodeToSwap.X, NodeToSwap.Y, false, false));
                 }
             }
 
