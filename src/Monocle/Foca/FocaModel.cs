@@ -346,7 +346,7 @@ namespace MonocleViewExtension.Foca
 
             var leftMostNode = nodeViews.OrderBy(nv => nv.ViewModel.Left).ThenBy(nv => nv.ViewModel.Top).First();
             var topMostNode = nodeViews.OrderBy(nv => nv.ViewModel.Top).First();
-            return new Thickness(-14,
+            return new Thickness(-41,
                 ((topMostNode.ViewModel.Top - leftMostNode.ViewModel.Top) - leftMostNode.ActualHeight - 6), 14,
                 14);
         }

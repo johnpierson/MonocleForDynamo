@@ -201,7 +201,7 @@ namespace MonocleViewExtension.Foca
                 ExpansionBay = Model.GetExpansionBay();
                 ExpansionBay?.Children.Add(View);
                 var rec = Model.WrapNodes();
-                Width = rec.Width;
+                Width = rec.Width + 49;
                 Height = rec.Height;
                 Thickness = Model.GetThickness();
 
