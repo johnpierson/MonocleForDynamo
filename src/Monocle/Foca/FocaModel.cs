@@ -6,6 +6,9 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using CoreNodeModels;
+using CoreNodeModels.Input;
+using CoreNodeModelsWpf;
 using Dynamo.Controls;
 using Dynamo.Graph;
 using Dynamo.Graph.Connectors;
@@ -72,7 +75,16 @@ namespace MonocleViewExtension.Foca
                     {
                         //this error is silenced
                     }
-
+                    break;
+                case "fundleBundle":
+                    try
+                    {
+                        PowList(nodes,true);
+                    }
+                    catch (Exception)
+                    {
+                        //this error is silenced
+                    }
                     break;
                 case "nodeSwapper":
                     try
@@ -261,7 +273,7 @@ namespace MonocleViewExtension.Foca
             }
         }
 
-        public void PowList(List<NodeModel> nodeModel)
+        public void PowList(List<NodeModel> nodeModel, bool customSelectionOption = false)
         {
             foreach (var node in nodeModel)
             {
@@ -275,6 +287,35 @@ namespace MonocleViewExtension.Foca
                 if (!cachedValue.IsCollection) return;
 
                 var values = cachedValue.GetElements().ToList();
+
+                if (customSelectionOption)
+                {
+                    //create the list.create node
+                    string newGuid = Guid.NewGuid().ToString();
+                    var command = new DynamoModel.CreateNodeCommand(newGuid, "Custom Selection", nodeModel.Max(n => n.CenterX) + 120, nodeModel.Min(n => n.CenterY - n.Height / 2), false, false);
+                    DynamoViewModel.Model.ExecuteCommand(command);
+
+                    var customSelectionNode = DynamoViewModel.CurrentSpaceViewModel.Nodes.Last();
+
+                    CustomSelection nodeLogic = customSelectionNode.NodeLogic as CustomSelection;
+
+                    for (int i = 0; i < 3; i++)
+                    {
+                        nodeLogic.Items.RemoveAt(0);
+                    }
+
+                    int selectionIndex = 0;
+                    foreach (var value in values)
+                    {
+                        nodeLogic.Items.Add(new DynamoDropDownItem(value.StringData, selectionIndex));
+                        selectionIndex++;
+                    }
+
+                    nodeLogic.SelectedIndex = 0;
+
+                    return;
+                }
+                
                 var count = values.Count > 20 ? 20 : values.Count;
 
                 string codeBlockString = string.Empty;
