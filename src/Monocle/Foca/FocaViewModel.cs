@@ -125,8 +125,6 @@ namespace MonocleViewExtension.Foca
             Model = model;
             model.LoadedParams.SelectionCollectionChanged += LoadedParamsOnSelectionCollectionChanged;
 
-            model.DynamoViewModel.CurrentSpace.AnnotationAdded += WorkspaceOnAnnotationAdded;
-
             //set color wheel size
             ColorWheelHeight = 48;
             ColorWheelMargin = new Thickness(-36);
@@ -143,13 +141,6 @@ namespace MonocleViewExtension.Foca
             AlignClick = new DelegateCommand(OnAlignClick);
 
             ToolboxClick = new DelegateCommand(OnToolboxClick);
-        }
-
-      
-
-        private void WorkspaceOnAnnotationAdded(AnnotationModel obj)
-        {
-            Model.FixHeaderColors();
         }
 
         public void OnMouseEnter(object o)

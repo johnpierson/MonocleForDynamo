@@ -64,7 +64,7 @@ namespace MonocleViewExtension.Foca
                         }
 
                     }
-
+                        
                     break;
                 case "powList":
                     try
@@ -507,41 +507,6 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
                 }
             }
         }
-
-        public void FixHeaderColors()
-        {
-            //cleanup darker group colors
-            var annotations = MiscUtils.FindVisualChildren<AnnotationView>(DynamoView);
-
-            foreach (var annotation in annotations)
-            {
-                try
-                {
-                    var originalColor = annotation.ViewModel.Background;
-
-                    System.Drawing.Color color = System.Drawing.Color.FromArgb(originalColor.A, originalColor.R, originalColor.G, originalColor.B);
-
-                    var brightness = color.GetBrightness();
-
-                    if (brightness <= 0.5)
-                    {
-                        TextBlock textBlock = annotation.FindName("GroupTextBlock") as TextBlock;
-
-                        textBlock.Foreground = new SolidColorBrush(Colors.White);
-
-                        TextBlock textBlock2 = annotation.FindName("GroupDescriptionTextBlock") as TextBlock;
-
-                        textBlock2.Foreground = new SolidColorBrush(Colors.White);
-                    }
-                }
-                catch (Exception)
-                {
-                    //suppress
-                }
-              
-            }
-        }
-
 
         public void AlignSelected(string alignment)
         {
