@@ -36,7 +36,7 @@
             <Image Tag="HorizontalCenter" Source="Resources/button-alignVerticalCenterBlack.png" Height="20" Width="20" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="-24 0 -24 60" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
         </Grid>
 
-        <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Name="ToolboxGrid"  Margin="-36 -52 -48 0" Opacity="0.5" MouseEnter="ToolboxGrid_OnMouseEnter" Unloaded="ToolboxGrid_OnUnloaded">
+        <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Name="ToolboxGrid"  Margin="-36 -52 -60 0" Opacity="0.5" MouseEnter="ToolboxGrid_OnMouseEnter" Unloaded="ToolboxGrid_OnUnloaded">
             <Grid.RowDefinitions>
                 <RowDefinition Height="24"/>
                 <RowDefinition Height="4"/>

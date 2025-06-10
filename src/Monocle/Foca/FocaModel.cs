@@ -363,33 +363,57 @@ namespace MonocleViewExtension.Foca
 
         public Rect WrapNodes()
         {
-            var nodeViews = Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0 ? FindVisualChildren<NodeView>(DynamoView).Where(nv => ((Border)nv.FindName("selectionBorder")).IsVisible).ToList() : FindVisualChildren<NodeView>(DynamoView).Where(nv => ((System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder")).IsVisible).ToList();
+            var allNodeViews = FindVisualChildren<NodeView>(DynamoView);
 
-            return NodeUtils.GetBoundingRectangle(nodeViews);
+            if (allNodeViews is null) return new Rect();
+
+            List<NodeView> selectedNodeViews = allNodeViews.Where(nv => nv.ViewModel.IsSelected).ToList();
+            
+            return NodeUtils.GetBoundingRectangle(selectedNodeViews);
         }
 
         public Canvas GetExpansionBay()
         {
-            var nodeViews = Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0 ? FindVisualChildren<NodeView>(DynamoView).Where(nv => ((Border)nv.FindName("selectionBorder")).IsVisible).ToList() : FindVisualChildren<NodeView>(DynamoView).Where(nv => ((System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder")).IsVisible).ToList();
+            var allNodeViews = FindVisualChildren<NodeView>(DynamoView);
+
+            if (allNodeViews is null) return null;
+
+            List<NodeView> selectedNodeViews = allNodeViews.Where(nv => nv.ViewModel.IsSelected).ToList();
 
 
-            var leftMostNode = nodeViews.OrderBy(nv => nv.ViewModel.Left).ThenBy(nv => nv.ViewModel.Top).First();
-            var topMostNode = nodeViews.OrderBy(nv => nv.ViewModel.Top).First();
+            //var nodeViews = Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0 ? FindVisualChildren<NodeView>(DynamoView).Where(nv => ((Border)nv.FindName("selectionBorder")).IsVisible).ToList() : FindVisualChildren<NodeView>(DynamoView).Where(nv => ((System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder")).IsVisible).ToList();
+
+            var leftMostNode = selectedNodeViews.OrderBy(nv => nv.ViewModel.Left).ThenBy(nv => nv.ViewModel.Top).First();
+            var topMostNode = selectedNodeViews.OrderBy(nv => nv.ViewModel.Top).First();
 
             //host it in the left most node's expansion bay so it can move and live it's life
             return FindVisualChildren<Canvas>(leftMostNode)
                 .First(c => c.Name == "expansionBay");
         }
 
-        public Thickness GetThickness()
+        public Thickness GetThickness(double multiSelect = 0.0)
         {
-            var nodeViews = Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0 ? FindVisualChildren<NodeView>(DynamoView).Where(nv => ((Border)nv.FindName("selectionBorder")).IsVisible).ToList() : FindVisualChildren<NodeView>(DynamoView).Where(nv => ((System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder")).IsVisible).ToList();
+            var allNodeViews = FindVisualChildren<NodeView>(DynamoView);
 
-            var leftMostNode = nodeViews.OrderBy(nv => nv.ViewModel.Left).ThenBy(nv => nv.ViewModel.Top).First();
-            var topMostNode = nodeViews.OrderBy(nv => nv.ViewModel.Top).First();
-            return new Thickness(-41,
-                ((topMostNode.ViewModel.Top - leftMostNode.ViewModel.Top) - leftMostNode.ActualHeight - 6), 14,
-                14);
+            if (allNodeViews is null) return new Thickness();
+
+            List<NodeView> selectedNodeViews = allNodeViews.Where(nv => nv.ViewModel.IsSelected).ToList();
+
+            var leftMostNode = selectedNodeViews.OrderBy(nv => nv.ViewModel.Left).ThenBy(nv => nv.ViewModel.Top).First();
+            var topMostNode = selectedNodeViews.OrderBy(nv => nv.ViewModel.Top).First();
+
+            if (multiSelect >= 1.0)
+            {
+                return new Thickness(-41,
+                    ((topMostNode.ViewModel.Top - leftMostNode.ViewModel.Top) - leftMostNode.ActualHeight) - 20, 14,
+                    8);
+            }
+            else
+            {
+                return new Thickness(-14,
+                        ((topMostNode.ViewModel.Top - leftMostNode.ViewModel.Top) - leftMostNode.ActualHeight - 6), 14,
+                    14);
+            }
         }
 
        

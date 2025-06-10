@@ -199,9 +199,9 @@ namespace MonocleViewExtension.Foca
                 ExpansionBay = Model.GetExpansionBay();
                 ExpansionBay?.Children.Add(View);
                 var rec = Model.WrapNodes();
-                Width = rec.Width + 49;
-                Height = rec.Height;
-                Thickness = Model.GetThickness();
+                Width = MultiSelect >= 1.0 ? rec.Width + 49 : rec.Width;
+                Height = MultiSelect >= 1.0 ? rec.Height + 40 : rec.Height;
+                Thickness = Model.GetThickness(MultiSelect);
 
                 CombineVisibility = count > 1 ? 1 : 0;
                 DropdownVisibility = count == 1 ? 1 : 0;

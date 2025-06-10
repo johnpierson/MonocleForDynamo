@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Xceed.Wpf.AvalonDock.Controls;
 
 namespace MonocleViewExtension.Utilities
 {
@@ -26,7 +27,10 @@ namespace MonocleViewExtension.Utilities
 
                 if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
                 {
-                    var border = (Border)nv.FindName("selectionBorder");
+                    Grid nvGrid = nv.Content as Grid;
+
+                    var border = nvGrid.Children.OfType<Border>().FirstOrDefault(n => n.Name.Equals("selectionBorder"));
+                    
                     var geo = border.RenderSize;
 
                     xAxis.Add(nvm.Left);
