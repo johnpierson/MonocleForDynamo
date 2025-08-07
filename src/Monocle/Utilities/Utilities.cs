@@ -27,10 +27,8 @@ namespace MonocleViewExtension.Utilities
 
                 if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
                 {
-                    Grid nvGrid = nv.Content as Grid;
+                    var border = nv.FindVisualChildren<Border>().FirstOrDefault(n => n.Name.ToLower().Equals("selectionborder"));
 
-                    var border = nvGrid.Children.OfType<Border>().FirstOrDefault(n => n.Name.Equals("selectionBorder"));
-                    
                     var geo = border.RenderSize;
 
                     xAxis.Add(nvm.Left);

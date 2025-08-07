@@ -20,6 +20,7 @@ using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.NodeSwapper;
 using MonocleViewExtension.Utilities;
+using Xceed.Wpf.AvalonDock.Controls;
 using Thickness = System.Windows.Thickness;
 
 namespace MonocleViewExtension.Foca
@@ -374,21 +375,41 @@ namespace MonocleViewExtension.Foca
 
         public Canvas GetExpansionBay()
         {
-            var allNodeViews = FindVisualChildren<NodeView>(DynamoView);
+            List<NodeView> selectedNodeViews = new List<NodeView>();
 
-            if (allNodeViews is null) return null;
-
-            List<NodeView> selectedNodeViews = allNodeViews.Where(nv => nv.ViewModel.IsSelected).ToList();
-
-
+            var allNodeViews = FindVisualChildren<NodeView>(DynamoView).ToList();
+            if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
+            {
+                foreach (var nv in allNodeViews)
+                {
+                    var selectionBorder = nv.FindVisualChildren<Border>().FirstOrDefault(child => child.Name.ToLower().Equals("selectionborder"));
+                    if (selectionBorder.IsVisible)
+                    {
+                        selectedNodeViews.Add(nv);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var nv in allNodeViews)
+                {
+                    var selectionBorder = nv.FindVisualChildren<System.Windows.Shapes.Rectangle>().FirstOrDefault(child => child.Name.ToLower().Equals("selectionborder"));
+                    if (selectionBorder.IsVisible)
+                    {
+                        selectedNodeViews.Add(nv);
+                    }
+                }
+            }
+            
             //var nodeViews = Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0 ? FindVisualChildren<NodeView>(DynamoView).Where(nv => ((Border)nv.FindName("selectionBorder")).IsVisible).ToList() : FindVisualChildren<NodeView>(DynamoView).Where(nv => ((System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder")).IsVisible).ToList();
 
             var leftMostNode = selectedNodeViews.OrderBy(nv => nv.ViewModel.Left).ThenBy(nv => nv.ViewModel.Top).First();
             var topMostNode = selectedNodeViews.OrderBy(nv => nv.ViewModel.Top).First();
+            var expando = FindVisualChildren<Canvas>(leftMostNode)
+                .First(c => c.Name.ToLower() == "expansionbay");
 
             //host it in the left most node's expansion bay so it can move and live it's life
-            return FindVisualChildren<Canvas>(leftMostNode)
-                .First(c => c.Name == "expansionBay");
+            return expando;
         }
 
         public Thickness GetThickness(double multiSelect = 0.0)
