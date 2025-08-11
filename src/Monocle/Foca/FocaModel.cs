@@ -406,7 +406,28 @@ namespace MonocleViewExtension.Foca
             var leftMostNode = selectedNodeViews.OrderBy(nv => nv.ViewModel.Left).ThenBy(nv => nv.ViewModel.Top).First();
             var topMostNode = selectedNodeViews.OrderBy(nv => nv.ViewModel.Top).First();
             var expando = FindVisualChildren<Canvas>(leftMostNode)
-                .First(c => c.Name.ToLower() == "expansionbay");
+                .FirstOrDefault(c => c.Name == "focaHost");
+
+            if(expando is null)
+            {
+                var grid = FindVisualChildren<Grid>(leftMostNode)
+                .FirstOrDefault(c => c.Name.ToLower() == "grid");
+
+                var focaHost = new Canvas()
+                {
+                    Name = "focaHost",
+                    Margin = new Thickness(0, 4, 0, 0),
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    Background = Brushes.Blue
+                };
+
+                Grid.SetRow(focaHost, 5);
+                Grid.SetColumnSpan(focaHost, 3);
+
+                grid.Children.Add(focaHost);
+
+                expando = focaHost;
+            }
 
             //host it in the left most node's expansion bay so it can move and live it's life
             return expando;
