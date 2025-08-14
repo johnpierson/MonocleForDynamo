@@ -583,7 +583,7 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
             }
 
             //cool ai stuff
-            if (!Globals.IsFocaAiEnabled && !Keyboard.IsKeyDown(Key.LeftShift)) return;
+            if (!Globals.IsFocaAiEnabled) return;
 
             var newGroup = DynamoViewModel.CurrentSpaceViewModel.Annotations.Last();
 
