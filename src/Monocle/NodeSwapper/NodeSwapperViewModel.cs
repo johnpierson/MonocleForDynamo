@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Input;
 using Dynamo.Graph.Nodes;
+using Dynamo.Graph.Nodes.ZeroTouch;
 using Dynamo.Logging;
 using Dynamo.Models;
 using Dynamo.ViewModels;
@@ -168,6 +169,7 @@ namespace MonocleViewExtension.NodeSwapper
                 }
                 else
                 {
+
 #if D30_OR_GREATER
                     var nse = Model.dynamoViewModel.Model.SearchModel.Entries.Where(n => n.IsVisibleInSearch).FirstOrDefault(s =>
                         s.CreationName.Contains(NodeToSwapTo.OriginalName));

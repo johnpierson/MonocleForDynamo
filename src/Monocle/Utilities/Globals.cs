@@ -21,6 +21,8 @@ namespace MonocleViewExtension.Utilities
         public static string SettingsFile = Path.Combine(ExtraFolder, "MonocleSettings.xml");
 
         public static bool IsFocaEnabled { get; set; } = true;
+        public static bool IsFocaAiEnabled { get; set; } = false;
+        internal static string OpenAIApiKey { get; set; } 
         public static bool IsConnectoEnabled { get; set; } = false;
         public static bool InCanvasSearchEnabled { get; set; } = true;
         public static string QuickSaveDateFormat { get; set; } = "-yyyy.MM.dd_HH.mm.ss";

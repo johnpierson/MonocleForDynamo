@@ -46,6 +46,9 @@ namespace MonocleViewExtension.Utilities
             [XmlElement("IsFocaEnabled")] 
             public bool IsFocaEnabled { get; set; } = true;
 
+            [XmlElement("IsFocaAiEnabled")]
+            public bool IsFocaAiEnabled { get; set; } = false;
+
             [XmlElement("IsConnectoEnabled")]
             public bool IsConnectoEnabled { get; set; } = true;
 
@@ -95,6 +98,8 @@ namespace MonocleViewExtension.Utilities
 
                 Globals.IsFocaEnabled = newSettings.IsFocaEnabled;
 
+                Globals.IsFocaAiEnabled = newSettings.IsFocaAiEnabled;
+
                 Globals.IsConnectoEnabled = newSettings.IsConnectoEnabled;
 
                 Globals.InCanvasSearchEnabled = newSettings.InCanvasSearchEnabled;
@@ -115,7 +120,7 @@ namespace MonocleViewExtension.Utilities
         {
             try
             {
-                Utilities.Settings.MonocleSettings settings = new Utilities.Settings.MonocleSettings { Settings = Globals.MonocleGroupSettings.Values.ToList(), CustomNodeIdentifierSettings = new CustomNodeIdentifierSettings(){CustomNodeColor = Globals.CustomNodeIdentificationColor.ToString(),BorderThickness = Globals.CustomNodeBorderThickness }, CustomNodeNotePrefix = Globals.CustomNodeNotePrefix, IsFocaEnabled = Globals.IsFocaEnabled, InCanvasSearchEnabled = Globals.InCanvasSearchEnabled, QuickSaveDateFormat = Globals.QuickSaveDateFormat, IsConnectoEnabled = Globals.IsConnectoEnabled};
+                Utilities.Settings.MonocleSettings settings = new Utilities.Settings.MonocleSettings { Settings = Globals.MonocleGroupSettings.Values.ToList(), CustomNodeIdentifierSettings = new CustomNodeIdentifierSettings(){CustomNodeColor = Globals.CustomNodeIdentificationColor.ToString(),BorderThickness = Globals.CustomNodeBorderThickness }, CustomNodeNotePrefix = Globals.CustomNodeNotePrefix, IsFocaEnabled = Globals.IsFocaEnabled,IsFocaAiEnabled = Globals.IsFocaAiEnabled, InCanvasSearchEnabled = Globals.InCanvasSearchEnabled, QuickSaveDateFormat = Globals.QuickSaveDateFormat, IsConnectoEnabled = Globals.IsConnectoEnabled};
                 Utilities.Settings.SerializeModels(Globals.SettingsFile, settings);
             }
             catch (Exception e)

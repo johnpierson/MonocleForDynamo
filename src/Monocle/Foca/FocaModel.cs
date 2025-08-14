@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -13,6 +14,8 @@ using Dynamo.Controls;
 using Dynamo.Graph;
 using Dynamo.Graph.Connectors;
 using Dynamo.Graph.Nodes;
+using Dynamo.Graph.Notes;
+using Dynamo.Logging;
 using Dynamo.Models;
 using Dynamo.Nodes;
 using Dynamo.Utilities;
@@ -20,6 +23,8 @@ using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.NodeSwapper;
 using MonocleViewExtension.Utilities;
+using OpenAI.Assistants;
+using OpenAI.Chat;
 using Xceed.Wpf.AvalonDock.Controls;
 using Thickness = System.Windows.Thickness;
 
@@ -473,8 +478,9 @@ namespace MonocleViewExtension.Foca
 
             return null;
         }
-        public void CreateGroup(string groupName)
+        public async Task CreateGroup(string groupName)
         {
+
             Globals.MonocleGroupSettings.TryGetValue(groupName, out Settings.GroupSetting groupSetting);
 
             var colorToUse = (Color)ColorConverter.ConvertFromString(groupSetting.GroupColor);
@@ -572,6 +578,23 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
                     //silent fail
                 }
             }
+
+            //cool ai stuff
+            if (!Globals.IsFocaAiEnabled) return;
+
+            var newGroup = DynamoViewModel.CurrentSpaceViewModel.Annotations.Last();
+
+            try
+            {
+                await FocaAI.SetGroupTitleAndDescription(newGroup);
+            }
+            catch (Exception e)
+            {
+                Dynamo.Logging.LogMessage.Error($"Failed to call OpenAI - {e.Message}");
+            }
+           
+        }
+
         }
 
         public void AlignSelected(string alignment)
