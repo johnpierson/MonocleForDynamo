@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using CoreNodeModels;
+using CoreNodeModels.Input;
+using CoreNodeModelsWpf;
 using Dynamo.Controls;
 using Dynamo.Graph;
 using Dynamo.Graph.Connectors;
@@ -22,6 +25,7 @@ using MonocleViewExtension.NodeSwapper;
 using MonocleViewExtension.Utilities;
 using OpenAI.Assistants;
 using OpenAI.Chat;
+using Xceed.Wpf.AvalonDock.Controls;
 using Thickness = System.Windows.Thickness;
 
 namespace MonocleViewExtension.Foca
@@ -66,7 +70,7 @@ namespace MonocleViewExtension.Foca
                         }
 
                     }
-
+                        
                     break;
                 case "powList":
                     try
@@ -77,7 +81,16 @@ namespace MonocleViewExtension.Foca
                     {
                         //this error is silenced
                     }
-
+                    break;
+                case "fundleBundle":
+                    try
+                    {
+                        PowList(nodes,true);
+                    }
+                    catch (Exception)
+                    {
+                        //this error is silenced
+                    }
                     break;
                 case "nodeSwapper":
                     try
@@ -266,7 +279,7 @@ namespace MonocleViewExtension.Foca
             }
         }
 
-        public void PowList(List<NodeModel> nodeModel)
+        public void PowList(List<NodeModel> nodeModel, bool customSelectionOption = false)
         {
             foreach (var node in nodeModel)
             {
@@ -280,6 +293,35 @@ namespace MonocleViewExtension.Foca
                 if (!cachedValue.IsCollection) return;
 
                 var values = cachedValue.GetElements().ToList();
+
+                if (customSelectionOption)
+                {
+                    //create the list.create node
+                    string newGuid = Guid.NewGuid().ToString();
+                    var command = new DynamoModel.CreateNodeCommand(newGuid, "Custom Selection", nodeModel.Max(n => n.CenterX) + 120, nodeModel.Min(n => n.CenterY - n.Height / 2), false, false);
+                    DynamoViewModel.Model.ExecuteCommand(command);
+
+                    var customSelectionNode = DynamoViewModel.CurrentSpaceViewModel.Nodes.Last();
+
+                    CustomSelection nodeLogic = customSelectionNode.NodeLogic as CustomSelection;
+
+                    for (int i = 0; i < 3; i++)
+                    {
+                        nodeLogic.Items.RemoveAt(0);
+                    }
+
+                    int selectionIndex = 0;
+                    foreach (var value in values)
+                    {
+                        nodeLogic.Items.Add(new DynamoDropDownItem(value.StringData, selectionIndex));
+                        selectionIndex++;
+                    }
+
+                    nodeLogic.SelectedIndex = 0;
+
+                    return;
+                }
+                
                 var count = values.Count > 20 ? 20 : values.Count;
 
                 string codeBlockString = string.Empty;
@@ -327,33 +369,98 @@ namespace MonocleViewExtension.Foca
 
         public Rect WrapNodes()
         {
-            var nodeViews = Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0 ? FindVisualChildren<NodeView>(DynamoView).Where(nv => ((Border)nv.FindName("selectionBorder")).IsVisible).ToList() : FindVisualChildren<NodeView>(DynamoView).Where(nv => ((System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder")).IsVisible).ToList();
+            var allNodeViews = FindVisualChildren<NodeView>(DynamoView);
 
-            return NodeUtils.GetBoundingRectangle(nodeViews);
+            if (allNodeViews is null) return new Rect();
+
+            List<NodeView> selectedNodeViews = allNodeViews.Where(nv => nv.ViewModel.IsSelected).ToList();
+            
+            return NodeUtils.GetBoundingRectangle(selectedNodeViews);
         }
 
         public Canvas GetExpansionBay()
         {
-            var nodeViews = Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0 ? FindVisualChildren<NodeView>(DynamoView).Where(nv => ((Border)nv.FindName("selectionBorder")).IsVisible).ToList() : FindVisualChildren<NodeView>(DynamoView).Where(nv => ((System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder")).IsVisible).ToList();
+            List<NodeView> selectedNodeViews = new List<NodeView>();
 
+            var allNodeViews = FindVisualChildren<NodeView>(DynamoView).ToList();
+            if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
+            {
+                foreach (var nv in allNodeViews)
+                {
+                    var selectionBorder = nv.FindVisualChildren<Border>().FirstOrDefault(child => child.Name.ToLower().Equals("selectionborder"));
+                    if (selectionBorder.IsVisible)
+                    {
+                        selectedNodeViews.Add(nv);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var nv in allNodeViews)
+                {
+                    var selectionBorder = nv.FindVisualChildren<System.Windows.Shapes.Rectangle>().FirstOrDefault(child => child.Name.ToLower().Equals("selectionborder"));
+                    if (selectionBorder.IsVisible)
+                    {
+                        selectedNodeViews.Add(nv);
+                    }
+                }
+            }
+            
+            //var nodeViews = Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0 ? FindVisualChildren<NodeView>(DynamoView).Where(nv => ((Border)nv.FindName("selectionBorder")).IsVisible).ToList() : FindVisualChildren<NodeView>(DynamoView).Where(nv => ((System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder")).IsVisible).ToList();
 
-            var leftMostNode = nodeViews.OrderBy(nv => nv.ViewModel.Left).ThenBy(nv => nv.ViewModel.Top).First();
-            var topMostNode = nodeViews.OrderBy(nv => nv.ViewModel.Top).First();
+            var leftMostNode = selectedNodeViews.OrderBy(nv => nv.ViewModel.Left).ThenBy(nv => nv.ViewModel.Top).First();
+            var topMostNode = selectedNodeViews.OrderBy(nv => nv.ViewModel.Top).First();
+            var expando = FindVisualChildren<Canvas>(leftMostNode)
+                .FirstOrDefault(c => c.Name == "focaHost");
+
+            if(expando is null)
+            {
+                var grid = FindVisualChildren<Grid>(leftMostNode)
+                .FirstOrDefault(c => c.Name.ToLower() == "grid");
+
+                var focaHost = new Canvas()
+                {
+                    Name = "focaHost",
+                    Margin = new Thickness(0, 4, 0, 0),
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    Background = Brushes.Blue
+                };
+
+                Grid.SetRow(focaHost, 5);
+                Grid.SetColumnSpan(focaHost, 3);
+
+                grid.Children.Add(focaHost);
+
+                expando = focaHost;
+            }
 
             //host it in the left most node's expansion bay so it can move and live it's life
-            return FindVisualChildren<Canvas>(leftMostNode)
-                .First(c => c.Name == "expansionBay");
+            return expando;
         }
 
-        public Thickness GetThickness()
+        public Thickness GetThickness(double multiSelect = 0.0)
         {
-            var nodeViews = Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0 ? FindVisualChildren<NodeView>(DynamoView).Where(nv => ((Border)nv.FindName("selectionBorder")).IsVisible).ToList() : FindVisualChildren<NodeView>(DynamoView).Where(nv => ((System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder")).IsVisible).ToList();
+            var allNodeViews = FindVisualChildren<NodeView>(DynamoView);
 
-            var leftMostNode = nodeViews.OrderBy(nv => nv.ViewModel.Left).ThenBy(nv => nv.ViewModel.Top).First();
-            var topMostNode = nodeViews.OrderBy(nv => nv.ViewModel.Top).First();
-            return new Thickness(-14,
-                ((topMostNode.ViewModel.Top - leftMostNode.ViewModel.Top) - leftMostNode.ActualHeight - 6), 14,
-                14);
+            if (allNodeViews is null) return new Thickness();
+
+            List<NodeView> selectedNodeViews = allNodeViews.Where(nv => nv.ViewModel.IsSelected).ToList();
+
+            var leftMostNode = selectedNodeViews.OrderBy(nv => nv.ViewModel.Left).ThenBy(nv => nv.ViewModel.Top).First();
+            var topMostNode = selectedNodeViews.OrderBy(nv => nv.ViewModel.Top).First();
+
+            if (multiSelect >= 1.0)
+            {
+                return new Thickness(-41,
+                    ((topMostNode.ViewModel.Top - leftMostNode.ViewModel.Top) - leftMostNode.ActualHeight) - 20, 14,
+                    8);
+            }
+            else
+            {
+                return new Thickness(-14,
+                        ((topMostNode.ViewModel.Top - leftMostNode.ViewModel.Top) - leftMostNode.ActualHeight - 6), 14,
+                    14);
+            }
         }
 
        
@@ -472,7 +579,6 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
                 }
             }
 
-
             //cool ai stuff
             if (!Globals.IsFocaAiEnabled) return;
 
@@ -489,8 +595,7 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
            
         }
 
-       
-
+        }
 
         public void AlignSelected(string alignment)
         {

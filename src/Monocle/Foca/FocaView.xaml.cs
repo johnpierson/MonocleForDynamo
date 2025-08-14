@@ -69,15 +69,16 @@ namespace MonocleViewExtension.Foca
         {
             this.combinifier.Visibility = Convert.ToInt32(this.combinifier.Tag) == 1 ? Visibility.Visible : Visibility.Hidden;
             this.powList.Visibility = Convert.ToInt32(this.powList.Tag) == 1 ? Visibility.Visible : Visibility.Hidden;
+            this.fundleBundle.Visibility = Convert.ToInt32(this.fundleBundle.Tag) == 1 ? Visibility.Visible : Visibility.Hidden;
             this.dropdownConverter.Visibility = Convert.ToInt32(this.dropdownConverter.Tag) == 1 ? Visibility.Visible : Visibility.Hidden;
             this.nodeSwapper.Visibility = Convert.ToInt32(this.nodeSwapper.Tag) == 1 ? Visibility.Visible : Visibility.Hidden;
-
         }
 
         private void ToolboxGrid_OnUnloaded(object sender, RoutedEventArgs e)
         {
             this.combinifier.Visibility = Visibility.Hidden;
             this.powList.Visibility = Visibility.Hidden;
+            this.fundleBundle.Visibility = Visibility.Hidden;
             this.dropdownConverter.Visibility = Visibility.Hidden;
             this.nodeSwapper.Visibility = Visibility.Hidden;
         }

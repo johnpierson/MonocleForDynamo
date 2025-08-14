@@ -7,9 +7,9 @@
 		<PlatformTarget>x64</PlatformTarget>
 		<AssemblyTitle>Monocle</AssemblyTitle>
 		<Product>Monocle</Product>
-		<Copyright>Copyright©  2024 john pierson</Copyright>
-		<AssemblyVersion>2024.12.1</AssemblyVersion>
-		<FileVersion>2024.12.1</FileVersion>
+		<Copyright>Copyright©  2025 john pierson</Copyright>
+		<AssemblyVersion>2025.8.2</AssemblyVersion>
+		<FileVersion>2025.8.2</FileVersion>
 		<OutputPath>bin\$(Configuration)\</OutputPath>
 		<Configurations>Debug 2.0;Debug 2.1;Debug 2.10;Debug 2.12;Debug 2.13;Debug 2.16;Debug 2.17;Debug 2.18;Debug 2.19;Debug 2.2;Debug 2.3;Debug 2.5;Debug 2.6;Debug 3.0;Debug 3.1;Debug 3.2;Debug 3.3;Debug 3.4</Configurations>
 		<Configurations>$(Configurations);Release 2.0;Release 2.1;Release 2.10;Release 2.12;Release 2.13;Release 2.16;Release 2.17;Release 2.18;Release 2.19;Release 2.2;Release 2.3;Release 2.5;Release 2.6;Release 3.0;Release 3.1;Release 3.2;Release 3.3;Release 3.4</Configurations>
@@ -288,7 +288,7 @@
 	<PropertyGroup>
 		<DynVersion>$(DynamoVersion)</DynVersion>
 		<BuildOutput>$(DynamoOutput)</BuildOutput>
-		<FolderPackages>D:\repos_john\MonocleForDynamo\deploy\$(BuildOutput)\</FolderPackages>
+		<FolderPackages>C:\Users\piersoj\Documents\Repos\MonocleForDynamo\deploy\$(BuildOutput)\</FolderPackages>
 	</PropertyGroup>
 	<PropertyGroup>
 		<StartAction>Program</StartAction>

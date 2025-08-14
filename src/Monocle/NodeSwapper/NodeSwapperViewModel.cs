@@ -169,8 +169,15 @@ namespace MonocleViewExtension.NodeSwapper
                 }
                 else
                 {
+
+#if D30_OR_GREATER
                     var nse = Model.dynamoViewModel.Model.SearchModel.Entries.Where(n => n.IsVisibleInSearch).FirstOrDefault(s =>
                         s.CreationName.Contains(NodeToSwapTo.OriginalName));
+#endif
+#if !D30_OR_GREATER
+                    var nse = Model.dynamoViewModel.Model.SearchModel.SearchEntries.Where(n => n.IsVisibleInSearch).FirstOrDefault(s =>
+                        s.CreationName.Contains(NodeToSwapTo.OriginalName));
+#endif
 
                     var dynMethod = nse.GetType().GetMethod("ConstructNewNodeModel",
                         BindingFlags.NonPublic | BindingFlags.Instance);
