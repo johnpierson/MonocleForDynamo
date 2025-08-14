@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ClientModel;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -10,12 +11,13 @@ using Dynamo.Graph.Notes;
 using Dynamo.Models;
 using Dynamo.ViewModels;
 using MonocleViewExtension.Utilities;
+using OpenAI;
 using OpenAI.Assistants;
 using OpenAI.Chat;
 
 namespace MonocleViewExtension.Foca
 {
-    
+
     public class FocaAI
     {
         // Chat GPT related fields
@@ -32,18 +34,25 @@ namespace MonocleViewExtension.Foca
         private readonly List<MessageContent> assistantMessages = new List<MessageContent>();
 #pragma warning restore OPENAI001 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
 
+        List<ChatMessage> chatMessages = new List<ChatMessage>();
+
         /// <summary>
         /// Response from backend service
         /// </summary>
         internal string response;
 
-        public FocaAI(string apiKey)
+        public FocaAI(string apiKey, string endpoint = "https://api.x.ai/v1")
         {
-            // Create a ChatGPTClient instance with the API key
-            chatGPTClient = new(model: "gpt-4o-mini", apiKey);
+            // Create a ChatGPTClient instance with the API key and endpoint
+            chatGPTClient = new(
+                model: "grok-3-mini", // Or other Grok model names like "grok-beta"
+                credential: new ApiKeyCredential(apiKey),
+                options: new OpenAIClientOptions() { Endpoint = new Uri(endpoint) });
 
-            // Create a ChatGPTAssistantClient instance with the API key
-            //assistantClient = new(apiKey);
+            chatMessages.Add(new SystemChatMessage("Revit & Dynamo expert, adept at graph creation/modification, element management, & workflow automation. Proficient in Dynamo, Revit, BIM, AutoCAD, Custom Nodes, Packages, Python, & architectural modeling. Offer clear explanations, best practices, & code examples.\r\n\r\n"));
+
+            // Create a ChatGPTAssistantClient instance with the API key and endpoint
+            //assistantClient = new(apiKey, endpoint);
 
             //assistant = assistantClient.GetAssistant("asst_J8PSA1asQDqEGluCGMykzJhJ").Value;
         }
@@ -52,7 +61,9 @@ namespace MonocleViewExtension.Foca
         {
             // Send the user's input to the ChatGPT client and start to stream the response
             // Single chat completion
-            ChatCompletion completion = await chatGPTClient.CompleteChatAsync(msg);
+            chatMessages.Add(ChatMessage.CreateUserMessage(msg));
+
+            ChatCompletion completion = await chatGPTClient.CompleteChatAsync(chatMessages);
             response = completion.Content[0].Text;
         }
 
@@ -79,26 +90,27 @@ namespace MonocleViewExtension.Foca
                     noteText.Add(noteModel.Text);
                 }
             }
-            string prompt =
-                $"Given the following nodes from the Dynamo visual programming tool: {string.Join(',', nodeNames)} and notes with descriptive text of {string.Join(',', noteText)}. " +
-                $"What would you title a grouping of these nodes as, in a few words? and what would you add as a more detailed description, in about 40 words or less? Please provide the response as xml, with open and close for title and description.";
+            string noteTexts = noteText.Any() ? $"Dynamo Notes containing text: {string.Join(',', noteText)}" : "";
+
+
+            string prompt = $"Dynamo nodes: {string.Join(',', nodeNames)}{noteTexts}. Suggest concise title and description (<20 words)." +
+                            "<response_format>\r\n<title></title>\r\n<description></description>";
 
             var apiKey = Globals.OpenAIApiKey;
+
 
             FocaAI focaAi =
                 new FocaAI(apiKey);
 
             await focaAi.SendMessageToGPT(prompt);
 
-
             var result = focaAi.response;
-
 
             newGroup.AnnotationDescriptionText = Utilities.StringUtils.FindTextBetween(result, "<description>", "</description>");
             newGroup.AnnotationText = Utilities.StringUtils.FindTextBetween(result, "<title>", "</title>");
         }
 
-       
+
 
         #endregion
     }

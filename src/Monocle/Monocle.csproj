@@ -369,7 +369,7 @@
 		<PackageReference Include="DynamoVisualProgramming.DynamoServices" Version="$(DynVersion).*" />
 		<PackageReference Include="DynamoVisualProgramming.WpfUILibrary" Version="$(DynVersion).*" />
 		<PackageReference Include="DynamoVisualProgramming.ZeroTouchLibrary" Version="$(DynVersion).*" />
-		<PackageReference Include="OpenAI" Version="2.1.0" />
+		<PackageReference Include="OpenAI" Version="2.3.0" />
 		<PackageReference Include="Prism" Version="4.1.0.0" />
 		<PackageReference Include="SharpDX" Version="4.2.0" />
 		<PackageReference Include="SharpDX.D3DCompiler" Version="4.2.0" />

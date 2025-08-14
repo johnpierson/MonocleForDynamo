@@ -96,7 +96,7 @@ namespace MonocleViewExtension.Foca
                 Globals.IsFocaAiEnabled = true;
 
                 //check if the environment variable already exists
-                string? apiKey = Environment.GetEnvironmentVariable("OpenAIApiKey", EnvironmentVariableTarget.User);
+                string? apiKey = Environment.GetEnvironmentVariable("GrokApiKey", EnvironmentVariableTarget.User);
 
                 if (!string.IsNullOrEmpty(apiKey))
                 {
@@ -105,11 +105,11 @@ namespace MonocleViewExtension.Foca
 
                 else
                 {
-                    var inputBox = Microsoft.VisualBasic.Interaction.InputBox("enter open ai api key. this never leaves your machine and is stored under environment variable, OpenAIApiKey.",
-                        "open ai api key not found",
+                    var inputBox = Microsoft.VisualBasic.Interaction.InputBox("enter Grok api key. this never leaves your machine and is stored under environment variable, GrokApiKey.",
+                        "grok api key not found",
                         "");
                     
-                    Environment.SetEnvironmentVariable("OpenAIApiKey",inputBox.Trim(),EnvironmentVariableTarget.User);
+                    Environment.SetEnvironmentVariable("GrokApiKey", inputBox.Trim(),EnvironmentVariableTarget.User);
 
                     Globals.OpenAIApiKey = inputBox;
                 }
@@ -119,6 +119,21 @@ namespace MonocleViewExtension.Foca
                 Globals.IsFocaAiEnabled = false;
             };
             focaMainMenuItem.Items.Add(focaAiMenuItem);
+
+            if (Globals.IsFocaAiEnabled)
+            {
+                string? apiKey = Environment.GetEnvironmentVariable("GrokApiKey", EnvironmentVariableTarget.User);
+
+                if (!string.IsNullOrEmpty(apiKey))
+                {
+                    Globals.OpenAIApiKey = apiKey;
+                }
+                else
+                {
+                    focaAiMenuItem.IsChecked = false;
+                    Globals.IsFocaAiEnabled = false;
+                }
+            }
 
 
             var colorCodeMenuItem = new MenuItem { Header = Properties.Resources.FocaStandardGroupMenuItemHeader };

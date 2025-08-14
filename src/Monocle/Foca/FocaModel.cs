@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using CoreNodeModels;
 using CoreNodeModels.Input;
@@ -21,11 +22,13 @@ using Dynamo.Nodes;
 using Dynamo.Utilities;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
+using Microsoft.VisualBasic.Devices;
 using MonocleViewExtension.NodeSwapper;
 using MonocleViewExtension.Utilities;
 using OpenAI.Assistants;
 using OpenAI.Chat;
 using Xceed.Wpf.AvalonDock.Controls;
+using Keyboard = System.Windows.Input.Keyboard;
 using Thickness = System.Windows.Thickness;
 
 namespace MonocleViewExtension.Foca
@@ -580,22 +583,45 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
             }
 
             //cool ai stuff
-            if (!Globals.IsFocaAiEnabled) return;
+            if (!Globals.IsFocaAiEnabled && !Keyboard.IsKeyDown(Key.LeftShift)) return;
 
             var newGroup = DynamoViewModel.CurrentSpaceViewModel.Annotations.Last();
 
+            string ogTitle = newGroup.AnnotationText;
+            string ogDescription = newGroup.AnnotationDescriptionText;
+
+            newGroup.AnnotationText = "generating title ✨";
+            newGroup.AnnotationDescriptionText = "generating description ✨";
+
+
+            var aiTask = FocaAI.SetGroupTitleAndDescription(newGroup);
+
+            while (!aiTask.IsCompleted)
+            {
+                newGroup.AnnotationText += "✨";
+                newGroup.AnnotationDescriptionText += "✨";
+                if (newGroup.AnnotationText.Length > 30)
+                {
+                    newGroup.AnnotationText = "generating title ✨";
+                    newGroup.AnnotationDescriptionText = "generating description ✨";
+                }
+                await Task.Delay(75);
+            }
+
             try
             {
-                await FocaAI.SetGroupTitleAndDescription(newGroup);
+                await aiTask;
             }
             catch (Exception e)
             {
                 Dynamo.Logging.LogMessage.Error($"Failed to call OpenAI - {e.Message}");
+                newGroup.AnnotationText = ogTitle;
+                newGroup.AnnotationDescriptionText = ogDescription;
             }
            
         }
 
-        }
+        
 
         public void AlignSelected(string alignment)
         {
