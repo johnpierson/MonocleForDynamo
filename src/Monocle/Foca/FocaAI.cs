@@ -45,7 +45,7 @@ namespace MonocleViewExtension.Foca
         {
             // Create a ChatGPTClient instance with the API key and endpoint
             chatGPTClient = new(
-                model: "grok-3-mini", // Or other Grok model names like "grok-beta"
+                model: "grok-code-fast-1", // Or other Grok model names like "grok-beta"
                 credential: new ApiKeyCredential(apiKey),
                 options: new OpenAIClientOptions() { Endpoint = new Uri(endpoint) });
 
