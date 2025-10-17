@@ -23,7 +23,7 @@ jobs:
       - name: Consume 
         run: |
           echo ${{ steps.fetch-latest-release.outputs.release }}
-      - uses: captradeoff/x-post-action@v1
+      - uses: captradeoff/x-post-action@v1.2
         with:
           message: "New Monocle for #DynamoBIM Release: https://github.com/johnpierson/MonocleForDynamo/releases/tag/${{ steps.fetch-latest-release.outputs.release }}" 
           appKey: ${{ secrets.TWITTER_CONSUMER_API_KEY }}
