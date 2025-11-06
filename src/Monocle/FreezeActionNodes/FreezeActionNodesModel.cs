@@ -64,7 +64,7 @@ namespace MonocleViewExtension.FreezeActionNodes
         }
 
         /// <summary>
-        /// Determines if a node is an action node (performs side effects)
+        /// Determines if a node is an action node (performs side effects or creates data)
         /// </summary>
         /// <param name="nodeModel">The node to check</param>
         /// <returns>True if the node is an action node</returns>
@@ -103,7 +103,9 @@ namespace MonocleViewExtension.FreezeActionNodes
 
                 // Check node name for common action node patterns
                 var nodeName = nodeModel.Name.ToLower();
-                var actionKeywords = new[] { "write", "save", "export", "delete", "modify", "update", "create", "set", "add", "remove" };
+                
+                // Action keywords (nodes that modify or perform operations)
+                var actionKeywords = new[] { "write", "save", "export", "delete", "modify", "update", "set", "add", "remove" };
                 if (actionKeywords.Any(keyword => nodeName.Contains(keyword)))
                 {
                     // Additional check: make sure it's not just a query node
@@ -113,9 +115,22 @@ namespace MonocleViewExtension.FreezeActionNodes
                     }
                 }
 
-                // Check category for action-related categories
+                // Data creation keywords (nodes that create new data/objects)
+                // "By" is a common Dynamo pattern for constructors (e.g., "Point.ByCoordinates", "Line.ByStartPointEndPoint")
+                var createKeywords = new[] { "by", "create", "new", "generate", "build", "make", "construct" };
+                if (createKeywords.Any(keyword => nodeName.Contains(keyword)))
+                {
+                    // Skip query/read operations that might contain these words
+                    if (!nodeName.Contains("query") && !nodeName.Contains("get") && !nodeName.Contains("read"))
+                    {
+                        return true;
+                    }
+                }
+
+                // Check category for action-related or creation-related categories
                 var category = nodeModel.Category?.ToLower() ?? "";
-                if (category.Contains("action") || category.Contains("modify") || category.Contains("write"))
+                if (category.Contains("action") || category.Contains("modify") || category.Contains("write") ||
+                    category.Contains("create") || category.Contains("geometry") || category.Contains("build"))
                 {
                     return true;
                 }

@@ -17,8 +17,8 @@ namespace MonocleViewExtension.FreezeActionNodes
             
             var freezeActionNodesMenu = new MenuItem 
             { 
-                Header = "Freeze Action Nodes",
-                ToolTip = "Toggles the frozen state of all action nodes in the graph (freezes if unfrozen, unfreezes if frozen)"
+                Header = "freeze/thaw action nodes",
+                ToolTip = "toggles the frozen state of all action nodes in the graph (freezes if unfrozen, thaws if frozen). yes, this is an autocad reference with freeze/thaw."
             };
 
             freezeActionNodesMenu.Click += (sender, args) =>
