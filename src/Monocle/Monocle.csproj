@@ -431,7 +431,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="DynamoPackages">
-			<HintPath>C:\Program Files\Autodesk\Revit 2022\AddIns\DynamoForRevit\DynamoPackages.dll</HintPath>
+			<HintPath>C:\Program Files\Autodesk\Revit 2023\AddIns\DynamoForRevit\DynamoPackages.dll</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="PresentationCore" />
