@@ -14,6 +14,7 @@ using MonocleViewExtension.BetterSave;
 using MonocleViewExtension.Debug;
 using MonocleViewExtension.FancyPaste;
 using MonocleViewExtension.Foca;
+using MonocleViewExtension.FreezeActionNodes;
 using MonocleViewExtension.GraphResizerer;
 using MonocleViewExtension.InlineNodeConnectomatic;
 using MonocleViewExtension.MonocleSettings;
@@ -109,6 +110,7 @@ namespace MonocleViewExtension
             ScaffoldTheJacobSmallSpecial(p);
 
             NodeDocumentationCommand.AddMenuItem(monocleMenuItem, p);
+            FreezeActionNodesCommand.AddMenuItem(monocleMenuItem, p);
 
             //debug stuff
             var debugMenu = p.dynamoMenu.Items.OfType<MenuItem>().FirstOrDefault(m => m.Header.Equals("De_bug"));
