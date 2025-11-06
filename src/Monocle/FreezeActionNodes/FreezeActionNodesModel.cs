@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using CoreNodeModels;
@@ -13,6 +14,9 @@ namespace MonocleViewExtension.FreezeActionNodes
 {
     internal class FreezeActionNodesModel
     {
+        // Static list to track nodes that were frozen by this command
+        private static HashSet<Guid> _frozenNodeGuids = new HashSet<Guid>();
+
         public DynamoView DynamoView { get; }
         public DynamoViewModel DynamoViewModel { get; }
         public ViewLoadedParams LoadedParams { get; }
@@ -26,36 +30,89 @@ namespace MonocleViewExtension.FreezeActionNodes
 
         /// <summary>
         /// Toggles the frozen state of all action nodes in the graph (freezes if unfrozen, unfreezes if frozen)
+        /// Only unfreezes nodes that were previously frozen by this command
         /// </summary>
         /// <returns>Number of nodes toggled</returns>
         public int FreezeActionNodes()
         {
             int toggledCount = 0;
 
-            // Get all nodes in the current workspace
-            var allNodes = DynamoViewModel.CurrentSpaceViewModel.Nodes.ToList();
-
-            foreach (var nodeViewModel in allNodes)
+            // If we have tracked nodes, we're in "unfreeze" mode - only unfreeze tracked nodes
+            if (_frozenNodeGuids.Count > 0)
             {
-                var nodeModel = nodeViewModel.NodeModel;
+                // Get all nodes in the current workspace
+                var allNodes = DynamoViewModel.CurrentSpaceViewModel.Nodes.ToList();
+                var allNodeGuids = allNodes.Select(nvm => nvm.NodeModel.GUID).ToHashSet();
+                var nodesToRemove = new List<Guid>();
 
-                // Check if this node is an action node
-                if (IsActionNode(nodeModel))
+                // First, clean up any tracked nodes that no longer exist in the workspace
+                var nodesToCleanup = _frozenNodeGuids.Where(guid => !allNodeGuids.Contains(guid)).ToList();
+                foreach (var guid in nodesToCleanup)
                 {
-                    try
+                    _frozenNodeGuids.Remove(guid);
+                }
+
+                foreach (var nodeViewModel in allNodes)
+                {
+                    var nodeModel = nodeViewModel.NodeModel;
+                    var nodeGuid = nodeModel.GUID;
+
+                    // Only process nodes that we previously froze
+                    if (_frozenNodeGuids.Contains(nodeGuid))
                     {
-                        // Toggle the frozen state of the node
-                        if (ToggleNodeFreeze(nodeModel))
+                        try
                         {
-                            toggledCount++;
+                            // Unfreeze the node
+                            if (UnfreezeNode(nodeModel))
+                            {
+                                toggledCount++;
+                                nodesToRemove.Add(nodeGuid);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // Log warning but continue processing other nodes
+                            DynamoViewModel.Model.Logger.LogWarning(
+                                $"Monocle- Failed to unfreeze node {nodeModel.Name}: {ex.Message}",
+                                WarningLevel.Mild);
                         }
                     }
-                    catch (Exception ex)
+                }
+
+                // Remove unfrozen nodes from tracking list
+                foreach (var guid in nodesToRemove)
+                {
+                    _frozenNodeGuids.Remove(guid);
+                }
+            }
+            else
+            {
+                // No tracked nodes, so we're in "freeze" mode - freeze all action nodes
+                var allNodes = DynamoViewModel.CurrentSpaceViewModel.Nodes.ToList();
+
+                foreach (var nodeViewModel in allNodes)
+                {
+                    var nodeModel = nodeViewModel.NodeModel;
+
+                    // Check if this node is an action node
+                    if (IsActionNode(nodeModel))
                     {
-                        // Log warning but continue processing other nodes
-                        DynamoViewModel.Model.Logger.LogWarning(
-                            $"Monocle- Failed to toggle freeze state for node {nodeModel.Name}: {ex.Message}",
-                            WarningLevel.Mild);
+                        try
+                        {
+                            // Freeze the node and track it
+                            if (FreezeNode(nodeModel))
+                            {
+                                toggledCount++;
+                                _frozenNodeGuids.Add(nodeModel.GUID);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // Log warning but continue processing other nodes
+                            DynamoViewModel.Model.Logger.LogWarning(
+                                $"Monocle- Failed to freeze node {nodeModel.Name}: {ex.Message}",
+                                WarningLevel.Mild);
+                        }
                     }
                 }
             }
@@ -144,15 +201,15 @@ namespace MonocleViewExtension.FreezeActionNodes
         }
 
         /// <summary>
-        /// Toggles the frozen state of a node by setting its IsFrozen property
+        /// Freezes a node by setting its IsFrozen property to true
         /// </summary>
-        /// <param name="nodeModel">The node to toggle</param>
-        /// <returns>True if the node's frozen state was successfully toggled</returns>
-        private bool ToggleNodeFreeze(NodeModel nodeModel)
+        /// <param name="nodeModel">The node to freeze</param>
+        /// <returns>True if the node was successfully frozen</returns>
+        private bool FreezeNode(NodeModel nodeModel)
         {
             try
             {
-                // Try to toggle IsFrozen property directly on the node model
+                // Try to set IsFrozen property directly on the node model
                 var nodeType = nodeModel.GetType();
                 var isFrozenProperty = nodeType.GetProperty("IsFrozen", BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
                 
@@ -162,9 +219,13 @@ namespace MonocleViewExtension.FreezeActionNodes
                     var currentValue = isFrozenProperty.GetValue(nodeModel);
                     if (currentValue is bool isFrozen)
                     {
-                        // Toggle the frozen state
-                        isFrozenProperty.SetValue(nodeModel, !isFrozen);
-                        return true;
+                        // Only freeze if not already frozen
+                        if (!isFrozen)
+                        {
+                            isFrozenProperty.SetValue(nodeModel, true);
+                            return true;
+                        }
+                        return false; // Already frozen
                     }
                 }
 
@@ -182,9 +243,75 @@ namespace MonocleViewExtension.FreezeActionNodes
                         var currentValue = vmIsFrozenProperty.GetValue(nodeViewModel);
                         if (currentValue is bool isFrozen)
                         {
-                            // Toggle the frozen state
-                            vmIsFrozenProperty.SetValue(nodeViewModel, !isFrozen);
+                            // Only freeze if not already frozen
+                            if (!isFrozen)
+                            {
+                                vmIsFrozenProperty.SetValue(nodeViewModel, true);
+                                return true;
+                            }
+                            return false; // Already frozen
+                        }
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Unfreezes a node by setting its IsFrozen property to false
+        /// </summary>
+        /// <param name="nodeModel">The node to unfreeze</param>
+        /// <returns>True if the node was successfully unfrozen</returns>
+        private bool UnfreezeNode(NodeModel nodeModel)
+        {
+            try
+            {
+                // Try to set IsFrozen property directly on the node model
+                var nodeType = nodeModel.GetType();
+                var isFrozenProperty = nodeType.GetProperty("IsFrozen", BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
+                
+                if (isFrozenProperty != null && isFrozenProperty.CanWrite)
+                {
+                    // Get current frozen state
+                    var currentValue = isFrozenProperty.GetValue(nodeModel);
+                    if (currentValue is bool isFrozen)
+                    {
+                        // Only unfreeze if currently frozen
+                        if (isFrozen)
+                        {
+                            isFrozenProperty.SetValue(nodeModel, false);
                             return true;
+                        }
+                        return false; // Already unfrozen
+                    }
+                }
+
+                // If direct property access doesn't work, try setting through ViewModel
+                var nodeViewModel = DynamoViewModel.CurrentSpaceViewModel.Nodes
+                    .FirstOrDefault(nvm => nvm.NodeModel.GUID == nodeModel.GUID);
+                
+                if (nodeViewModel != null)
+                {
+                    var viewModelType = nodeViewModel.GetType();
+                    var vmIsFrozenProperty = viewModelType.GetProperty("IsFrozen", BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic);
+                    
+                    if (vmIsFrozenProperty != null && vmIsFrozenProperty.CanWrite)
+                    {
+                        var currentValue = vmIsFrozenProperty.GetValue(nodeViewModel);
+                        if (currentValue is bool isFrozen)
+                        {
+                            // Only unfreeze if currently frozen
+                            if (isFrozen)
+                            {
+                                vmIsFrozenProperty.SetValue(nodeViewModel, false);
+                                return true;
+                            }
+                            return false; // Already unfrozen
                         }
                     }
                 }
