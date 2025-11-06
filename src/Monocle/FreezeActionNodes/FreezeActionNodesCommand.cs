@@ -18,19 +18,19 @@ namespace MonocleViewExtension.FreezeActionNodes
             var freezeActionNodesMenu = new MenuItem 
             { 
                 Header = "Freeze Action Nodes",
-                ToolTip = "Freezes all nodes in the graph that perform actions (nodes with side effects)"
+                ToolTip = "Toggles the frozen state of all action nodes in the graph (freezes if unfrozen, unfreezes if frozen)"
             };
 
             freezeActionNodesMenu.Click += (sender, args) =>
             {
                 var m = new FreezeActionNodesModel(dvm, p);
-                int frozenCount = m.FreezeActionNodes();
+                int toggledCount = m.FreezeActionNodes();
                 
                 dvm.Model.Logger.LogNotification(
                     "Monocle",
                     "FreezeActionNodes",
-                    $"Frozen {frozenCount} action node(s)",
-                    $"Successfully froze {frozenCount} action node(s) in the graph."
+                    $"Toggled {toggledCount} action node(s)",
+                    $"Successfully toggled frozen state for {toggledCount} action node(s) in the graph."
                 );
             };
 
