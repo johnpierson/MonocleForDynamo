@@ -276,6 +276,9 @@ namespace MonocleViewExtension.Foca
 
         public void PowList(List<NodeModel> nodeModel, bool customSelectionOption = false)
         {
+#if !D216_OR_GREATER
+        return;    
+#endif
             foreach (var node in nodeModel)
             {
                 if (node.OutPorts.Count > 1 || node.CachedValue is null)
