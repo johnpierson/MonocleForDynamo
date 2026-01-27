@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -17,6 +17,7 @@ using MonocleViewExtension.Foca;
 using MonocleViewExtension.GraphResizerer;
 using MonocleViewExtension.InlineNodeConnectomatic;
 using MonocleViewExtension.MonocleSettings;
+using MonocleViewExtension.NodeCount;
 using MonocleViewExtension.NodeDocumentation;
 using MonocleViewExtension.NodeSwapper;
 using MonocleViewExtension.PackageUsage;
@@ -106,6 +107,7 @@ namespace MonocleViewExtension
             MonocleSettingsCommand.AddMenuItem(monocleMenuItem);
             FancyPasteCommand.AddMenuItem(p);
             BetterSaveCommand.AddMenuItem(p);
+            NodeCountCommand.AddMenuItem(monocleMenuItem, p);
             ScaffoldTheJacobSmallSpecial(p);
 
             NodeDocumentationCommand.AddMenuItem(monocleMenuItem, p);
