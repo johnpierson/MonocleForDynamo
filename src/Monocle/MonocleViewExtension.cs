@@ -14,10 +14,10 @@ using MonocleViewExtension.BetterSave;
 using MonocleViewExtension.Debug;
 using MonocleViewExtension.FancyPaste;
 using MonocleViewExtension.Foca;
+using MonocleViewExtension.GraphInformation;
 using MonocleViewExtension.GraphResizerer;
 using MonocleViewExtension.InlineNodeConnectomatic;
 using MonocleViewExtension.MonocleSettings;
-using MonocleViewExtension.NodeCount;
 using MonocleViewExtension.NodeDocumentation;
 using MonocleViewExtension.NodeSwapper;
 using MonocleViewExtension.PackageUsage;
@@ -107,7 +107,7 @@ namespace MonocleViewExtension
             MonocleSettingsCommand.AddMenuItem(monocleMenuItem);
             FancyPasteCommand.AddMenuItem(p);
             BetterSaveCommand.AddMenuItem(p);
-            NodeCountCommand.AddMenuItem(monocleMenuItem, p);
+            GraphInformationCommand.AddMenuItem(monocleMenuItem, p);
             ScaffoldTheJacobSmallSpecial(p);
 
             NodeDocumentationCommand.AddMenuItem(monocleMenuItem, p);
