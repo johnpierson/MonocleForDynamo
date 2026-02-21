@@ -11,7 +11,6 @@ using Dynamo.PackageManager;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.About;
 using MonocleViewExtension.BetterSave;
-using MonocleViewExtension.Debug;
 using MonocleViewExtension.FancyPaste;
 using MonocleViewExtension.Foca;
 using MonocleViewExtension.GraphInformation;
@@ -35,6 +34,7 @@ namespace MonocleViewExtension
 
         public void Dispose()
         {
+            AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomainOnAssemblyResolve;
         }
 
         public void Startup(ViewStartupParams viewStartupParams)
@@ -111,14 +111,6 @@ namespace MonocleViewExtension
             ScaffoldTheJacobSmallSpecial(p);
 
             NodeDocumentationCommand.AddMenuItem(monocleMenuItem, p);
-
-            //debug stuff
-            var debugMenu = p.dynamoMenu.Items.OfType<MenuItem>().FirstOrDefault(m => m.Header.Equals("De_bug"));
-            if (debugMenu != null)
-            {
-                PlaceAllNodes.AddMenuItem(debugMenu,p);
-            }
-
 
             /*if the user has plugins loaded in Revit (or otherwise) that use a toolkit called "DevExpress",
             we fix the overrides that toolkit forces on the app.

@@ -59,15 +59,18 @@ namespace MonocleViewExtension.Utilities
         public static void SerializeModels(string filename, MonocleSettings settings)
         {
             var xmls = new XmlSerializer(settings.GetType());
-            var writer = new StreamWriter(filename);
-            xmls.Serialize(writer, settings);
-            writer.Close();
+            using (var writer = new StreamWriter(filename))
+            {
+                xmls.Serialize(writer, settings);
+            }
         }
         public static MonocleSettings DeserializeModels(string filename)
         {
-            var fs = new FileStream(filename, FileMode.Open);
-            var xmls = new XmlSerializer(typeof(MonocleSettings));
-            return (MonocleSettings)xmls.Deserialize(fs);
+            using (var fs = new FileStream(filename, FileMode.Open))
+            {
+                var xmls = new XmlSerializer(typeof(MonocleSettings));
+                return (MonocleSettings)xmls.Deserialize(fs);
+            }
         }
 
         public static void LoadMonocleSettings()
