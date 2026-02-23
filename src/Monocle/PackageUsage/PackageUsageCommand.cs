@@ -200,38 +200,6 @@ namespace MonocleViewExtension.PackageUsage
             {
                 m.DynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
             }
-
-            InputGestureCollection gestures = new InputGestureCollection
-            {
-                new KeyGesture(Key.P, ModifierKeys.Control | ModifierKeys.Shift)
-            };
-
-            RoutedUICommand uiCommand = new RoutedUICommand("PackageUsage", "PackageUsageCommand", typeof(ResourceNames.MainWindow), gestures);
-            var binding = new CommandBinding(uiCommand);
-            binding.Executed += (sender, args) =>
-            {
-                //var dvm = p.DynamoWindow.DataContext as DynamoViewModel;
-                //var m = new PackageUsageModel(dvm, p);
-                var vm = new PackageUsageViewModel(m);
-
-                var boringWindow = new PackageUsageView
-                {
-                    // Set the data context for the main grid in the window.
-                    MainGrid = { DataContext = vm },
-                    // Set the owner of the window to the Dynamo window.
-                    Owner = p.DynamoWindow,
-                    Top = p.DynamoWindow.Top + 200,
-                    Left = p.DynamoWindow.Left + 200,
-                };
-
-                boringWindow.Show();
-
-                //unsubscribe from events
-                boringWindow.Closing += (o, eventArgs) => vm.Dispose();
-            };
-
-
-            view.CommandBindings.Add(binding);
         }
     }
 }
