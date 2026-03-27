@@ -404,7 +404,7 @@ namespace MonocleViewExtension.PackageUsage
         }
         public string GetPackageVersion(NodeModel node)
         {
-            string version = null;
+            string version = "";
             //event handlers for when changes are made
             try
             {
