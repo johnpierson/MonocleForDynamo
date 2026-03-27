@@ -408,11 +408,13 @@ namespace MonocleViewExtension.PackageUsage
             //event handlers for when changes are made
             try
             {
+#if D25_OR_GREATER
                 if (Globals.PmExtension?.PackageLoader == null) return "";
                 var packageName = GetPackageName(node).SimplifyString();
                 var targetInfo = Globals.PmExtension.PackageLoader.LocalPackages.FirstOrDefault(x => x.Name.SimplifyString() == packageName);
 
                 version = $"v.{targetInfo.VersionName}";
+#endif
             }
             catch (Exception)
             {
