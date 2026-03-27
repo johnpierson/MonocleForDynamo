@@ -1,0 +1,157 @@
+name: Build MonocleForDynamo
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Setup MSBuild for .NET Framework
+        uses: microsoft/setup-msbuild@v1.3
+
+      - name: Build Monocle - Release 2.0
+        run: |
+          msbuild src/Monocle/Monocle.sln /p:Configuration="Release 2.0" /p:Platform="Any CPU" /t:Restore,Build
+
+      - name: Build Monocle - Release 2.1
+        run: |
+          msbuild src/Monocle/Monocle.sln /p:Configuration="Release 2.1" /p:Platform="Any CPU" /t:Restore,Build
+
+      - name: Build Monocle - Release 2.2
+        run: |
+          msbuild src/Monocle/Monocle.sln /p:Configuration="Release 2.2" /p:Platform="Any CPU" /t:Restore,Build
+
+      - name: Build Monocle - Release 2.3
+        run: |
+          msbuild src/Monocle/Monocle.sln /p:Configuration="Release 2.3" /p:Platform="Any CPU" /t:Restore,Build
+
+      - name: Build Monocle - Release 2.5
+        run: |
+          msbuild src/Monocle/Monocle.sln /p:Configuration="Release 2.5" /p:Platform="Any CPU" /t:Restore,Build
+
+      - name: Build Monocle - Release 2.6
+        run: |
+          msbuild src/Monocle/Monocle.sln /p:Configuration="Release 2.6" /p:Platform="Any CPU" /t:Restore,Build
+
+      - name: Build Monocle - Release 2.10
+        run: |
+          msbuild src/Monocle/Monocle.sln /p:Configuration="Release 2.10" /p:Platform="Any CPU" /t:Restore,Build
+
+      - name: Build Monocle - Release 2.12
+        run: |
+          msbuild src/Monocle/Monocle.sln /p:Configuration="Release 2.12" /p:Platform="Any CPU" /t:Restore,Build
+
+      - name: Build Monocle - Release 2.13
+        run: |
+          msbuild src/Monocle/Monocle.sln /p:Configuration="Release 2.13" /p:Platform="Any CPU" /t:Restore,Build
+
+      - name: Build Monocle - Release 2.16
+        run: |
+          msbuild src/Monocle/Monocle.sln /p:Configuration="Release 2.16" /p:Platform="Any CPU" /t:Restore,Build
+
+      - name: Build Monocle - Release 2.17
+        run: |
+          msbuild src/Monocle/Monocle.sln /p:Configuration="Release 2.17" /p:Platform="Any CPU" /t:Restore,Build
+
+      - name: Build Monocle - Release 2.18
+        run: |
+          msbuild src/Monocle/Monocle.sln /p:Configuration="Release 2.18" /p:Platform="Any CPU" /t:Restore,Build
+
+      - name: Build Monocle - Release 2.19
+        run: |
+          msbuild src/Monocle/Monocle.sln /p:Configuration="Release 2.19" /p:Platform="Any CPU" /t:Restore,Build
+
+      - name: Build Monocle - Release 3.0
+        run: |
+          msbuild src/Monocle/Monocle.sln /p:Configuration="Release 3.0" /p:Platform="Any CPU" /t:Restore,Build
+
+      - name: Build Monocle - Release 3.1
+        run: |
+          msbuild src/Monocle/Monocle.sln /p:Configuration="Release 3.1" /p:Platform="Any CPU" /t:Restore,Build
+
+      - name: Build Monocle - Release 3.2
+        run: |
+          msbuild src/Monocle/Monocle.sln /p:Configuration="Release 3.2" /p:Platform="Any CPU" /t:Restore,Build
+
+      - name: Build Monocle - Release 3.3
+        run: |
+          msbuild src/Monocle/Monocle.sln /p:Configuration="Release 3.3" /p:Platform="Any CPU" /t:Restore,Build
+
+      - name: Build Monocle - Release 3.4
+        run: |
+          msbuild src/Monocle/Monocle.sln /p:Configuration="Release 3.4" /p:Platform="Any CPU" /t:Restore,Build
+
+      - name: Verify deploy folder structure
+        run: |
+          Write-Host "Verifying deploy folder structure..."
+          $deployPath = "deploy"
+          $versions = @("2.0", "2.1", "2.2", "2.3", "2.5", "2.6", "2.10", "2.12", "2.13", "2.16", "2.17", "2.18", "2.19", "3.0", "3.1", "3.2", "3.3", "3.4")
+
+          $allValid = $true
+
+          foreach ($version in $versions) {
+            $dllPath = Join-Path $deployPath $version "MonocleViewExtension.dll"
+            if (-not (Test-Path $dllPath)) {
+              Write-Host "ERROR: Missing $dllPath" -ForegroundColor Red
+              $allValid = $false
+            } else {
+              Write-Host "Found $dllPath" -ForegroundColor Green
+            }
+          }
+
+          if (-not $allValid) {
+            Write-Host "Build verification failed - some required files are missing" -ForegroundColor Red
+            exit 1
+          }
+          Write-Host "All required files verified successfully!" -ForegroundColor Green
+
+      - name: Configure Git
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+      - name: Commit and push deploy folder changes
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        run: |
+          git add deploy/
+          $changes = git diff --cached --name-only
+          if ($changes) {
+            $commitMessage = "chore: update deploy folder with latest builds [skip ci]"
+            git commit -m $commitMessage
+            Write-Host "Committed deploy folder changes"
+            git push origin HEAD:${{ github.ref_name }}
+            Write-Host "Pushed changes to ${{ github.ref_name }}"
+          } else {
+            Write-Host "No changes to commit in deploy folder"
+          }
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-folder
+          path: deploy/
+          retention-days: 30

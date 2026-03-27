@@ -288,7 +288,7 @@
 	<PropertyGroup>
 		<DynVersion>$(DynamoVersion)</DynVersion>
 		<BuildOutput>$(DynamoOutput)</BuildOutput>
-		<FolderPackages>C:\Users\piersoj\Documents\Repos\MonocleForDynamo\deploy\$(BuildOutput)\</FolderPackages>
+		<FolderPackages>$(MSBuildProjectDirectory)\..\..\deploy\$(BuildOutput)\</FolderPackages>
 	</PropertyGroup>
 	<PropertyGroup>
 		<StartAction>Program</StartAction>
