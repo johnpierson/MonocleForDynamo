@@ -66,7 +66,7 @@ namespace MonocleViewExtension
         public void Loaded(ViewLoadedParams p)
         {
             //store the package manager extension for getting package versions
-#if D25_OR_GREATER
+#if D219_OR_GREATER
             Globals.PmExtension = p.ViewStartupParams.ExtensionManager.Extensions.OfType<PackageManagerExtension>().FirstOrDefault();
 #endif
             

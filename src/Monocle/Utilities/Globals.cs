@@ -11,7 +11,7 @@ namespace MonocleViewExtension.Utilities
 {
     public class Globals
     {
-#if D25_OR_GREATER
+#if D219_OR_GREATER
         public static PackageManagerExtension PmExtension { get; set; }
 #else
         public static object PmExtension { get; set; }
