@@ -416,6 +416,10 @@
 		</Reference>
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+		<Reference Include="DynamoPackages">
+			<HintPath>..\..\dynamoResources\netFramework48\DynamoPackages.dll</HintPath>
+			<Private>False</Private>
+		</Reference>
 		<Reference Include="HelixToolkit">
 			<HintPath>..\..\dynamoResources\netFramework48\HelixToolkit.dll</HintPath>
 			<Private>False</Private>
@@ -430,10 +434,6 @@
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
-		<Reference Include="DynamoPackages">
-			<HintPath>C:\Program Files\Autodesk\Revit 2022\AddIns\DynamoForRevit\DynamoPackages.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
 		<Reference Include="PresentationCore" />
 		<Reference Include="PresentationFramework" />
 		<Reference Include="System.Configuration" />
