@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -511,12 +511,12 @@ namespace MonocleViewExtension.Foca
                 if (caseSwitch.Contains("NodeModel"))
                 {
 
-#if !net8
+#if !net8 && !net10
 annotationCommand =
                         new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
                             currentSelection.CenterX, currentSelection.CenterY, false);
 #endif
-#if net8
+#if net8 || net10
                     //TODO: Implement group descriptions in monocle
                     annotationCommand =
                         new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,string.Empty,
@@ -530,12 +530,12 @@ annotationCommand =
                 {
                     try
                     {
-#if !net8
+#if !net8 && !net10
 annotationCommand =
                         new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
                             currentSelection.CenterX, currentSelection.CenterY, false);
 #endif
-#if net8
+#if net8 || net10
                         //TODO: Implement group descriptions in monocle
                         annotationCommand =
                             new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText, string.Empty,
@@ -555,11 +555,11 @@ annotationCommand =
             {
                 try
                 {
-#if !net8
+#if !net8 && !net10
 var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
                         0, 0, false);
 #endif
-#if net8
+#if net8 || net10
                     var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,string.Empty,
                         0, 0, false);
 #endif
