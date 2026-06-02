@@ -148,39 +148,47 @@ namespace MonocleViewExtension.PackageUsage
                     {
                         if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
                         {
-                            var border = (Border)nv.FindName("nodeBorder");
-
-                            VisualBrush vb = new VisualBrush();
-                            Rectangle rec = new Rectangle
+                            var border = nv.FindName("nodeBorder") as Border ?? nv.FindName("NodeBorder") as Border;
+                            if (border != null)
                             {
-                                Width = border.ActualWidth,
-                                Height = border.ActualHeight,
-                                StrokeDashArray = new DoubleCollection { 6, 2 },
-                                Stroke = new SolidColorBrush(Globals.CustomNodeIdentificationColor),
-                                Margin = new Thickness(-Globals.CustomNodeBorderThickness),
-                                RadiusX = 8,
-                                RadiusY = 8,
-                                StrokeThickness = Globals.CustomNodeBorderThickness,
-                            };
-                            vb.Visual = rec;
-                            border.BorderBrush = vb;
-                            border.BorderThickness = new Thickness(Globals.CustomNodeBorderThickness);
-                            border.Margin = new Thickness(-Globals.CustomNodeBorderThickness);
+                                VisualBrush vb = new VisualBrush();
+                                Rectangle rec = new Rectangle
+                                {
+                                    Width = border.ActualWidth,
+                                    Height = border.ActualHeight,
+                                    StrokeDashArray = new DoubleCollection { 6, 2 },
+                                    Stroke = new SolidColorBrush(Globals.CustomNodeIdentificationColor),
+                                    Margin = new Thickness(-Globals.CustomNodeBorderThickness),
+                                    RadiusX = 8,
+                                    RadiusY = 8,
+                                    StrokeThickness = Globals.CustomNodeBorderThickness,
+                                };
+                                vb.Visual = rec;
+                                border.BorderBrush = vb;
+                                border.BorderThickness = new Thickness(Globals.CustomNodeBorderThickness);
+                                border.Margin = new Thickness(-Globals.CustomNodeBorderThickness);
+                            }
                         }
                         else
                         {
-                            var rect = nv.FindName("nodeBorder") as System.Windows.Shapes.Rectangle;
-                            rect.Stroke = new SolidColorBrush(Globals.CustomNodeIdentificationColor);
-                            rect.StrokeThickness = Globals.CustomNodeBorderThickness;
-                            rect.Margin = new Thickness(-Globals.CustomNodeBorderThickness);
-                            rect.RadiusX = 4;
-                            rect.RadiusY = 4;
-                            rect.StrokeDashArray = new DoubleCollection { 6, 2 };
+                            var rect = nv.FindName("nodeBorder") as System.Windows.Shapes.Rectangle ?? nv.FindName("NodeBorder") as System.Windows.Shapes.Rectangle;
+                            if (rect != null)
+                            {
+                                rect.Stroke = new SolidColorBrush(Globals.CustomNodeIdentificationColor);
+                                rect.StrokeThickness = Globals.CustomNodeBorderThickness;
+                                rect.Margin = new Thickness(-Globals.CustomNodeBorderThickness);
+                                rect.RadiusX = 4;
+                                rect.RadiusY = 4;
+                                rect.StrokeDashArray = new DoubleCollection { 6, 2 };
+                            }
                         }
                         //TODO: Enable this for 2.15+
                         //nvm.ImgGlyphOneSource = "/MonocleViewExtension;component/Foca/Resources/customnode-64.png";
                         var nodeBorder = nv.FindName("nodeColorOverlayZoomOut") as Border;
-                        nodeBorder.Background = new SolidColorBrush(Globals.CustomNodeIdentificationColor);
+                        if (nodeBorder != null)
+                        {
+                            nodeBorder.Background = new SolidColorBrush(Globals.CustomNodeIdentificationColor);
+                        }
                     }
                     catch (Exception e)
                     {
@@ -216,22 +224,27 @@ namespace MonocleViewExtension.PackageUsage
         {
             if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
             {
-                var border = (Border)nv.FindName("nodeBorder");
-
-                border.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF9F9F9"));
-                border.BorderThickness = new Thickness(1);
-                border.CornerRadius = new CornerRadius(8, 8, 0, 0);
-                border.Margin = new Thickness(-1);
+                var border = nv.FindName("nodeBorder") as Border ?? nv.FindName("NodeBorder") as Border;
+                if (border != null)
+                {
+                    border.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF9F9F9"));
+                    border.BorderThickness = new Thickness(1);
+                    border.CornerRadius = new CornerRadius(8, 8, 0, 0);
+                    border.Margin = new Thickness(-1);
+                }
             }
             else
             {
-                var rect = nv.FindName("nodeBorder") as System.Windows.Shapes.Rectangle;
-                rect.Stroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF5E5C5A"));
-                rect.StrokeThickness = 1;
-                rect.Margin = new Thickness(-1);
-                rect.RadiusX = 0;
-                rect.RadiusY = 0;
-                rect.StrokeDashArray.Clear();
+                var rect = nv.FindName("nodeBorder") as System.Windows.Shapes.Rectangle ?? nv.FindName("NodeBorder") as System.Windows.Shapes.Rectangle;
+                if (rect != null)
+                {
+                    rect.Stroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF5E5C5A"));
+                    rect.StrokeThickness = 1;
+                    rect.Margin = new Thickness(-1);
+                    rect.RadiusX = 0;
+                    rect.RadiusY = 0;
+                    rect.StrokeDashArray.Clear();
+                }
             }
         }
 
@@ -283,23 +296,29 @@ namespace MonocleViewExtension.PackageUsage
 
                     if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
                     {
-                        var border = (Border)nv.FindName("nodeBorder");
-                        border.BorderBrush = new SolidColorBrush(Colors.Aquamarine);
-                        border.BorderThickness = new Thickness(Globals.CustomNodeBorderThickness + 2);
-                        border.CornerRadius = new CornerRadius(8, 8, 0, 0);
-                        border.Margin = new Thickness(-1);
-                        
-                        Storyboard.SetTarget(colorAnimation, border);
-                        Storyboard.SetTargetProperty(colorAnimation, new PropertyPath("(Border.BorderBrush).(SolidColorBrush.Color)"));
+                        var border = nv.FindName("nodeBorder") as Border ?? nv.FindName("NodeBorder") as Border;
+                        if (border != null)
+                        {
+                            border.BorderBrush = new SolidColorBrush(Colors.Aquamarine);
+                            border.BorderThickness = new Thickness(Globals.CustomNodeBorderThickness + 2);
+                            border.CornerRadius = new CornerRadius(8, 8, 0, 0);
+                            border.Margin = new Thickness(-1);
+                            
+                            Storyboard.SetTarget(colorAnimation, border);
+                            Storyboard.SetTargetProperty(colorAnimation, new PropertyPath("(Border.BorderBrush).(SolidColorBrush.Color)"));
+                        }
                     }
                     else
                     {
-                        var rect = nv.FindName("nodeBorder") as System.Windows.Shapes.Rectangle;
-                        rect.Stroke = new SolidColorBrush(Colors.Aquamarine);
-                        rect.StrokeThickness = Globals.CustomNodeBorderThickness + 2;
-                        rect.Margin = new Thickness(-Globals.CustomNodeBorderThickness + 2);
-                        rect.RadiusX = 4;
-                        rect.RadiusY = 4;
+                        var rect = nv.FindName("nodeBorder") as System.Windows.Shapes.Rectangle ?? nv.FindName("NodeBorder") as System.Windows.Shapes.Rectangle;
+                        if (rect != null)
+                        {
+                            rect.Stroke = new SolidColorBrush(Colors.Aquamarine);
+                            rect.StrokeThickness = Globals.CustomNodeBorderThickness + 2;
+                            rect.Margin = new Thickness(-Globals.CustomNodeBorderThickness + 2);
+                            rect.RadiusX = 4;
+                            rect.RadiusY = 4;
+                        }
                     }
 
                     storyboard.Begin();
