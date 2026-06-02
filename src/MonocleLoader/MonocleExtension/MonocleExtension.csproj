@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
    <TargetFramework>net48</TargetFramework>
@@ -6,8 +6,8 @@
 	<UseWindowsForms>true</UseWindowsForms>
     <UseWPF>true</UseWPF>
 	<PlatformTarget>x64</PlatformTarget>
-	<AssemblyVersion>2024.12.1</AssemblyVersion>
-	<FileVersion>2024.12.1</FileVersion>
+	<AssemblyVersion>2026.6.1</AssemblyVersion>
+	<FileVersion>2026.6.1</FileVersion>
   </PropertyGroup>
   
  <PropertyGroup>

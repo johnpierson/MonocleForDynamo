@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <RootNamespace>MonocleViewExtension</RootNamespace>
     <AssemblyName>Monocle8</AssemblyName>
@@ -9,8 +9,8 @@
     <AssemblyTitle>Monocle</AssemblyTitle>
     <Product>Monocle</Product>
     <Copyright>Copyright©  2024 john pierson</Copyright>
-    <AssemblyVersion>2024.5.1</AssemblyVersion>
-    <FileVersion>2024.5.1</FileVersion>
+    <AssemblyVersion>2026.6.1</AssemblyVersion>
+    <FileVersion>2026.6.1</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
 	<Configurations>Debug net48;Debug net8;</Configurations>
     <Configurations>$(Configurations)Release net48;Release net8;</Configurations>
