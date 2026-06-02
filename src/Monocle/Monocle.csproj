@@ -11,8 +11,8 @@
 		<AssemblyVersion>2025.8.2</AssemblyVersion>
 		<FileVersion>2025.8.2</FileVersion>
 		<OutputPath>bin\$(Configuration)\</OutputPath>
-		<Configurations>Debug 2.0;Debug 2.1;Debug 2.10;Debug 2.12;Debug 2.13;Debug 2.16;Debug 2.17;Debug 2.18;Debug 2.19;Debug 2.2;Debug 2.3;Debug 2.5;Debug 2.6;Debug 3.0;Debug 3.1;Debug 3.2;Debug 3.3;Debug 3.4;Debug 4.0;Debug 4.1</Configurations>
-		<Configurations>$(Configurations);Release 2.0;Release 2.1;Release 2.10;Release 2.12;Release 2.13;Release 2.16;Release 2.17;Release 2.18;Release 2.19;Release 2.2;Release 2.3;Release 2.5;Release 2.6;Release 3.0;Release 3.1;Release 3.2;Release 3.3;Release 3.4;Release 4.0;Release 4.1</Configurations>
+		<Configurations>Debug 2.0;Debug 2.1;Debug 2.10;Debug 2.12;Debug 2.13;Debug 2.16;Debug 2.17;Debug 2.18;Debug 2.19;Debug 2.2;Debug 2.3;Debug 2.5;Debug 2.6;Debug 3.0;Debug 3.1;Debug 3.2;Debug 3.3;Debug 3.4;Debug 3.5;Debug 3.6;Debug 4.0;Debug 4.1</Configurations>
+		<Configurations>$(Configurations);Release 2.0;Release 2.1;Release 2.10;Release 2.12;Release 2.13;Release 2.16;Release 2.17;Release 2.18;Release 2.19;Release 2.2;Release 2.3;Release 2.5;Release 2.6;Release 3.0;Release 3.1;Release 3.2;Release 3.3;Release 3.4;Release 3.5;Release 3.6;Release 4.0;Release 4.1</Configurations>
 	</PropertyGroup>
 	<PropertyGroup Condition="$(Configuration.Contains('Debug 2.0'))">
 		<DynamoVersion>2.0</DynamoVersion>
@@ -176,6 +176,24 @@
 
 		<TargetFramework>net8.0-windows</TargetFramework>
 	</PropertyGroup>
+	<PropertyGroup Condition="$(Configuration.Contains('Debug 3.5'))">
+		<DynamoVersion>3.5</DynamoVersion>
+		<DynamoOutput>3.5</DynamoOutput>
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<DefineConstants>$(DefineConstants);net8;D20;D20_OR_GREATER;D21_OR_GREATER;D22_OR_GREATER;D23_OR_GREATER;D25_OR_GREATER;D26_OR_GREATER;D210_OR_GREATER;D212_OR_GREATER;D213_OR_GREATER;D216_OR_GREATER;D217_OR_GREATER;D218_OR_GREATER;D219_OR_GREATER;D30_OR_GREATER;D31_OR_GREATER;D32_OR_GREATER;D33_OR_GREATER;D34_OR_GREATER;D35_OR_GREATER</DefineConstants>
+
+		<TargetFramework>net8.0-windows</TargetFramework>
+	</PropertyGroup>
+	<PropertyGroup Condition="$(Configuration.Contains('Debug 3.6'))">
+		<DynamoVersion>3.6</DynamoVersion>
+		<DynamoOutput>3.6</DynamoOutput>
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<DefineConstants>$(DefineConstants);net8;D20;D20_OR_GREATER;D21_OR_GREATER;D22_OR_GREATER;D23_OR_GREATER;D25_OR_GREATER;D26_OR_GREATER;D210_OR_GREATER;D212_OR_GREATER;D213_OR_GREATER;D216_OR_GREATER;D217_OR_GREATER;D218_OR_GREATER;D219_OR_GREATER;D30_OR_GREATER;D31_OR_GREATER;D32_OR_GREATER;D33_OR_GREATER;D34_OR_GREATER;D35_OR_GREATER;D36_OR_GREATER</DefineConstants>
+
+		<TargetFramework>net8.0-windows</TargetFramework>
+	</PropertyGroup>
 	<PropertyGroup Condition="$(Configuration.Contains('Debug 4.0'))">
 		<DynamoVersion>4.0</DynamoVersion>
 		<DynamoOutput>4.0</DynamoOutput>
@@ -282,6 +300,18 @@
 		<DynamoVersion>3.1</DynamoVersion>
 		<DynamoOutput>3.1</DynamoOutput>
 		<DefineConstants>$(DefineConstants);net8;D20;D20_OR_GREATER;D21_OR_GREATER;D22_OR_GREATER;D23_OR_GREATER;D25_OR_GREATER;D26_OR_GREATER;D210_OR_GREATER;D212_OR_GREATER;D213_OR_GREATER;D216_OR_GREATER;D217_OR_GREATER;D218_OR_GREATER;D219_OR_GREATER;D30_OR_GREATER;D31_OR_GREATER</DefineConstants>
+		<TargetFramework>net8.0-windows</TargetFramework>
+	</PropertyGroup>
+	<PropertyGroup Condition="$(Configuration.Contains('Release 3.5'))">
+		<DynamoVersion>3.5</DynamoVersion>
+		<DynamoOutput>3.5</DynamoOutput>
+		<DefineConstants>$(DefineConstants);net8;D20;D20_OR_GREATER;D21_OR_GREATER;D22_OR_GREATER;D23_OR_GREATER;D25_OR_GREATER;D26_OR_GREATER;D210_OR_GREATER;D212_OR_GREATER;D213_OR_GREATER;D216_OR_GREATER;D217_OR_GREATER;D218_OR_GREATER;D219_OR_GREATER;D30_OR_GREATER;D31_OR_GREATER;D32_OR_GREATER;D33_OR_GREATER;D34_OR_GREATER;D35_OR_GREATER</DefineConstants>
+		<TargetFramework>net8.0-windows</TargetFramework>
+	</PropertyGroup>
+	<PropertyGroup Condition="$(Configuration.Contains('Release 3.6'))">
+		<DynamoVersion>3.6</DynamoVersion>
+		<DynamoOutput>3.6</DynamoOutput>
+		<DefineConstants>$(DefineConstants);net8;D20;D20_OR_GREATER;D21_OR_GREATER;D22_OR_GREATER;D23_OR_GREATER;D25_OR_GREATER;D26_OR_GREATER;D210_OR_GREATER;D212_OR_GREATER;D213_OR_GREATER;D216_OR_GREATER;D217_OR_GREATER;D218_OR_GREATER;D219_OR_GREATER;D30_OR_GREATER;D31_OR_GREATER;D32_OR_GREATER;D33_OR_GREATER;D34_OR_GREATER;D35_OR_GREATER;D36_OR_GREATER</DefineConstants>
 		<TargetFramework>net8.0-windows</TargetFramework>
 	</PropertyGroup>
 	<PropertyGroup Condition="$(Configuration.Contains('Release 3.2'))">

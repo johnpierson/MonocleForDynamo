@@ -17,11 +17,11 @@ namespace MonocleViewExtension.SimpleSearch
         public SimpleSearchViewModel(DynamoViewModel dvm)
         {
             dynamoViewModel = dvm;
-#if net8
+#if net8 || net10
             var myNodes = dvm.Model.SearchModel.Entries.Where(s => s.IsVisibleInSearch).OrderBy(n => n.Name);
 #endif
 
-#if !net8
+#if !net8 && !net10
               var myNodes = dvm.Model.SearchModel.SearchEntries.Where(s => s.IsVisibleInSearch).OrderBy(n => n.Name);
 #endif
             

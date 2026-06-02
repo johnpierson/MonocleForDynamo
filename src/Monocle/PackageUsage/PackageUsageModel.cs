@@ -316,13 +316,15 @@ namespace MonocleViewExtension.PackageUsage
 
         public List<string> GetCustomPackageList()
         {
-#if net8
+
+#if net8 || net10
             List<NodeSearchElement> libraries = DynamoViewModel.Model.SearchModel.Entries.ToList();
 #endif
 
-#if !net8
+#if !net8 && !net10
             List<NodeSearchElement> libraries = DynamoViewModel.Model.SearchModel.SearchEntries.ToList();
 #endif
+
             List<string> addOns = new List<string>();
             foreach (var element in libraries)
             {

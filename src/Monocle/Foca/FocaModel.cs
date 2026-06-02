@@ -289,6 +289,7 @@ namespace MonocleViewExtension.Foca
 
                 var values = cachedValue.GetElements().ToList();
 
+#if D216_OR_GREATER
                 if (customSelectionOption)
                 {
                     //create the list.create node
@@ -316,7 +317,7 @@ namespace MonocleViewExtension.Foca
 
                     return;
                 }
-                
+#endif
                 var count = values.Count > 20 ? 20 : values.Count;
 
                 string codeBlockString = string.Empty;
