@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34309.116
@@ -25,6 +25,8 @@ Global
 		Debug 3.2|Any CPU = Debug 3.2|Any CPU
 		Debug 3.3|Any CPU = Debug 3.3|Any CPU
 		Debug 3.4|Any CPU = Debug 3.4|Any CPU
+		Debug 4.0|Any CPU = Debug 4.0|Any CPU
+		Debug 4.1|Any CPU = Debug 4.1|Any CPU
 		Release 2.0|Any CPU = Release 2.0|Any CPU
 		Release 2.1|Any CPU = Release 2.1|Any CPU
 		Release 2.10|Any CPU = Release 2.10|Any CPU
@@ -43,6 +45,8 @@ Global
 		Release 3.2|Any CPU = Release 3.2|Any CPU
 		Release 3.3|Any CPU = Release 3.3|Any CPU
 		Release 3.4|Any CPU = Release 3.4|Any CPU
+		Release 4.0|Any CPU = Release 4.0|Any CPU
+		Release 4.1|Any CPU = Release 4.1|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{8D01E674-9F02-43C9-AA3B-59BCB97F290F}.Debug 2.0|Any CPU.ActiveCfg = Debug 2.0|Any CPU
@@ -81,6 +85,10 @@ Global
 		{8D01E674-9F02-43C9-AA3B-59BCB97F290F}.Debug 3.3|Any CPU.Build.0 = Debug 3.3|Any CPU
 		{8D01E674-9F02-43C9-AA3B-59BCB97F290F}.Debug 3.4|Any CPU.ActiveCfg = Debug 3.4|Any CPU
 		{8D01E674-9F02-43C9-AA3B-59BCB97F290F}.Debug 3.4|Any CPU.Build.0 = Debug 3.4|Any CPU
+		{8D01E674-9F02-43C9-AA3B-59BCB97F290F}.Debug 4.0|Any CPU.ActiveCfg = Debug 4.0|Any CPU
+		{8D01E674-9F02-43C9-AA3B-59BCB97F290F}.Debug 4.0|Any CPU.Build.0 = Debug 4.0|Any CPU
+		{8D01E674-9F02-43C9-AA3B-59BCB97F290F}.Debug 4.1|Any CPU.ActiveCfg = Debug 4.1|Any CPU
+		{8D01E674-9F02-43C9-AA3B-59BCB97F290F}.Debug 4.1|Any CPU.Build.0 = Debug 4.1|Any CPU
 		{8D01E674-9F02-43C9-AA3B-59BCB97F290F}.Release 2.0|Any CPU.ActiveCfg = Release 2.0|Any CPU
 		{8D01E674-9F02-43C9-AA3B-59BCB97F290F}.Release 2.0|Any CPU.Build.0 = Release 2.0|Any CPU
 		{8D01E674-9F02-43C9-AA3B-59BCB97F290F}.Release 2.1|Any CPU.ActiveCfg = Release 2.1|Any CPU
@@ -117,6 +125,10 @@ Global
 		{8D01E674-9F02-43C9-AA3B-59BCB97F290F}.Release 3.3|Any CPU.Build.0 = Release 3.3|Any CPU
 		{8D01E674-9F02-43C9-AA3B-59BCB97F290F}.Release 3.4|Any CPU.ActiveCfg = Release 3.4|Any CPU
 		{8D01E674-9F02-43C9-AA3B-59BCB97F290F}.Release 3.4|Any CPU.Build.0 = Release 3.4|Any CPU
+		{8D01E674-9F02-43C9-AA3B-59BCB97F290F}.Release 4.0|Any CPU.ActiveCfg = Release 4.0|Any CPU
+		{8D01E674-9F02-43C9-AA3B-59BCB97F290F}.Release 4.0|Any CPU.Build.0 = Release 4.0|Any CPU
+		{8D01E674-9F02-43C9-AA3B-59BCB97F290F}.Release 4.1|Any CPU.ActiveCfg = Release 4.1|Any CPU
+		{8D01E674-9F02-43C9-AA3B-59BCB97F290F}.Release 4.1|Any CPU.Build.0 = Release 4.1|Any CPU
 
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
