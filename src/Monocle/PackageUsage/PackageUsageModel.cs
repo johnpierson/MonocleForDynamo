@@ -385,7 +385,7 @@ namespace MonocleViewExtension.PackageUsage
             
             try
             {
-#if D26_OR_GREATER
+#if D30_OR_GREATER
                 if (Globals.PmExtension?.PackageLoader != null)
                 {
                     var packageNames = Globals.PmExtension.PackageLoader.LocalPackages.Select(p => p.Name).ToList();
