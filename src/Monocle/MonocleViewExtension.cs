@@ -35,11 +35,17 @@ namespace MonocleViewExtension
         public void Dispose()
         {
             AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomainOnAssemblyResolve;
+#if net8 || net10
+            System.Runtime.Loader.AssemblyLoadContext.Default.Resolving -= AssemblyLoadContext_Resolving;
+#endif
         }
 
         public void Startup(ViewStartupParams viewStartupParams)
         {
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainOnAssemblyResolve;
+#if net8 || net10
+            System.Runtime.Loader.AssemblyLoadContext.Default.Resolving += AssemblyLoadContext_Resolving;
+#endif
         }
 
         private Assembly CurrentDomainOnAssemblyResolve(object sender, ResolveEventArgs args)
@@ -57,11 +63,29 @@ namespace MonocleViewExtension
             // Load assembly from resource
             using (var stream = Globals.ExecutingAssembly.GetManifestResourceStream(resourceName))
             {
-                var bytes = new byte[stream.Length];
-                stream.Read(bytes, 0, bytes.Length);
-                return Assembly.Load(bytes);
+                using (var memoryStream = new MemoryStream())
+                {
+                    stream.CopyTo(memoryStream);
+                    return Assembly.Load(memoryStream.ToArray());
+                }
             }
         }
+
+#if net8 || net10
+        private Assembly AssemblyLoadContext_Resolving(System.Runtime.Loader.AssemblyLoadContext context, AssemblyName assemblyName)
+        {
+            var assemblyNameStr = new AssemblyName(assemblyName.Name).Name + ".dll";
+            var resourceName = Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(x => x.EndsWith(".dll")).ToArray().FirstOrDefault(x => x.EndsWith(assemblyNameStr));
+            if (resourceName == null)
+            {
+                return null;
+            }
+            using (var stream = Globals.ExecutingAssembly.GetManifestResourceStream(resourceName))
+            {
+                return context.LoadFromStream(stream);
+            }
+        }
+#endif
 
         public void Loaded(ViewLoadedParams p)
         {
