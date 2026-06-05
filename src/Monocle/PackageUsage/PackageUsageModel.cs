@@ -72,7 +72,16 @@ namespace MonocleViewExtension.PackageUsage
             {
                 if (note.Text.StartsWith("**") || note.Text.StartsWith("Custom Node:") || note.Text.StartsWith(Globals.CustomNodeNotePrefix))
                 {
-                    //note.PinnedNode = null;
+                    try
+                    {
+                        var pinnedNodeProp = note.GetType().GetProperty("PinnedNode");
+                        if (pinnedNodeProp != null)
+                        {
+                            pinnedNodeProp.SetValue(note, null);
+                        }
+                    }
+                    catch { }
+
                     DynamoViewModel.Model.ExecuteCommand(new DynamoModel.DeleteModelCommand(note.GUID));
 
                     count++;
