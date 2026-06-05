@@ -135,22 +135,32 @@ namespace MonocleViewExtension.PackageUsage
 
         private Border GetNodeBorder(NodeView nv)
         {
-            var border = nv.FindName("nodeBorder") as Border ?? nv.FindName("NodeBorder") as Border;
+            var border = nv.FindName("nodeBorder") as Border 
+                         ?? nv.FindName("NodeBorder") as Border 
+                         ?? nv.FindName("nodeBackground") as Border 
+                         ?? nv.FindName("NodeBackground") as Border;
             if (border != null) return border;
 
             var allBorders = MiscUtils.FindVisualChildren<Border>(nv).ToList();
-            return allBorders.FirstOrDefault(b => !string.IsNullOrEmpty(b.Name) && b.Name.IndexOf("border", StringComparison.OrdinalIgnoreCase) >= 0 && !b.Name.Equals("selectionBorder", StringComparison.OrdinalIgnoreCase)) 
-                   ?? allBorders.FirstOrDefault(b => string.IsNullOrEmpty(b.Name) || !b.Name.Equals("selectionBorder", StringComparison.OrdinalIgnoreCase));
+            return allBorders
+                .Where(b => string.IsNullOrEmpty(b.Name) || !b.Name.Equals("selectionBorder", StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(b => b.ActualWidth * b.ActualHeight)
+                .FirstOrDefault();
         }
 
         private System.Windows.Shapes.Rectangle GetNodeRectangle(NodeView nv)
         {
-            var rect = nv.FindName("nodeBorder") as System.Windows.Shapes.Rectangle ?? nv.FindName("NodeBorder") as System.Windows.Shapes.Rectangle;
+            var rect = nv.FindName("nodeBorder") as System.Windows.Shapes.Rectangle 
+                       ?? nv.FindName("NodeBorder") as System.Windows.Shapes.Rectangle 
+                       ?? nv.FindName("nodeBackground") as System.Windows.Shapes.Rectangle 
+                       ?? nv.FindName("NodeBackground") as System.Windows.Shapes.Rectangle;
             if (rect != null) return rect;
 
             var allRects = MiscUtils.FindVisualChildren<System.Windows.Shapes.Rectangle>(nv).ToList();
-            return allRects.FirstOrDefault(r => !string.IsNullOrEmpty(r.Name) && r.Name.IndexOf("border", StringComparison.OrdinalIgnoreCase) >= 0 && !r.Name.Equals("selectionBorder", StringComparison.OrdinalIgnoreCase))
-                   ?? allRects.FirstOrDefault(r => string.IsNullOrEmpty(r.Name) || !r.Name.Equals("selectionBorder", StringComparison.OrdinalIgnoreCase));
+            return allRects
+                .Where(r => string.IsNullOrEmpty(r.Name) || !r.Name.Equals("selectionBorder", StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(r => r.ActualWidth * r.ActualHeight)
+                .FirstOrDefault();
         }
 
         public void HighlightCustomNodes()
