@@ -93,7 +93,6 @@
     <None Remove="Resources\monocleLogoRoundedSquare.png" />
     <None Remove="Resources\PaintBrushIcon.svg" />
     <None Remove="Resources\smalls.JPG" />
-    <None Remove="Resources\WpfAnimatedGif.dll" />
     <None Remove="Resources\Xceed.Wpf.AvalonDock.dll" />
     <None Remove="Resources\Xceed.Wpf.AvalonDock.NET5.dll" />
     <None Remove="SimpleSearch\Resources\magnifyingGlass.png" />
@@ -143,7 +142,6 @@
     <PackageReference Include="System.Memory" Version="4.5.5" />
     <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
     
-    <PackageReference Include="WpfAnimatedGif" Version="2.0.2" />
   </ItemGroup>
 <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
 		<PackageReference Include="CommonServiceLocator" Version="1.0" />
@@ -260,7 +258,6 @@
     <Resource Include="Resources\PaintBrushIcon.svg" />
     <Resource Include="Resources\PaintBrushIcon.xaml" />
     <Resource Include="Resources\smalls.JPG" />
-    <EmbeddedResource Include="Resources\WpfAnimatedGif.dll" />
     <EmbeddedResource Include="Resources\Xceed.Wpf.AvalonDock.dll" />
     <Resource Include="SimpleSearch\Resources\magnifyingGlass.png" />
     <Resource Include="SimpleSearch\Resources\monocle.png" />
