@@ -288,39 +288,36 @@ namespace MonocleViewExtension.PackageUsage
 
             var markedAsinputNodeViews = inputNodeViews.Where(n => n.ViewModel.IsSetAsInput).ToList();
 
-            Storyboard storyboard = new Storyboard
-            {
-                FillBehavior = FillBehavior.Stop
-            };
-
-            ColorAnimation colorAnimation = new ColorAnimation(Colors.Transparent, Colors.Aquamarine, TimeSpan.FromSeconds(5), FillBehavior.Stop)
-                {
-                    RepeatBehavior = new RepeatBehavior(1)
-                };
-
-            DoubleAnimation doubleAnimation = new DoubleAnimation
-            {
-                From = 45,
-                Duration = new Duration(TimeSpan.FromSeconds(10)),
-                RepeatBehavior = new RepeatBehavior(1),
-                EasingFunction = new ElasticEase()
-                    { EasingMode = EasingMode.EaseOut, Oscillations = 24, Springiness = 8 },
-
-            };
-            storyboard.Children.Add(doubleAnimation);
-            storyboard.Children.Add(colorAnimation);
-
             foreach (var nv in markedAsinputNodeViews)
             {
                 try
                 {
+                    Storyboard storyboard = new Storyboard { FillBehavior = FillBehavior.Stop };
+
+                    DoubleAnimation doubleAnimation = new DoubleAnimation
+                    {
+                        From = 45,
+                        Duration = new Duration(TimeSpan.FromSeconds(10)),
+                        RepeatBehavior = new RepeatBehavior(1),
+                        EasingFunction = new ElasticEase() { EasingMode = EasingMode.EaseOut, Oscillations = 24, Springiness = 8 }
+                    };
+                    storyboard.Children.Add(doubleAnimation);
+
                     nv.RenderTransform = new RotateTransform(0, nv.RenderSize.Width, (nv.RenderSize.Height / 2) + 14);
                     Storyboard.SetTarget(doubleAnimation, nv);
                     Storyboard.SetTargetProperty(doubleAnimation, new PropertyPath("RenderTransform.Angle"));
 
-                    if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
+                    var border = GetNodeBorder(nv);
+                    var rect = border == null ? GetNodeRectangle(nv) : null;
+
+                    if (border != null || rect != null)
                     {
-                        var border = GetNodeBorder(nv);
+                        ColorAnimation colorAnimation = new ColorAnimation(Colors.Transparent, Colors.Aquamarine, TimeSpan.FromSeconds(5), FillBehavior.Stop)
+                        {
+                            RepeatBehavior = new RepeatBehavior(1)
+                        };
+                        storyboard.Children.Add(colorAnimation);
+
                         if (border != null)
                         {
                             border.BorderBrush = new SolidColorBrush(Colors.Aquamarine);
@@ -331,17 +328,16 @@ namespace MonocleViewExtension.PackageUsage
                             Storyboard.SetTarget(colorAnimation, border);
                             Storyboard.SetTargetProperty(colorAnimation, new PropertyPath("(Border.BorderBrush).(SolidColorBrush.Color)"));
                         }
-                    }
-                    else
-                    {
-                        var rect = GetNodeRectangle(nv);
-                        if (rect != null)
+                        else if (rect != null)
                         {
                             rect.Stroke = new SolidColorBrush(Colors.Aquamarine);
                             rect.StrokeThickness = Globals.CustomNodeBorderThickness + 2;
                             rect.Margin = new Thickness(-Globals.CustomNodeBorderThickness + 2);
                             rect.RadiusX = 4;
                             rect.RadiusY = 4;
+                            
+                            Storyboard.SetTarget(colorAnimation, rect);
+                            Storyboard.SetTargetProperty(colorAnimation, new PropertyPath("(Shape.Stroke).(SolidColorBrush.Color)"));
                         }
                     }
 
