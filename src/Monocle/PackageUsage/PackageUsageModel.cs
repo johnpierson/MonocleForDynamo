@@ -385,20 +385,6 @@ namespace MonocleViewExtension.PackageUsage
             
             try
             {
-                // Fallback: If ElementTypes.Packaged changed in 4.0, extract directly from CustomNodeManager
-                var customNodeWorkspaces = DynamoViewModel.Model.CustomNodeManager.LoadedCustomNodes.Select(x => x.Value.Category).Distinct();
-                foreach (var category in customNodeWorkspaces)
-                {
-                    if (!string.IsNullOrEmpty(category))
-                    {
-                        var rootCategory = category.Split('.').First();
-                        if (!addOns.Contains(rootCategory) && !rootCategory.StartsWith("Core") && !rootCategory.StartsWith("Revit"))
-                        {
-                            addOns.Add(rootCategory);
-                        }
-                    }
-                }
-
 #if D26_OR_GREATER
                 if (Globals.PmExtension?.PackageLoader != null)
                 {
