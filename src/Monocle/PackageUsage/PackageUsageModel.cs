@@ -133,22 +133,46 @@ namespace MonocleViewExtension.PackageUsage
             return count++;
         }
 
+        private Border GetNodeBorder(NodeView nv)
+        {
+            var border = nv.FindName("nodeBorder") as Border ?? nv.FindName("NodeBorder") as Border;
+            if (border != null) return border;
+
+            var allBorders = MiscUtils.FindVisualChildren<Border>(nv).ToList();
+            return allBorders.FirstOrDefault(b => !string.IsNullOrEmpty(b.Name) && b.Name.IndexOf("border", StringComparison.OrdinalIgnoreCase) >= 0 && !b.Name.Equals("selectionBorder", StringComparison.OrdinalIgnoreCase)) 
+                   ?? allBorders.FirstOrDefault(b => string.IsNullOrEmpty(b.Name) || !b.Name.Equals("selectionBorder", StringComparison.OrdinalIgnoreCase));
+        }
+
+        private System.Windows.Shapes.Rectangle GetNodeRectangle(NodeView nv)
+        {
+            var rect = nv.FindName("nodeBorder") as System.Windows.Shapes.Rectangle ?? nv.FindName("NodeBorder") as System.Windows.Shapes.Rectangle;
+            if (rect != null) return rect;
+
+            var allRects = MiscUtils.FindVisualChildren<System.Windows.Shapes.Rectangle>(nv).ToList();
+            return allRects.FirstOrDefault(r => !string.IsNullOrEmpty(r.Name) && r.Name.IndexOf("border", StringComparison.OrdinalIgnoreCase) >= 0 && !r.Name.Equals("selectionBorder", StringComparison.OrdinalIgnoreCase))
+                   ?? allRects.FirstOrDefault(r => string.IsNullOrEmpty(r.Name) || !r.Name.Equals("selectionBorder", StringComparison.OrdinalIgnoreCase));
+        }
+
         public void HighlightCustomNodes()
         {
             var nodeViews = MiscUtils.FindVisualChildren<NodeView>(DynamoView);
+
+            var customPackages = GetCustomPackageList();
 
             foreach (var nv in nodeViews)
             {
                 var nvm = nv.ViewModel;
 
-                if (IsCustomNode(nvm.NodeModel) && !nvm.NodeModel.Name.ToLower().Contains("relay") && !nvm.NodeModel.Name.ToLower().Contains("remember") && !nvm.NodeModel.Name.ToLower().Contains("gate"))
+                bool isCustom = customPackages.Any(x => nvm.NodeModel.Category.StartsWith(x, StringComparison.OrdinalIgnoreCase));
+
+                if (isCustom && !nvm.NodeModel.Name.ToLower().Contains("relay") && !nvm.NodeModel.Name.ToLower().Contains("remember") && !nvm.NodeModel.Name.ToLower().Contains("gate"))
                 {
                     //try and fail if user is in older dynamo
                     try
                     {
                         if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
                         {
-                            var border = nv.FindName("nodeBorder") as Border ?? nv.FindName("NodeBorder") as Border;
+                            var border = GetNodeBorder(nv);
                             if (border != null)
                             {
                                 VisualBrush vb = new VisualBrush();
@@ -171,7 +195,7 @@ namespace MonocleViewExtension.PackageUsage
                         }
                         else
                         {
-                            var rect = nv.FindName("nodeBorder") as System.Windows.Shapes.Rectangle ?? nv.FindName("NodeBorder") as System.Windows.Shapes.Rectangle;
+                            var rect = GetNodeRectangle(nv);
                             if (rect != null)
                             {
                                 rect.Stroke = new SolidColorBrush(Globals.CustomNodeIdentificationColor);
@@ -224,7 +248,7 @@ namespace MonocleViewExtension.PackageUsage
         {
             if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
             {
-                var border = nv.FindName("nodeBorder") as Border ?? nv.FindName("NodeBorder") as Border;
+                var border = GetNodeBorder(nv);
                 if (border != null)
                 {
                     border.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF9F9F9"));
@@ -235,7 +259,7 @@ namespace MonocleViewExtension.PackageUsage
             }
             else
             {
-                var rect = nv.FindName("nodeBorder") as System.Windows.Shapes.Rectangle ?? nv.FindName("NodeBorder") as System.Windows.Shapes.Rectangle;
+                var rect = GetNodeRectangle(nv);
                 if (rect != null)
                 {
                     rect.Stroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF5E5C5A"));
@@ -296,7 +320,7 @@ namespace MonocleViewExtension.PackageUsage
 
                     if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
                     {
-                        var border = nv.FindName("nodeBorder") as Border ?? nv.FindName("NodeBorder") as Border;
+                        var border = GetNodeBorder(nv);
                         if (border != null)
                         {
                             border.BorderBrush = new SolidColorBrush(Colors.Aquamarine);
@@ -310,7 +334,7 @@ namespace MonocleViewExtension.PackageUsage
                     }
                     else
                     {
-                        var rect = nv.FindName("nodeBorder") as System.Windows.Shapes.Rectangle ?? nv.FindName("NodeBorder") as System.Windows.Shapes.Rectangle;
+                        var rect = GetNodeRectangle(nv);
                         if (rect != null)
                         {
                             rect.Stroke = new SolidColorBrush(Colors.Aquamarine);
@@ -362,6 +386,42 @@ namespace MonocleViewExtension.PackageUsage
                     }
                 }
             }
+            
+            try
+            {
+                // Fallback: If ElementTypes.Packaged changed in 4.0, extract directly from CustomNodeManager
+                var customNodeWorkspaces = DynamoViewModel.Model.CustomNodeManager.LoadedCustomNodes.Select(x => x.Value.Category).Distinct();
+                foreach (var category in customNodeWorkspaces)
+                {
+                    if (!string.IsNullOrEmpty(category))
+                    {
+                        var rootCategory = category.Split('.').First();
+                        if (!addOns.Contains(rootCategory) && !rootCategory.StartsWith("Core") && !rootCategory.StartsWith("Revit"))
+                        {
+                            addOns.Add(rootCategory);
+                        }
+                    }
+                }
+
+#if D26_OR_GREATER
+                if (Globals.PmExtension?.PackageLoader != null)
+                {
+                    var packageNames = Globals.PmExtension.PackageLoader.LocalPackages.Select(p => p.Name).ToList();
+                    foreach (var pName in packageNames)
+                    {
+                        if (!addOns.Contains(pName))
+                        {
+                            addOns.Add(pName);
+                        }
+                    }
+                }
+#endif
+            }
+            catch(Exception e)
+            {
+                DynamoViewModel.Model.Logger.LogWarning($"Monocle- GetCustomPackageList fallback failed: {e.Message}", WarningLevel.Mild);
+            }
+
             return addOns.Distinct().ToList();
         }
         //public string AllCustomNodes()
