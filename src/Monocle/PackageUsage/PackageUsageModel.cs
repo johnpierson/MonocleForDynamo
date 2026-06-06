@@ -77,7 +77,29 @@ namespace MonocleViewExtension.PackageUsage
                         var pinnedNodeProp = note.GetType().GetProperty("PinnedNode");
                         if (pinnedNodeProp != null)
                         {
-                            pinnedNodeProp.SetValue(note, null);
+                            var pinnedNode = pinnedNodeProp.GetValue(note);
+                            if (pinnedNode != null)
+                            {
+                                // Find NoteViewModel and invoke unpin action
+                                var noteViewModel = DynamoViewModel.CurrentSpaceViewModel.Notes.FirstOrDefault(n => n.Model.GUID == note.GUID);
+                                if (noteViewModel != null)
+                                {
+                                    var unpinMethod = noteViewModel.GetType().GetMethod("UnpinFromNode", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                                                   ?? noteViewModel.GetType().GetMethod("UnpinNode", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                                                   ?? noteViewModel.GetType().GetMethod("Unpin", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+                                    if (unpinMethod != null)
+                                    {
+                                        if (unpinMethod.GetParameters().Length == 0)
+                                            unpinMethod.Invoke(noteViewModel, null);
+                                        else if (unpinMethod.GetParameters().Length == 1)
+                                            unpinMethod.Invoke(noteViewModel, new object[] { pinnedNode });
+                                    }
+                                }
+                                
+                                // Also clear the model property as fallback
+                                pinnedNodeProp.SetValue(note, null);
+                            }
                         }
                     }
                     catch { }
