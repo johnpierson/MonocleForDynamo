@@ -92,6 +92,13 @@ namespace MonocleViewExtension.StandardViews
             }
         }
 
+        public override void Dispose()
+        {
+            Model.LoadedParams.SelectionCollectionChanged -= LoadedParamsOnSelectionCollectionChanged;
+            ViewControlPanel?.Children.Remove(View);
+            base.Dispose();
+        }
+
 
         #region Helpers
         public IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject

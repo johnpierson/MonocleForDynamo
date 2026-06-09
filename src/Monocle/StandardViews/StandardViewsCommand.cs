@@ -13,7 +13,7 @@ namespace MonocleViewExtension.StandardViews
         /// Enable Standard Views in canvas
         /// </summary>
         /// <param name="p">our view loaded parameters for dynamo</param>
-        public static void EnableStandardViews(ViewLoadedParams p)
+        public static StandardViewsViewModel EnableStandardViews(ViewLoadedParams p)
         {
             var m = new StandardViewsModel(p);
             var vm = new StandardViewsViewModel(m);
@@ -27,6 +27,7 @@ namespace MonocleViewExtension.StandardViews
 
             vm.ViewControlPanel = statusBarPanel;
 
+            return vm;
         }
 
 
