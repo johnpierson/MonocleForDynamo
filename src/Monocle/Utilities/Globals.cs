@@ -21,7 +21,7 @@ namespace MonocleViewExtension.Utilities
 
         public static string TempPath = Path.GetTempPath();
         public static string ExecutingPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        public static string ExtraFolder = ExecutingPath.Replace("bin", "extra");
+        public static string ExtraFolder = Path.Combine(Directory.GetParent(ExecutingPath)?.FullName, "extra");
         public static string SettingsFile = Path.Combine(ExtraFolder, "MonocleSettings.xml");
 
         public static bool IsFocaEnabled { get; set; } = true;

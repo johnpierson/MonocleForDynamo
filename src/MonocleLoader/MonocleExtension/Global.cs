@@ -10,8 +10,8 @@ namespace MonocleExtension
         internal static Assembly ExecutingAssembly = Assembly.GetExecutingAssembly();
 
         internal static string PackageBinFolder => Path.GetDirectoryName(ExecutingAssembly.Location);
-        internal static string PackageExtraFolder => PackageBinFolder.Replace("bin", "extra");
-        internal static string PackageRoot => PackageBinFolder.Replace("bin", "");
+        internal static string PackageRoot => Directory.GetParent(PackageBinFolder)?.FullName;
+        internal static string PackageExtraFolder => Path.Combine(PackageRoot, "extra");
         internal static string MonocleViewExtensionDll => Path.Combine(PackageBinFolder, "MonocleViewExtension.dll");
 
         internal static string ViewExtensionXml => Path.Combine(PackageExtraFolder, "Monocle_ViewExtensionDefinition.xml");

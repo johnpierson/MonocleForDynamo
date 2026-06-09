@@ -31,9 +31,11 @@ namespace MonocleViewExtension
         public string UniqueId => "5A256B35-BD09-423C-82A1-372957143927";
         public string Name => "Monocle View Extension";
 
+        private StandardViewsViewModel standardViewsViewModel;
 
         public void Dispose()
         {
+            standardViewsViewModel?.Dispose();
             AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomainOnAssemblyResolve;
 #if net8 || net10
             System.Runtime.Loader.AssemblyLoadContext.Default.Resolving -= AssemblyLoadContext_Resolving;
@@ -129,7 +131,7 @@ namespace MonocleViewExtension
             InlineNodeConnectomaticCommand.AddMenuItem(p, monocleMenuItem);
             SimpleSearchCommand.AddMenuItem(p, monocleMenuItem, this);
             //TODO: Check if standard views consistently loads on different file changes
-            StandardViewsCommand.EnableStandardViews(p);
+            standardViewsViewModel = StandardViewsCommand.EnableStandardViews(p);
             MonocleSettingsCommand.AddMenuItem(monocleMenuItem);
             FancyPasteCommand.AddMenuItem(p);
             BetterSaveCommand.AddMenuItem(p);
