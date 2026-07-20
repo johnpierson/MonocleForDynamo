@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using Dynamo.Extensions;
 using System.Net;
 
@@ -13,7 +12,7 @@ namespace MonocleExtension
         public string UniqueId => "53301BE8-BDA9-47CA-9EF0-2B70808B13A5";
         public string Name => "MonocleExtension";
 
-        internal string GitHubUrl => "https://raw.githubusercontent.com/johnpierson/MonocleForDynamo/master/deploy/"; 
+        internal string GitHubUrl => "https://raw.githubusercontent.com/johnpierson/MonocleForDynamo/master/deploy";
         public void Ready(ReadyParams rp)   
         {
             this.ReadyCalled = true;
@@ -38,14 +37,17 @@ namespace MonocleExtension
             if (!File.Exists(Global.MonocleViewExtensionDll))
             {
                 //check which version of Dynamo core is loaded
-                var dynamoCore = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.FullName.Contains("DynamoCore"));
+                var dynamoCore = AppDomain.CurrentDomain.GetAssemblies()
+                    .FirstOrDefault(a => string.Equals(a.GetName().Name, "DynamoCore", StringComparison.Ordinal));
+                if (dynamoCore == null)
+                {
+                    throw new InvalidOperationException("Monocle could not determine the loaded DynamoCore version.");
+                }
 
                 Global.DynamoVersion = dynamoCore.GetName().Version;
 
-
-                //download the correct Monocle dll for the Dynamo version TODO: test this
+                // Download the view extension built for this Dynamo major/minor version.
                 DownloadFile(Global.TruncatedDynVersion, Global.MonocleViewExtensionDll);
-
             }
         }
         internal void DownloadFile(string version, string fileLocation)
@@ -54,19 +56,38 @@ namespace MonocleExtension
 
             string fileName = fileInfo.Name;
 
-            var url = string.IsNullOrWhiteSpace(version) ? $"{GitHubUrl}/{fileName}" : $"{GitHubUrl}/{version}/{fileName}";
+            var url = string.IsNullOrWhiteSpace(version)
+                ? $"{GitHubUrl}/{fileName}"
+                : $"{GitHubUrl}/{version}/{fileName}";
+            var temporaryFile = $"{fileLocation}.download";
 
-            using (WebClient wc = new WebClient())
+            Directory.CreateDirectory(fileInfo.DirectoryName);
+
+            try
             {
-                wc.Headers.Add("a", "a");
-                try
+                if (File.Exists(temporaryFile))
                 {
-                    wc.DownloadFile(url, fileLocation);
+                    File.Delete(temporaryFile);
                 }
-                catch (Exception ex)
+
+                using (WebClient wc = new WebClient())
                 {
-                    //
-                    string messsss = ex.Message;
+                    wc.Headers.Add(HttpRequestHeader.UserAgent, "MonocleForDynamo");
+                    wc.DownloadFile(url, temporaryFile);
+                }
+
+                if (new FileInfo(temporaryFile).Length == 0)
+                {
+                    throw new InvalidDataException($"Monocle downloaded an empty view extension from {url}.");
+                }
+
+                File.Move(temporaryFile, fileLocation);
+            }
+            finally
+            {
+                if (File.Exists(temporaryFile))
+                {
+                    File.Delete(temporaryFile);
                 }
             }
         }
