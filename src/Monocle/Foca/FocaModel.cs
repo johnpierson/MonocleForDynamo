@@ -18,6 +18,7 @@ using Dynamo.Nodes;
 using Dynamo.Utilities;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
+using MonocleViewExtension.LocalGroupNaming;
 using MonocleViewExtension.NodeSwapper;
 using MonocleViewExtension.Utilities;
 using Xceed.Wpf.AvalonDock.Controls;
@@ -30,11 +31,18 @@ namespace MonocleViewExtension.Foca
         public DynamoView DynamoView { get; }
         public ViewLoadedParams LoadedParams { get; }
         public DynamoViewModel DynamoViewModel { get; }
-        public FocaModel(ViewLoadedParams p)
+        internal LocalLlamaServerClient LocalGroupNamingClient { get; }
+
+        public FocaModel(ViewLoadedParams p) : this(p, null)
+        {
+        }
+
+        internal FocaModel(ViewLoadedParams p, LocalLlamaServerClient localGroupNamingClient)
         {
             DynamoView = p.DynamoWindow as DynamoView;
             LoadedParams = p;
             DynamoViewModel = p.DynamoWindow.DataContext as DynamoViewModel;
+            LocalGroupNamingClient = localGroupNamingClient;
         }
 
 
@@ -474,7 +482,7 @@ namespace MonocleViewExtension.Foca
 
             return null;
         }
-        public void CreateGroup(string groupName)
+        public AnnotationViewModel CreateGroup(string groupName)
         {
             Globals.MonocleGroupSettings.TryGetValue(groupName, out Settings.GroupSetting groupSetting);
 
@@ -498,7 +506,7 @@ namespace MonocleViewExtension.Foca
                 {
                     group.Background = colorToUse;
                     group.FontSize = fontSize;
-                    return;
+                    return group;
                 }
 
 
@@ -525,6 +533,7 @@ annotationCommand =
                     DynamoViewModel.Model.ExecuteCommand(annotationCommand);
                     DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().FontSize = fontSize;
                     DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().Background = colorToUse;
+                    return DynamoViewModel.CurrentSpaceViewModel.Annotations.Last();
                 }
                 else
                 {
@@ -544,6 +553,7 @@ annotationCommand =
                         DynamoViewModel.Model.ExecuteCommand(annotationCommand);
                         DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().FontSize = fontSize;
                         DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().Background = colorToUse;
+                        return DynamoViewModel.CurrentSpaceViewModel.Annotations.Last();
                     }
                     catch (Exception)
                     {
@@ -567,12 +577,15 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
                     DynamoViewModel.Model.ExecuteCommand(annotationCommand);
                     DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().FontSize = 24;
                     DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().Background = colorToUse;
+                    return DynamoViewModel.CurrentSpaceViewModel.Annotations.Last();
                 }
                 catch (Exception)
                 {
                     //silent fail
                 }
             }
+
+            return null;
         }
 
         public void AlignSelected(string alignment)

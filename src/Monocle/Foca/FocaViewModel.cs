@@ -9,6 +9,7 @@ using Dynamo.Graph.Annotations;
 using Dynamo.Logging;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
+using MonocleViewExtension.LocalGroupNaming;
 using MonocleViewExtension.SimpleSearch;
 using MonocleViewExtension.Utilities;
 
@@ -19,6 +20,7 @@ namespace MonocleViewExtension.Foca
         public FocaModel Model { get; set; }
 
         public FocaView View;
+        private bool isCreatingGroup;
 
         public DelegateCommand CreateGroup { get; set; }
         public DelegateCommand MouseEnter { get; set; }
@@ -150,9 +152,27 @@ namespace MonocleViewExtension.Foca
             ColorWheelMargin = new Thickness(-48);
         }
 
-        public void OnCreateGroup(object o)
+        public async void OnCreateGroup(object o)
         {
-            Model.CreateGroup(o.ToString());
+            if (isCreatingGroup) return;
+
+            isCreatingGroup = true;
+            try
+            {
+                var group = Model.CreateGroup(o.ToString());
+                if (group != null && Model.LocalGroupNamingClient?.IsEnabled == true)
+                {
+                    await LocalGroupNamingCommand.SuggestAndRenameAsync(
+                        Model.LoadedParams.DynamoWindow,
+                        Model.DynamoViewModel,
+                        group.AnnotationModel,
+                        Model.LocalGroupNamingClient);
+                }
+            }
+            finally
+            {
+                isCreatingGroup = false;
+            }
         }
 
         public void OnAlignClick(object o)

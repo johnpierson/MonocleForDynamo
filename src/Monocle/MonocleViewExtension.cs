@@ -16,6 +16,7 @@ using MonocleViewExtension.Foca;
 using MonocleViewExtension.GraphInformation;
 using MonocleViewExtension.GraphResizerer;
 using MonocleViewExtension.InlineNodeConnectomatic;
+using MonocleViewExtension.LocalGroupNaming;
 using MonocleViewExtension.MonocleSettings;
 using MonocleViewExtension.NodeDocumentation;
 using MonocleViewExtension.NodeSwapper;
@@ -32,10 +33,12 @@ namespace MonocleViewExtension
         public string Name => "Monocle View Extension";
 
         private StandardViewsViewModel standardViewsViewModel;
+        private LocalLlamaServerClient localGroupNamingClient;
 
         public void Dispose()
         {
             standardViewsViewModel?.Dispose();
+            localGroupNamingClient?.Dispose();
             AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomainOnAssemblyResolve;
 #if net8 || net10
             System.Runtime.Loader.AssemblyLoadContext.Default.Resolving -= AssemblyLoadContext_Resolving;
@@ -127,7 +130,9 @@ namespace MonocleViewExtension
             PackageUsageCommand.AddMenuItem(monocleMenuItem, p);
             GraphResizererCommand.AddMenuItem(monocleMenuItem, p);
             NodeSwapperCommand.AddMenuItem(monocleMenuItem, p);
-            FocaCommand.EnableFoca(p, monocleMenuItem);
+            localGroupNamingClient = new LocalLlamaServerClient(LocalLlamaServerOptions.CreateDefault());
+            FocaCommand.EnableFoca(p, monocleMenuItem, localGroupNamingClient);
+            LocalGroupNamingCommand.AddModelToggle(monocleMenuItem, p, localGroupNamingClient);
             InlineNodeConnectomaticCommand.AddMenuItem(p, monocleMenuItem);
             SimpleSearchCommand.AddMenuItem(p, monocleMenuItem, this);
             //TODO: Check if standard views consistently loads on different file changes
