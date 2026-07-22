@@ -109,6 +109,8 @@ namespace MonocleViewExtension.LocalGroupNaming
             // title when there are no node names from which to infer a purpose.
             if (nodes.Count == 0) return;
 
+            var indicator = new LocalGroupNamingIndicator(owner);
+            indicator.Show();
             try
             {
                 var nodeNames = nodes.Select(node => node.Name).ToList();
@@ -167,6 +169,13 @@ namespace MonocleViewExtension.LocalGroupNaming
                             MessageBoxButton.OK,
                             MessageBoxImage.Warning);
                     });
+                }
+            }
+            finally
+            {
+                if (!owner.Dispatcher.HasShutdownStarted)
+                {
+                    owner.Dispatcher.Invoke(indicator.Dismiss);
                 }
             }
         }
