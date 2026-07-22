@@ -1,15 +1,22 @@
 using System;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
+using System.Windows.Threading;
 
 namespace MonocleViewExtension.LocalGroupNaming
 {
     internal sealed class LocalGroupNamingIndicator : Window
     {
+        private const int ExtendedWindowStyle = -20;
+        private const int TransparentWindowStyle = 0x00000020;
+        private const int NoActivateWindowStyle = 0x08000000;
         private readonly Window ownerWindow;
+        private readonly DispatcherTimer cursorTimer;
         private bool isDismissing;
 
         public LocalGroupNamingIndicator(Window owner)
@@ -26,6 +33,11 @@ namespace MonocleViewExtension.LocalGroupNaming
             Focusable = false;
             WindowStartupLocation = WindowStartupLocation.Manual;
             Opacity = 0;
+            cursorTimer = new DispatcherTimer(DispatcherPriority.Render)
+            {
+                Interval = TimeSpan.FromMilliseconds(33)
+            };
+            cursorTimer.Tick += CursorTimerTick;
 
             var progressBar = new ProgressBar
             {
@@ -67,8 +79,7 @@ namespace MonocleViewExtension.LocalGroupNaming
 
             Loaded += OnLoaded;
             Closed += OnClosed;
-            ownerWindow.LocationChanged += OwnerBoundsChanged;
-            ownerWindow.SizeChanged += OwnerBoundsChanged;
+            SourceInitialized += OnSourceInitialized;
         }
 
         public void Dismiss()
@@ -89,13 +100,14 @@ namespace MonocleViewExtension.LocalGroupNaming
         private void OnLoaded(object sender, RoutedEventArgs args)
         {
             Reposition();
+            cursorTimer.Start();
             BeginAnimation(OpacityProperty, new DoubleAnimation(
                 0,
                 0.9,
                 TimeSpan.FromMilliseconds(140)));
         }
 
-        private void OwnerBoundsChanged(object sender, EventArgs args)
+        private void CursorTimerTick(object sender, EventArgs args)
         {
             Reposition();
         }
@@ -104,17 +116,64 @@ namespace MonocleViewExtension.LocalGroupNaming
         {
             if (!IsLoaded) return;
 
-            const double inset = 22;
-            Left = Math.Max(ownerWindow.Left + inset,
-                ownerWindow.Left + ownerWindow.ActualWidth - ActualWidth - inset);
-            Top = Math.Max(ownerWindow.Top + inset,
-                ownerWindow.Top + ownerWindow.ActualHeight - ActualHeight - inset);
+            if (!GetCursorPosition(out var nativeCursor)) return;
+
+            var presentationSource = PresentationSource.FromVisual(ownerWindow);
+            if (presentationSource?.CompositionTarget == null) return;
+
+            var cursor = presentationSource.CompositionTarget.TransformFromDevice.Transform(
+                new Point(nativeCursor.X, nativeCursor.Y));
+            const double cursorOffset = 16;
+            const double windowInset = 8;
+            var ownerRight = ownerWindow.Left + ownerWindow.ActualWidth;
+            var ownerBottom = ownerWindow.Top + ownerWindow.ActualHeight;
+
+            var left = cursor.X + cursorOffset;
+            if (left + ActualWidth > ownerRight - windowInset)
+            {
+                left = cursor.X - ActualWidth - cursorOffset;
+            }
+
+            var top = cursor.Y + cursorOffset;
+            if (top + ActualHeight > ownerBottom - windowInset)
+            {
+                top = cursor.Y - ActualHeight - cursorOffset;
+            }
+
+            Left = Math.Max(ownerWindow.Left + windowInset,
+                Math.Min(left, ownerRight - ActualWidth - windowInset));
+            Top = Math.Max(ownerWindow.Top + windowInset,
+                Math.Min(top, ownerBottom - ActualHeight - windowInset));
+        }
+
+        private void OnSourceInitialized(object sender, EventArgs args)
+        {
+            var handle = new WindowInteropHelper(this).Handle;
+            var styles = GetWindowLongPtr(handle, ExtendedWindowStyle).ToInt64();
+            styles |= TransparentWindowStyle | NoActivateWindowStyle;
+            SetWindowLongPtr(handle, ExtendedWindowStyle, new IntPtr(styles));
         }
 
         private void OnClosed(object sender, EventArgs args)
         {
-            ownerWindow.LocationChanged -= OwnerBoundsChanged;
-            ownerWindow.SizeChanged -= OwnerBoundsChanged;
+            cursorTimer.Stop();
+            cursorTimer.Tick -= CursorTimerTick;
+        }
+
+        [DllImport("user32.dll", EntryPoint = "GetCursorPos")]
+        private static extern bool GetCursorPosition(out NativePoint point);
+
+        [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")]
+        private static extern IntPtr GetWindowLongPtr(IntPtr windowHandle, int index);
+
+        [DllImport("user32.dll", EntryPoint = "SetWindowLongPtrW")]
+        private static extern IntPtr SetWindowLongPtr(IntPtr windowHandle, int index, IntPtr newValue);
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct NativePoint
+        {
+            public int X;
+            public int Y;
         }
     }
 }
