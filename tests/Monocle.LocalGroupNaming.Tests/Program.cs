@@ -18,6 +18,7 @@ namespace Monocle.LocalGroupNaming.Tests
             TestValidatorStripsCommonModelFormatting();
             TestValidatorRejectsLongAndStructuredResponses();
             TestValidatorRecognizesCopiedNodeNames();
+            TestDownloadManifestIsPinnedAndSecure();
 
             if (failures == 0)
             {
@@ -118,6 +119,33 @@ namespace Monocle.LocalGroupNaming.Tests
                 "Expected an exact node name to be rejected.");
             Assert(!GroupNameValidator.MatchesNodeName("Point Coordinate List Creation", nodeNames),
                 "Expected a synthesized group name not to match a node name.");
+        }
+
+        private static void TestDownloadManifestIsPinnedAndSecure()
+        {
+            Assert(LocalModelManifest.ModelDownloadUrl.StartsWith("https://", StringComparison.Ordinal),
+                "Expected the model download to use HTTPS.");
+            Assert(LocalModelManifest.RuntimeDownloadUrl.StartsWith("https://", StringComparison.Ordinal),
+                "Expected the runtime download to use HTTPS.");
+            Assert(IsSha256(LocalModelManifest.ModelSha256),
+                "Expected a pinned model SHA-256 checksum.");
+            Assert(IsSha256(LocalModelManifest.RuntimeSha256),
+                "Expected a pinned runtime SHA-256 checksum.");
+            Assert(LocalModelManifest.ModelFileSize > 2L * 1024 * 1024 * 1024,
+                "Expected the manifest to retain the tested Qwen3 4B model size.");
+        }
+
+        private static bool IsSha256(string value)
+        {
+            if (value == null || value.Length != 64) return false;
+            foreach (var character in value)
+            {
+                var isHex = character >= '0' && character <= '9' ||
+                            character >= 'A' && character <= 'F';
+                if (!isHex) return false;
+            }
+
+            return true;
         }
 
         private static void AssertContains(string value, string expected)
