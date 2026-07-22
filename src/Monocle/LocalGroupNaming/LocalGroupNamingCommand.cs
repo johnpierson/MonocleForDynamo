@@ -25,7 +25,7 @@ namespace MonocleViewExtension.LocalGroupNaming
                 Header = "local group naming (local AI)",
                 IsCheckable = true,
                 IsChecked = false,
-                ToolTip = "Set up and load the local model, then automatically name groups created from the Monocle flyout."
+                ToolTip = "Set up and load the local model for this Dynamo session. It stops when unchecked or when Dynamo closes."
             };
 
             toggle.Checked += async (sender, args) =>
@@ -56,7 +56,7 @@ namespace MonocleViewExtension.LocalGroupNaming
                         await provisioner.EnsureInstalledAsync(progress, cancellation.Token);
                         setupWindow.ShowLoadingModel();
                         await client.EnableAsync(cancellation.Token);
-                        toggle.ToolTip = "The local model is loaded. Uncheck this item to stop it.";
+                        toggle.ToolTip = "The local model is loaded for this Dynamo session. Uncheck this item to stop it.";
                     }
                     catch (OperationCanceledException)
                     {
@@ -83,7 +83,7 @@ namespace MonocleViewExtension.LocalGroupNaming
             toggle.Unchecked += (sender, args) =>
             {
                 client.Disable();
-                toggle.ToolTip = "Set up and load the local model, then automatically name groups created from the Monocle flyout.";
+                toggle.ToolTip = "Set up and load the local model for this Dynamo session. It stops when unchecked or when Dynamo closes.";
             };
 
             parentMenuItem.Items.Add(toggle);

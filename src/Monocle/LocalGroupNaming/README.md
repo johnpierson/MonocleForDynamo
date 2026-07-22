@@ -24,7 +24,9 @@ The files and the versioned acceptance marker are stored in:
 Later sessions reuse that installation without showing the agreement or
 downloading again. While the menu item remains checked, groups created from the
 Monocle flyout are named automatically and the local server remains running.
-Unchecking the item or closing Dynamo stops the server.
+The enabled state is not retained between Dynamo sessions. Unchecking the item
+or closing Dynamo stops the server; the downloaded files remain available for
+the next time the user enables it.
 
 ## Pinned third-party components
 

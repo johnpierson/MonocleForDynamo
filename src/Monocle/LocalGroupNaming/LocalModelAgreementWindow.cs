@@ -36,6 +36,12 @@ namespace MonocleViewExtension.LocalGroupNaming
             {
                 Text = "The files are stored under your local application data folder. Dynamo node names stay on this computer and are never sent to an external AI service.",
                 TextWrapping = TextWrapping.Wrap,
+                Margin = new Thickness(0, 0, 0, 10)
+            });
+            content.Children.Add(new TextBlock
+            {
+                Text = "The downloaded files and license acceptance persist, but the model is enabled only for the current Dynamo session or until you uncheck the menu item.",
+                TextWrapping = TextWrapping.Wrap,
                 Margin = new Thickness(0, 0, 0, 16)
             });
 
