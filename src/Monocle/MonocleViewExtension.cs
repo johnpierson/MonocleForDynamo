@@ -130,9 +130,15 @@ namespace MonocleViewExtension
             PackageUsageCommand.AddMenuItem(monocleMenuItem, p);
             GraphResizererCommand.AddMenuItem(monocleMenuItem, p);
             NodeSwapperCommand.AddMenuItem(monocleMenuItem, p);
-            localGroupNamingClient = new LocalLlamaServerClient(LocalLlamaServerOptions.CreateDefault());
+            var localGroupNamingOptions = LocalLlamaServerOptions.CreateDefault();
+            var localModelProvisioner = new LocalModelProvisioner(localGroupNamingOptions);
+            localGroupNamingClient = new LocalLlamaServerClient(localGroupNamingOptions);
             FocaCommand.EnableFoca(p, monocleMenuItem, localGroupNamingClient);
-            LocalGroupNamingCommand.AddModelToggle(monocleMenuItem, p, localGroupNamingClient);
+            LocalGroupNamingCommand.AddModelToggle(
+                monocleMenuItem,
+                p,
+                localGroupNamingClient,
+                localModelProvisioner);
             InlineNodeConnectomaticCommand.AddMenuItem(p, monocleMenuItem);
             SimpleSearchCommand.AddMenuItem(p, monocleMenuItem, this);
             //TODO: Check if standard views consistently loads on different file changes

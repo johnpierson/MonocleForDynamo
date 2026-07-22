@@ -1,40 +1,41 @@
 # Local group naming experiment
 
-This experiment suggests a short title for one selected Dynamo group by running
-`llama-server` and a GGUF model entirely on the local machine. No graph data is
-sent to an external service.
+Monocle suggests a short title for groups created from its existing group
+flyout by running `llama-server` and Qwen3 entirely on the local machine. Dynamo
+node names are never sent to an external AI service.
 
-The experiment does not commit model or runtime binaries. Place these files next
-to `MonocleViewExtension.dll` using the following layout:
+## First-run setup
+
+Check **local group naming (local AI)** in the Monocle menu. On the first use,
+Monocle:
+
+1. Shows the third-party licenses and requires separate acceptance of the
+   llama.cpp MIT License and Qwen3 Apache License 2.0.
+2. Downloads the pinned Windows CPU runtime and 2.5 GB Qwen3 4B Q4_K_M model.
+3. Verifies the expected file size and SHA-256 checksums.
+4. Starts the model on localhost after verification succeeds.
+
+The files and the versioned acceptance marker are stored in:
 
 ```text
-local-ai/
-  llama-server.exe
-  llama.dll
-  ggml*.dll
-  Qwen3-4B-Q4_K_M.gguf
+%LOCALAPPDATA%\Monocle\LocalGroupNaming\qwen3-4b-q4km-llama-b10075-v1\
 ```
 
-Copy the complete contents of the Windows CPU runtime archive into `local-ai`;
-the exact supporting DLL list varies by `llama.cpp` release.
+Later sessions reuse that installation without showing the agreement or
+downloading again. While the menu item remains checked, groups created from the
+Monocle flyout are named automatically and the local server remains running.
+Unchecking the item or closing Dynamo stops the server.
 
-For the experiment, use the official Windows `llama.cpp` release and the
-Apache-2.0-licensed 2.5 GB Q4_K_M model:
+## Pinned third-party components
 
-- <https://github.com/ggml-org/llama.cpp/releases>
-- <https://huggingface.co/ggml-org/Qwen3-4B-GGUF/blob/main/Qwen3-4B-Q4_K_M.gguf>
+- llama.cpp b10075 Windows x64 CPU runtime (MIT):
+  <https://github.com/ggml-org/llama.cpp/releases/tag/b10075>
+- Qwen3-4B-Q4_K_M GGUF model (Apache-2.0):
+  <https://huggingface.co/ggml-org/Qwen3-4B-GGUF/blob/main/Qwen3-4B-Q4_K_M.gguf>
 
-For development, alternate paths can be supplied with:
+The runtime is CPU-only with a 2,048-token context and four threads.
+
+For development, automatic provisioning can be bypassed by setting both:
 
 - `MONOCLE_LOCAL_AI_SERVER_PATH`
 - `MONOCLE_LOCAL_AI_MODEL_PATH`
-
-Check **local group naming (local AI)** in the Monocle menu to load the model.
-While that item remains checked, groups made with Monocle's existing
-create-groups flyout are automatically named from every node they contain. The
-local server stays running for subsequent groups and stops when the menu item is
-unchecked or Dynamo closes.
-
-The initial runtime is intentionally CPU-only with a 2,048-token context and four
-threads. Model and runtime redistribution must be reviewed separately before
-this moves beyond experimentation.

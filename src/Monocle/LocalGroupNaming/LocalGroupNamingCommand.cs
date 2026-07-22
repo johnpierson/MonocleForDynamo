@@ -17,50 +17,73 @@ namespace MonocleViewExtension.LocalGroupNaming
         public static void AddModelToggle(
             MenuItem parentMenuItem,
             ViewLoadedParams viewLoadedParams,
-            LocalLlamaServerClient client)
+            LocalLlamaServerClient client,
+            LocalModelProvisioner provisioner)
         {
             var toggle = new MenuItem
             {
                 Header = "local group naming (local AI)",
                 IsCheckable = true,
                 IsChecked = false,
-                ToolTip = "Load the bundled local model and automatically name groups created from the Monocle flyout."
+                ToolTip = "Set up and load the local model, then automatically name groups created from the Monocle flyout."
             };
 
             toggle.Checked += async (sender, args) =>
             {
                 toggle.IsEnabled = false;
-                var progressWindow = CreateProgressWindow(
-                    viewLoadedParams.DynamoWindow,
-                    "Loading the local group naming model...");
+                LocalModelSetupWindow setupWindow = null;
+                using (var cancellation = new CancellationTokenSource())
+                {
+                    try
+                    {
+                        if (provisioner.RequiresAgreement)
+                        {
+                            var agreementWindow = new LocalModelAgreementWindow(viewLoadedParams.DynamoWindow);
+                            if (agreementWindow.ShowDialog() != true)
+                            {
+                                toggle.IsChecked = false;
+                                return;
+                            }
 
-                try
-                {
-                    progressWindow.Show();
-                    await client.EnableAsync(CancellationToken.None);
-                    toggle.ToolTip = "The local model is loaded. Uncheck this item to stop it.";
-                }
-                catch (Exception exception)
-                {
-                    toggle.IsChecked = false;
-                    MessageBox.Show(
-                        viewLoadedParams.DynamoWindow,
-                        exception.Message,
-                        "Monocle local group naming",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Warning);
-                }
-                finally
-                {
-                    progressWindow.Close();
-                    toggle.IsEnabled = true;
+                            provisioner.RecordAgreementAcceptance();
+                        }
+
+                        setupWindow = new LocalModelSetupWindow(viewLoadedParams.DynamoWindow);
+                        setupWindow.CancelRequested += (cancelSender, cancelArgs) => cancellation.Cancel();
+                        var progress = new Progress<LocalModelDownloadProgress>(setupWindow.UpdateDownload);
+                        setupWindow.Show();
+
+                        await provisioner.EnsureInstalledAsync(progress, cancellation.Token);
+                        setupWindow.ShowLoadingModel();
+                        await client.EnableAsync(cancellation.Token);
+                        toggle.ToolTip = "The local model is loaded. Uncheck this item to stop it.";
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        toggle.IsChecked = false;
+                    }
+                    catch (Exception exception)
+                    {
+                        toggle.IsChecked = false;
+                        MessageBox.Show(
+                            viewLoadedParams.DynamoWindow,
+                            exception.Message,
+                            "Monocle local group naming",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning);
+                    }
+                    finally
+                    {
+                        setupWindow?.CompleteAndClose();
+                        toggle.IsEnabled = true;
+                    }
                 }
             };
 
             toggle.Unchecked += (sender, args) =>
             {
                 client.Disable();
-                toggle.ToolTip = "Load the bundled local model and automatically name groups created from the Monocle flyout.";
+                toggle.ToolTip = "Set up and load the local model, then automatically name groups created from the Monocle flyout.";
             };
 
             parentMenuItem.Items.Add(toggle);
@@ -146,26 +169,6 @@ namespace MonocleViewExtension.LocalGroupNaming
                     });
                 }
             }
-        }
-
-        private static Window CreateProgressWindow(Window owner, string message)
-        {
-            return new Window
-            {
-                Title = "Monocle local group naming",
-                Content = new TextBlock
-                {
-                    Text = message,
-                    Margin = new Thickness(24),
-                    TextWrapping = TextWrapping.Wrap
-                },
-                Owner = owner,
-                SizeToContent = SizeToContent.WidthAndHeight,
-                MinWidth = 420,
-                ResizeMode = ResizeMode.NoResize,
-                ShowInTaskbar = false,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner
-            };
         }
     }
 }

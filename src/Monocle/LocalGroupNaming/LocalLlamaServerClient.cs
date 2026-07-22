@@ -118,7 +118,7 @@ namespace MonocleViewExtension.LocalGroupNaming
                 serverProcess.ErrorDataReceived += OnServerErrorDataReceived;
                 if (!serverProcess.Start())
                 {
-                    throw new InvalidOperationException("The bundled local model server could not be started.");
+                    throw new InvalidOperationException("The local model server could not be started.");
                 }
 
                 serverProcess.BeginErrorReadLine();
