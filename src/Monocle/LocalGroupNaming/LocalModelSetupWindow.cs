@@ -83,7 +83,7 @@ namespace MonocleViewExtension.LocalGroupNaming
         public void ShowLoadingModel()
         {
             statusText.Text = "Loading the local group naming model...";
-            detailText.Text = "This can take a moment on the first start.";
+            detailText.Text = "This can take a moment on the first start. The model remains enabled only for this Dynamo session or until you turn it off.";
             progressBar.IsIndeterminate = true;
         }
 
