@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 using Dynamo.Graph.Annotations;
 using Dynamo.Logging;
 using Dynamo.UI.Commands;
@@ -25,6 +26,8 @@ namespace MonocleViewExtension.Foca
         public DelegateCommand AlignClick { get; set; }
         public DelegateCommand ToolboxClick { get; set; }
 
+        private DispatcherOperation _refreshOperation;
+        private bool _refreshColorsRequested;
 
         private double _width;
         public double Width
@@ -80,6 +83,13 @@ namespace MonocleViewExtension.Foca
         {
             get => _multiSelect;
             set { _multiSelect = value; RaisePropertyChanged(nameof(MultiSelect)); }
+        }
+
+        private bool _hasMultipleSelection;
+        public bool HasMultipleSelection
+        {
+            get => _hasMultipleSelection;
+            set { _hasMultipleSelection = value; RaisePropertyChanged(nameof(HasMultipleSelection)); }
         }
 
         private bool _colorWheelVisibility;
@@ -157,7 +167,10 @@ namespace MonocleViewExtension.Foca
 
         public void OnAlignClick(object o)
         {
+            if (o == null) return;
+
             Model.AlignSelected(o.ToString());
+            RequestRefresh(false);
         }
 
         public void OnToolboxClick(object o)
@@ -180,59 +193,102 @@ namespace MonocleViewExtension.Foca
 #endif
 
 
+            CollapseColorWheel();
+            RequestRefresh(true);
+        }
+
+        private void RequestRefresh(bool updateColors)
+        {
+            _refreshColorsRequested |= updateColors;
+
+            if (_refreshOperation?.Status == DispatcherOperationStatus.Pending)
+            {
+                return;
+            }
+
+            var dispatcher = View?.Dispatcher ?? Model.DynamoView.Dispatcher;
+            _refreshOperation = dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() =>
+            {
+                var shouldUpdateColors = _refreshColorsRequested;
+                _refreshColorsRequested = false;
+                _refreshOperation = null;
+                RefreshWidget(shouldUpdateColors);
+            }));
+        }
+
+        private void RefreshWidget(bool updateColors)
+        {
             try
             {
                 if (!Globals.IsFocaEnabled)
                 {
-                    ExpansionBay?.Children.Remove(View);
+                    FocaVisible = false;
+                    DetachView();
                     return;
                 }
 
-
-                var count = Model.LoadedParams.CurrentWorkspaceModel.CurrentSelection.Count();
+                var selection = Model.LoadedParams.CurrentWorkspaceModel.CurrentSelection.ToList();
+                var count = selection.Count;
 
                 FocaVisible = Model.ShowWidget();
-                MultiSelect = count >= 2 ? 1.0 : 0.0;
+                if (!FocaVisible)
+                {
+                    DetachView();
+                    return;
+                }
 
-                //remove old
-                ExpansionBay?.Children.Remove(View);
-                ExpansionBay = Model.GetExpansionBay();
-                ExpansionBay?.Children.Add(View);
+                HasMultipleSelection = count >= 2;
+                MultiSelect = HasMultipleSelection ? 1.0 : 0.0;
+
+                var nextExpansionBay = Model.GetExpansionBay();
+                if (!ReferenceEquals(ExpansionBay, nextExpansionBay))
+                {
+                    ExpansionBay?.Children.Remove(View);
+                    ExpansionBay = nextExpansionBay;
+                }
+
+                if (ExpansionBay != null && View != null && !ExpansionBay.Children.Contains(View))
+                {
+                    ExpansionBay.Children.Add(View);
+                }
+
                 var rec = Model.WrapNodes();
-                Width = MultiSelect >= 1.0 ? rec.Width + 49 : rec.Width;
-                Height = MultiSelect >= 1.0 ? rec.Height + 40 : rec.Height;
+                Width = HasMultipleSelection ? rec.Width + 49 : rec.Width;
+                Height = HasMultipleSelection ? rec.Height + 40 : rec.Height;
                 Thickness = Model.GetThickness(MultiSelect);
 
-                CombineVisibility = count > 1 ? 1 : 0;
-                DropdownVisibility = count == 1 ? 1 : 0;
+                CombineVisibility = HasMultipleSelection ? 1 : 0;
                 ListPowVisibility = count == 1 ? 1 : 0;
                 FundleBundleVisibility = count == 1 ? 1 : 0;
                 NodeSwapVisibility = count == 1 ? 1 : 0;
-
-                DropdownVisibility = Model.LoadedParams.CurrentWorkspaceModel.CurrentSelection.First().NodeType == "ExtensionNode" ? 1 : 0;
-                UpdateColors();
-            }
-            catch (Exception)
-            {
-                ResetColorWheel();
-                UpdateColors();
-            }
-        }
-
-
-        private void ResetColorWheel()
-        {
-            try
-            {
-                ColorWheelVisibility = false;
-                ColorWheelHeight = 48;
-                ColorWheelMargin = new Thickness(-36);
-
+                DropdownVisibility = count == 1 && selection[0].NodeType == "ExtensionNode" ? 1 : 0;
+                if (updateColors || GroupSettings == null)
+                {
+                    UpdateColors();
+                }
             }
             catch (Exception e)
             {
-                Model.DynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
+                FocaVisible = false;
+                DetachView();
+                CollapseColorWheel();
+                Model.DynamoViewModel.Model.Logger.LogWarning($"Monocle- Unable to refresh FOCA: {e.Message}", WarningLevel.Mild);
             }
+        }
+
+        private void DetachView()
+        {
+            ExpansionBay?.Children.Remove(View);
+            ExpansionBay = null;
+            HasMultipleSelection = false;
+            MultiSelect = 0.0;
+        }
+
+        public void CollapseColorWheel()
+        {
+            ColorWheelVisibility = false;
+            ColorWheelHeight = 48;
+            ColorWheelMargin = new Thickness(-36);
         }
 
         #region ColorBrushes
