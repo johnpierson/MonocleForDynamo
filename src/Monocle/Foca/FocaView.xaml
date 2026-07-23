@@ -13,30 +13,60 @@
                 <ResourceDictionary Source="/MonocleViewExtension;component/Resources/IconDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <BooleanToVisibilityConverter x:Key="b2v"/>
+            <Style x:Key="FocaHitTarget" TargetType="Border">
+                <Setter Property="Width" Value="28"/>
+                <Setter Property="Height" Value="28"/>
+                <Setter Property="Background" Value="Transparent"/>
+            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid Name="MainGrid" Margin="{Binding Thickness}" Visibility="{Binding FocaVisible, Converter={StaticResource b2v}}">
-        <Grid Name="AlignmentGrid" Opacity="{Binding MultiSelect}">
-            <Rectangle Stroke="#7F000000" StrokeThickness="2" StrokeDashArray="10.0 10.0" RadiusX="24" RadiusY="24"  Opacity="0.5" Width="{Binding Width}" Height= "{Binding Height}"/>
+        <Grid Name="AlignmentGrid" Opacity="{Binding MultiSelect}" IsHitTestVisible="{Binding HasMultipleSelection}">
+            <Rectangle Stroke="#7F000000" StrokeThickness="2" StrokeDashArray="10.0 10.0" RadiusX="24" RadiusY="24" Opacity="0.5" Width="{Binding Width}" Height="{Binding Height}" IsHitTestVisible="False"/>
 
-            <Image Tag="VerticalTop" Source="Resources/button-alignTopBlack.png" Height="22" Width="22" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0 -24 0 0" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
-            <Image Tag="VerticalDistribute" Source="Resources/button-distributeVerticalBlack.png" Height="20" Width="20" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="60 -24 0 0" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
-            <Image Tag="VerticalCenter" Source="Resources/button-alignHorizontalCenterBlack.png" Height="20" Width="20" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0 -24 60 0" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
+            <Border x:Name="TopAlignTarget" Tag="VerticalTop" Style="{StaticResource FocaHitTarget}" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0 -27 0 0" Opacity="0.5" MouseDown="UIElement_OnMouseDown">
+                <Image Source="Resources/button-alignTopBlack.png" Height="22" Width="22"/>
+            </Border>
+            <Border x:Name="TopDistributeTarget" Tag="VerticalDistribute" Style="{StaticResource FocaHitTarget}" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="60 -28 0 0" Opacity="0.5" MouseDown="UIElement_OnMouseDown">
+                <Image Source="Resources/button-distributeVerticalBlack.png" Height="20" Width="20"/>
+            </Border>
+            <Border x:Name="TopCenterTarget" Tag="VerticalCenter" Style="{StaticResource FocaHitTarget}" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0 -28 60 0" Opacity="0.5" MouseDown="UIElement_OnMouseDown">
+                <Image Source="Resources/button-alignHorizontalCenterBlack.png" Height="20" Width="20"/>
+            </Border>
 
-            <Image Tag="HorizontalLeft" Source="Resources/button-alignLeftBlack.png" Height="22" Width="22" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-24 0 0 0" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
-            <Image Tag="HorizontalDistribute" Source="Resources/button-distributeHorizontalBlack.png" Height="20" Width="20" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-24 60 0 0" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
-            <Image Tag="HorizontalCenter" Source="Resources/button-alignVerticalCenterBlack.png" Height="20" Width="20" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-24 0 0 60" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
+            <Border x:Name="LeftAlignTarget" Tag="HorizontalLeft" Style="{StaticResource FocaHitTarget}" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-27 0 0 0" Opacity="0.5" MouseDown="UIElement_OnMouseDown">
+                <Image Source="Resources/button-alignLeftBlack.png" Height="22" Width="22"/>
+            </Border>
+            <Border x:Name="LeftDistributeTarget" Tag="HorizontalDistribute" Style="{StaticResource FocaHitTarget}" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-28 60 0 0" Opacity="0.5" MouseDown="UIElement_OnMouseDown">
+                <Image Source="Resources/button-distributeHorizontalBlack.png" Height="20" Width="20"/>
+            </Border>
+            <Border x:Name="LeftCenterTarget" Tag="HorizontalCenter" Style="{StaticResource FocaHitTarget}" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="-28 0 0 60" Opacity="0.5" MouseDown="UIElement_OnMouseDown">
+                <Image Source="Resources/button-alignVerticalCenterBlack.png" Height="20" Width="20"/>
+            </Border>
 
-            <Image Tag="VerticalBottom" Source="Resources/button-alignBottomBlack.png" Height="22" Width="22" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0 0 0 -24" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
-            <Image Tag="VerticalDistribute" Source="Resources/button-distributeVerticalBlack.png" Height="20" Width="20" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="60 0 0 -24" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
-            <Image Tag="VerticalCenter" Source="Resources/button-alignHorizontalCenterBlack.png" Height="20" Width="20" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0 0 60 -24" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
+            <Border x:Name="BottomAlignTarget" Tag="VerticalBottom" Style="{StaticResource FocaHitTarget}" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0 0 0 -27" Opacity="0.5" MouseDown="UIElement_OnMouseDown">
+                <Image Source="Resources/button-alignBottomBlack.png" Height="22" Width="22"/>
+            </Border>
+            <Border x:Name="BottomDistributeTarget" Tag="VerticalDistribute" Style="{StaticResource FocaHitTarget}" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="60 0 0 -28" Opacity="0.5" MouseDown="UIElement_OnMouseDown">
+                <Image Source="Resources/button-distributeVerticalBlack.png" Height="20" Width="20"/>
+            </Border>
+            <Border x:Name="BottomCenterTarget" Tag="VerticalCenter" Style="{StaticResource FocaHitTarget}" VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0 0 60 -28" Opacity="0.5" MouseDown="UIElement_OnMouseDown">
+                <Image Source="Resources/button-alignHorizontalCenterBlack.png" Height="20" Width="20"/>
+            </Border>
 
-            <Image Tag="HorizontalRight" Source="Resources/button-alignRightBlack.png" Height="22" Width="22" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 -24 0" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
-            <Image Tag="HorizontalDistribute" Source="Resources/button-distributeHorizontalBlack.png" Height="20" Width="20" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="-24 60 -24 0" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
-            <Image Tag="HorizontalCenter" Source="Resources/button-alignVerticalCenterBlack.png" Height="20" Width="20" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="-24 0 -24 60" Opacity="0.5" MouseDown="UIElement_OnMouseDown"/>
+            <Border x:Name="RightAlignTarget" Tag="HorizontalRight" Style="{StaticResource FocaHitTarget}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0 0 -27 0" Opacity="0.5" MouseDown="UIElement_OnMouseDown">
+                <Image Source="Resources/button-alignRightBlack.png" Height="22" Width="22"/>
+            </Border>
+            <Border x:Name="RightDistributeTarget" Tag="HorizontalDistribute" Style="{StaticResource FocaHitTarget}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="-24 60 -28 0" Opacity="0.5" MouseDown="UIElement_OnMouseDown">
+                <Image Source="Resources/button-distributeHorizontalBlack.png" Height="20" Width="20"/>
+            </Border>
+            <Border x:Name="RightCenterTarget" Tag="HorizontalCenter" Style="{StaticResource FocaHitTarget}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="-24 0 -28 60" Opacity="0.5" MouseDown="UIElement_OnMouseDown">
+                <Image Source="Resources/button-alignVerticalCenterBlack.png" Height="20" Width="20"/>
+            </Border>
         </Grid>
 
-        <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Name="ToolboxGrid"  Margin="-36 -52 -60 0" Opacity="0.5" MouseEnter="ToolboxGrid_OnMouseEnter" Unloaded="ToolboxGrid_OnUnloaded">
+        <Grid HorizontalAlignment="Right" VerticalAlignment="Top" Name="ToolboxGrid" Margin="-36 -52 -60 0" Opacity="0.5" Background="Transparent"
+              MouseEnter="ToolboxGrid_OnMouseEnter" MouseLeave="ToolboxGrid_OnMouseLeave" Unloaded="ToolboxGrid_OnUnloaded">
             <Grid.RowDefinitions>
                 <RowDefinition Height="24"/>
                 <RowDefinition Height="4"/>

@@ -419,7 +419,7 @@ namespace MonocleViewExtension.Foca
                     Name = "focaHost",
                     Margin = new Thickness(0, 4, 0, 0),
                     HorizontalAlignment = HorizontalAlignment.Left,
-                    Background = Brushes.Blue
+                    ClipToBounds = false
                 };
 
                 Grid.SetRow(focaHost, 5);
@@ -783,9 +783,6 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
             {
                 //do nothing
             }
-
-            DynamoModel.SelectInRegionCommand cmd = new DynamoModel.SelectInRegionCommand(new Rect2D(), false);
-            DynamoViewModel.ExecuteCommand(cmd);
 
         }
 
