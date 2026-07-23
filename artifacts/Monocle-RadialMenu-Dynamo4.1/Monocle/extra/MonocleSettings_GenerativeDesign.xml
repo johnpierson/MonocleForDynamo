@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MonocleSettings xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <GroupSettings>
+    <GroupSetting>
+      <GroupId>1</GroupId>
+      <Text>Variables / Inputs</Text>
+      <Color>#FFFFB8D8</Color>
+      <FontSize>24</FontSize>
+    </GroupSetting>
+    <GroupSetting>
+      <GroupId>2</GroupId>
+      <Text>Working / Functions</Text>
+      <Color>#FFE8F7AD</Color>
+      <FontSize>24</FontSize>
+    </GroupSetting>
+    <GroupSetting>
+      <GroupId>3</GroupId>
+      <Text>Display / Validation</Text>
+      <Color>#FFA4E1FF</Color>
+      <FontSize>24</FontSize>
+    </GroupSetting>
+    <GroupSetting>
+      <GroupId>4</GroupId>
+      <Text>Checking / Outputs</Text>
+      <Color>#FFFFC999</Color>
+      <FontSize>24</FontSize>
+    </GroupSetting>
+    <GroupSetting>
+      <GroupId>5</GroupId>
+      <Text>Remember / Gate Nodes</Text>
+      <Color>#FFD4B6DB</Color>
+      <FontSize>24</FontSize>
+    </GroupSetting>
+    <GroupSetting>
+      <GroupId>6</GroupId>
+      <Text>General</Text>
+      <Color>#FFFFFFFF</Color>
+      <FontSize>24</FontSize>
+    </GroupSetting>
+  </GroupSettings>
+  <CustomNodeIdentifierSettings>
+    <Color>#FFFF0800</Color>
+    <BorderThickness>4</BorderThickness>
+  </CustomNodeIdentifierSettings>
+  <CustomNodeNotePrefix>Custom Node: </CustomNodeNotePrefix>
+  <IsFocaEnabled>true</IsFocaEnabled>
+  <InCanvasSearchEnabled>true</InCanvasSearchEnabled>
+</MonocleSettings>

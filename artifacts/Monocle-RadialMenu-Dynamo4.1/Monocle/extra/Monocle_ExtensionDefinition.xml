@@ -1,0 +1,4 @@
+﻿<ExtensionDefinition>
+  <AssemblyPath>..\bin\MonocleExtension.dll</AssemblyPath>
+  <TypeName>MonocleExtension.MonocleExtension</TypeName>
+</ExtensionDefinition>
