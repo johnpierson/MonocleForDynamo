@@ -20,6 +20,7 @@ using MonocleViewExtension.MonocleSettings;
 using MonocleViewExtension.NodeDocumentation;
 using MonocleViewExtension.NodeSwapper;
 using MonocleViewExtension.PackageUsage;
+using MonocleViewExtension.RadialMenu;
 using MonocleViewExtension.SimpleSearch;
 using MonocleViewExtension.StandardViews;
 using MonocleViewExtension.Utilities;
@@ -32,10 +33,12 @@ namespace MonocleViewExtension
         public string Name => "Monocle View Extension";
 
         private StandardViewsViewModel standardViewsViewModel;
+        private RadialMenuController radialMenuController;
 
         public void Dispose()
         {
             standardViewsViewModel?.Dispose();
+            radialMenuController?.Dispose();
             AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomainOnAssemblyResolve;
 #if net8 || net10
             System.Runtime.Loader.AssemblyLoadContext.Default.Resolving -= AssemblyLoadContext_Resolving;
@@ -136,6 +139,7 @@ namespace MonocleViewExtension
             FancyPasteCommand.AddMenuItem(p);
             BetterSaveCommand.AddMenuItem(p);
             GraphInformationCommand.AddMenuItem(monocleMenuItem, p);
+            radialMenuController = new RadialMenuController(p, monocleMenuItem);
             ScaffoldTheJacobSmallSpecial(p);
 
             NodeDocumentationCommand.AddMenuItem(monocleMenuItem, p);
