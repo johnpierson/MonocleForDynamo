@@ -9,6 +9,7 @@ using Dynamo.Logging;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
 using HelixToolkit.Wpf.SharpDX;
+using MonocleViewExtension.Core;
 using MonocleViewExtension.Utilities;
 
 namespace MonocleViewExtension.StandardViews
@@ -28,9 +29,12 @@ namespace MonocleViewExtension.StandardViews
             set { _viewControlPanel = value; RaisePropertyChanged(nameof(ViewControlPanel)); }
         }
 
+        private readonly IMonocleLogger _log;
+
         public StandardViewsViewModel(StandardViewsModel model)
         {
             Model = model;
+            _log = new MonocleLog(model.DynamoViewModel);
             model.LoadedParams.SelectionCollectionChanged += LoadedParamsOnSelectionCollectionChanged;
             //commands
             SetCameraCommand = new DelegateCommand(OnSetCamera, CanSetCamera);
@@ -50,7 +54,7 @@ namespace MonocleViewExtension.StandardViews
             }
             catch (Exception e)
             {
-                Model.DynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
+                _log.Warn("Could not re-attach the standard view buttons to the status bar.", e);
             }
         }
 
@@ -87,8 +91,10 @@ namespace MonocleViewExtension.StandardViews
             {
                 return Model.DynamoViewModel.BackgroundPreviewActive;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                // Runs constantly as WPF re-evaluates the buttons, so keep it quiet.
+                _log.Info($"Could not determine whether the 3D preview is active: {e.Message}");
                 return false;
             }
         }

@@ -3,13 +3,13 @@ using Dynamo.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using MonocleViewExtension.Core;
 using Xceed.Wpf.AvalonDock.Controls;
 
 namespace MonocleViewExtension.Utilities
@@ -57,21 +57,27 @@ namespace MonocleViewExtension.Utilities
     }
     internal static class ImageUtils
     {
+        /// <summary>
+        /// Loads an embedded image. Returns an empty BitmapImage if the resource is missing, so a
+        /// renamed asset shows as a blank icon rather than taking a window down with it.
+        /// </summary>
         public static BitmapImage LoadImage(Assembly a, string name)
         {
             var img = new BitmapImage();
-            try
-            {
-                var resourceName = a.GetManifestResourceNames().FirstOrDefault(x => x.Contains(name));
-                var stream = a.GetManifestResourceStream(resourceName);
 
+            var resourceName = a.GetManifestResourceNames().FirstOrDefault(x => x.Contains(name));
+            if (resourceName == null)
+            {
+                MonocleContext.Current?.Log.Warn($"Embedded image '{name}' was not found.");
+                return img;
+            }
+
+            using (var stream = a.GetManifestResourceStream(resourceName))
+            {
                 img.BeginInit();
                 img.StreamSource = stream;
+                img.CacheOption = BitmapCacheOption.OnLoad;
                 img.EndInit();
-            }
-            catch (Exception)
-            {
-                // ignored
             }
 
             return img;
@@ -177,16 +183,9 @@ namespace MonocleViewExtension.Utilities
         /// </summary>
         public static void CheckForDevExpress()
         {
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-
-            try
-            {
-                Globals.DevExpress = assemblies.First(a => a.FullName.Contains("DevExpress.Xpf.Core"));
-            }
-            catch (Exception)
-            {
-                Globals.DevExpress = null;
-            }
+            // Not being loaded is the normal case, so this is a lookup rather than a try/catch.
+            Globals.DevExpress = AppDomain.CurrentDomain.GetAssemblies()
+                .FirstOrDefault(a => a.FullName.Contains("DevExpress.Xpf.Core"));
 
             Globals.IsDevExpressLoaded = Globals.DevExpress != null;
         }
@@ -201,8 +200,14 @@ namespace MonocleViewExtension.Utilities
 
             try
             {
-                var objType = Enumerable.First<Type>(GetTypesSafely(Globals.DevExpress),
-                    t => t.Name.Equals("ThemeManager"));
+                var objType = GetTypesSafely(Globals.DevExpress)
+                    .FirstOrDefault(t => t.Name.Equals("ThemeManager"));
+
+                if (objType == null)
+                {
+                    MonocleContext.Current?.Log.Info("DevExpress is loaded but exposes no ThemeManager, so its theme override was left alone.");
+                    return;
+                }
 
                 object baseObject = System.Runtime.Serialization.FormatterServices
                     .GetUninitializedObject(objType);
@@ -210,9 +215,11 @@ namespace MonocleViewExtension.Utilities
                 objType.InvokeMember("SetThemeName",
                     BindingFlags.Default | BindingFlags.InvokeMethod, null, baseObject, new object[] { window, "None" });
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                //do nothing
+                // Reflection against a third-party toolkit we do not control. Failing here only
+                // means the user keeps DevExpress's theme, which is what they had before us.
+                MonocleContext.Current?.Log.Warn("Could not undo the theme DevExpress applied to Dynamo.", e);
             }
         }
 

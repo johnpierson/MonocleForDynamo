@@ -10,6 +10,7 @@ using Dynamo.Controls;
 using Dynamo.Graph;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
+using MonocleViewExtension.Core;
 
 namespace MonocleViewExtension.NodeDocumentation
 {
@@ -19,12 +20,30 @@ namespace MonocleViewExtension.NodeDocumentation
         public DynamoView DynamoView { get; }
         public DynamoViewModel DynamoViewModel { get; }
         public ViewLoadedParams LoadedParams { get; }
+        internal IMonocleLogger Log { get; }
 
         public NodeDocumentationModel(DynamoViewModel dvm, ViewLoadedParams loadedParams)
         {
             DynamoView = loadedParams.DynamoWindow as DynamoView;
             DynamoViewModel = dvm;
             LoadedParams = loadedParams;
+            Log = new MonocleLog(dvm);
+        }
+
+        /// <summary>
+        /// Removes a scratch image the combined export was built from. A file left behind next to
+        /// the real output is untidy but harmless, so this never interrupts the export.
+        /// </summary>
+        private void DeleteIntermediateImage(string path)
+        {
+            try
+            {
+                File.Delete(path);
+            }
+            catch (Exception e) when (e is IOException || e is UnauthorizedAccessException)
+            {
+                Log.Info($"Could not delete the intermediate image {path}: {e.Message}");
+            }
         }
 
         public void SaveDyn(string path)
@@ -32,14 +51,9 @@ namespace MonocleViewExtension.NodeDocumentation
             //dynamoViewModel.DoGraphAutoLayout("");
 
             DynamoViewModel.SaveAs(path, SaveContext.Save, false);
-            try
-            {
-                DynamoViewModel.CurrentSpace.CurrentSelection.First().Deselect();
-            }
-            catch (Exception)
-            {
-                //suppress it all
-            }
+
+            // Clearing the selection is cosmetic, and there may not be one.
+            DynamoViewModel.CurrentSpace.CurrentSelection.FirstOrDefault()?.Deselect();
         }
 
         public void ExportImage(int mode, string path)
@@ -72,31 +86,14 @@ namespace MonocleViewExtension.NodeDocumentation
                 string graphViewPath = path.Replace("img", "f");
                 DynamoViewModel.SaveImage(graphViewPath);
 
-                var combined = OverlayImages(backgroundPath, graphViewPath,1.5);
+                var combined = OverlayImages(backgroundPath, graphViewPath, 1.5, Log);
 
                 //save the combined as the original filename
                 SaveBitmapToJpg(combined,path);
 
-                //delete the other files
-                try
-                {
-                    File.Delete(backgroundPath);
-                }
-                catch (Exception)
-                {
-                    //
-                }
-
-                try
-                {
-                    File.Delete(graphViewPath);
-                }
-                catch (Exception)
-                {
-                    //
-                }
-                
-
+                //delete the intermediate files the combined image was built from
+                DeleteIntermediateImage(backgroundPath);
+                DeleteIntermediateImage(graphViewPath);
             }
         }
 
@@ -134,7 +131,8 @@ namespace MonocleViewExtension.NodeDocumentation
         /// <param name="background"></param>
         /// <param name="foreground"></param>
         /// <returns></returns>
-        public static Bitmap OverlayImages(string background, string foreground, double scale = 1.0)
+        public static Bitmap OverlayImages(string background, string foreground, double scale = 1.0,
+            IMonocleLogger log = null)
         {
             Bitmap finalImage;
 
@@ -165,8 +163,9 @@ namespace MonocleViewExtension.NodeDocumentation
                                             (float)0.25)); // Offset the overlaid image in the upper center part 
 
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
+                        log?.Warn("Could not overlay the 3D background onto the graph image.", e);
                         return null;
                     }
                 }

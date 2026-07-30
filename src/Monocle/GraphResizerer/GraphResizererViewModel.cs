@@ -1,6 +1,8 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
+using MonocleViewExtension.Core;
 
 namespace MonocleViewExtension.GraphResizerer
 {
@@ -60,16 +62,27 @@ namespace MonocleViewExtension.GraphResizerer
         }
         private void OnResizeGraph(object o)
         {
-            //if it is the first run, then store the original locations
-            if (RunCount == 0)
+            // Fires on every tick of a slider drag, so a failure must not throw into the
+            // dispatcher and take Dynamo down with it.
+            try
             {
-                Model.GetNodes();
-            }
-            var changeCount = Model.ResizeGraph(XScaleFactor,YScaleFactor);
-            RunCount++;
+                //if it is the first run, then store the original locations
+                if (RunCount == 0)
+                {
+                    Model.GetNodes();
+                }
+                var changeCount = Model.ResizeGraph(XScaleFactor, YScaleFactor);
+                RunCount++;
 
-            Results = $"{changeCount} nodes and notes changed, please review your results before saving.";
-            ResultsVisibility = true;
+                Results = $"{changeCount} nodes and notes changed, please review your results before saving.";
+                ResultsVisibility = true;
+            }
+            catch (Exception e)
+            {
+                new MonocleLog(Model.dynamoViewModel).Error("Could not resize the graph.", e);
+                Results = "Could not resize the graph. See the Dynamo log for details.";
+                ResultsVisibility = true;
+            }
         }
 
         private void OnLink(object o)

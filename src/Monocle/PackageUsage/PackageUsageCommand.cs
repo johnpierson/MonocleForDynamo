@@ -198,7 +198,7 @@ namespace MonocleViewExtension.PackageUsage
             }
             catch (Exception e)
             {
-                m.DynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
+                m.Log.Warn("Could not register the Package Usage keyboard shortcuts.", e);
             }
         }
     }

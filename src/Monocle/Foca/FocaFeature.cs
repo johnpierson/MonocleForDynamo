@@ -1,9 +1,31 @@
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System.Windows.Input;
 using MonocleViewExtension.Core;
 
 namespace MonocleViewExtension.Foca
 {
+    #region WhyIsThisCalledFoca
+    /*Why is this called Foca?
+    Well, this tool helps clean your dynamo graphs.
+    Foca is a laundry detergent,
+    and also means "Seal" in spanish
+    ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢀⣀⣀⣀⣀⡀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄
+    ⠄⠄⠄⠄⠄⠄⠄⢀⣤⣶⠶⠛⠋⠉⠉⠉⠉⠉⠉⠙⠛⠳⠶⣤⣀⠄⠄⠄⠄⠄⠄⠄
+    ⠄⠄⠄⠄⠄⣠⣾⠟⠁⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠉⠛⣦⠄⠄⠄⠄⠄
+    ⠄⠄⠄⢀⣼⠟⠄⠄⠄⠄⠄⠄⠄⠄⣀⣀⡀⠄⠄⠄⠄⠄⠄⠄⣀⣤⣈⡳⡄⠄⠄⠄
+    ⠄⠄⢠⡾⠃⠄⠄⠄⠄⠄⠄⠠⣴⡾⠛⠉⠉⠂⠄⠄⠄⠄⠄⠄⠄⠄⠙⢀⡹⣆⠄⠄
+    ⠄⠄⡿⠃⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠈⠉⢿⡿⠄⠄⠈⢻⡀⠄
+    ⠄⢸⠇⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⡀⠄⢠⠄⠄⠄⠄⠄⠄⡇⠄⠄⠰⢎⡇⠄
+    ⠄⣼⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⡈⠉⠄⡄⠄⠄⢀⣀⣤⣾⣧⣤⣄⣥⡾⣿⠄
+    ⠄⢸⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠈⠙⠶⠶⠶⠿⠟⠉⠁⠄⠄⠈⡹⠁⠄⣿⠄
+    ⠄⠈⢇⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢠⠇⠄
+    ⠄⠄⠈⠑⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⢀⡴⠏⠄⠄
+    ⠄⠄⠄⠄⠄⠄⠄⡀⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⣀⣤⠟⠄⠄⠄⠄
+    ⠄⠄⠄⠄⠄⠄⠄⠄⠁⠒⠄⠤⠄⢀⣀⣀⣀⣀⣀⣤⣤⡤⠶⠞⠛⠉⠄⠄⠄⠄⠄⠄
+    ⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠄⠀⠀⠀⠀⠀⠀
+     */
+    #endregion
+
     /// <summary>
     /// FOCA: the in-canvas widget for aligning, distributing and colour-coding a selection.
     /// </summary>

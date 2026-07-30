@@ -20,12 +20,14 @@ namespace MonocleViewExtension.InlineNodeConnectomatic
         public ViewLoadedParams LoadedParams { get; }
 
         private bool _attached;
+        private readonly Core.IMonocleLogger _log;
 
         public InlineNodeConnectomaticModel(DynamoViewModel dvm, ViewLoadedParams loadedParams)
         {
             dynamoView = loadedParams.DynamoWindow as DynamoView;
             dynamoViewModel = dvm;
             LoadedParams = loadedParams;
+            _log = new Core.MonocleLog(dvm);
         }
 
         /// <summary>
@@ -125,11 +127,10 @@ namespace MonocleViewExtension.InlineNodeConnectomatic
                 dynamoViewModel?.ExecuteCommand(
                     new DynamoModel.MakeConnectionCommand(end.Owner.GUID, end.Index, PortType.Input, DynamoModel.MakeConnectionCommand.Mode.End));
             }
-            catch (System.Exception)
+            catch (System.Exception exception)
             {
-                // do nothin
+                _log.Warn("Could not splice the node into that wire.", exception);
             }
-            
         }
 
         internal List<DependencyObject> HitResultsList = new List<DependencyObject>();

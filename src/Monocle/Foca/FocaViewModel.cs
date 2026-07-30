@@ -189,7 +189,7 @@ namespace MonocleViewExtension.Foca
         {
             // Changing the selection means the in-canvas search popup is no longer about what the
             // user is looking at, so get it out of the way.
-            var popup = SimpleSearchCommand.SimpleSearchPopup;
+            var popup = SimpleSearchFeature.SimpleSearchPopup;
             if (popup != null) popup.IsOpen = false;
 
             CollapseColorWheel();

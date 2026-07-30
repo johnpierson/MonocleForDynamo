@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -16,6 +16,7 @@ using Dynamo.Search.SearchElements;
 using Dynamo.Utilities;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
+using MonocleViewExtension.Core;
 using MonocleViewExtension.Utilities;
 using Border = System.Windows.Controls.Border;
 using Thickness = System.Windows.Thickness;
@@ -27,12 +28,14 @@ namespace MonocleViewExtension.PackageUsage
         public DynamoView DynamoView { get; }
         public DynamoViewModel DynamoViewModel { get; }
         public ViewLoadedParams LoadedParams { get; }
+        internal IMonocleLogger Log { get; }
 
         public PackageUsageModel(DynamoViewModel dvm, ViewLoadedParams loadedParams)
         {
             DynamoView = loadedParams.DynamoWindow as DynamoView;
             DynamoViewModel = dvm;
             LoadedParams = loadedParams;
+            Log = new MonocleLog(dvm);
         }
 
         public ObservableCollection<PackageUsageWrapper> GetCustomNodeInfos()
@@ -102,7 +105,12 @@ namespace MonocleViewExtension.PackageUsage
                             }
                         }
                     }
-                    catch { }
+                    catch (Exception e)
+                    {
+                        // Unpinning is best-effort reflection against an API that has been
+                        // renamed more than once. The note gets deleted either way.
+                        Log.Info($"Could not unpin a note before deleting it: {e.Message}");
+                    }
 
                     DynamoViewModel.Model.ExecuteCommand(new DynamoModel.DeleteModelCommand(note.GUID));
 
@@ -155,7 +163,8 @@ namespace MonocleViewExtension.PackageUsage
                     }
                     catch (Exception e)
                     {
-                        DynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
+                        // The note is created either way; pinning is the part that may not exist.
+                        Log.Info($"Could not pin the package note to its node: {e.Message}");
                     }
                     count++;
                 }
@@ -244,7 +253,7 @@ namespace MonocleViewExtension.PackageUsage
                     }
                     catch (Exception e)
                     {
-                        DynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
+                        Log.Warn($"Could not highlight '{nvm.NodeModel.Name}'.", e);
                     }
                 }
             }
@@ -266,7 +275,7 @@ namespace MonocleViewExtension.PackageUsage
                     }
                     catch (Exception e)
                     {
-                        DynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
+                        Log.Warn($"Could not reset the highlight on '{nvm.NodeModel.Name}'.", e);
                     }
                 }
             }
@@ -409,7 +418,7 @@ namespace MonocleViewExtension.PackageUsage
                 }
                 catch (Exception e)
                 {
-                    DynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
+                    Log.Warn($"Could not animate the input node '{nv.ViewModel?.NodeModel?.Name}'.", e);
                 }
             }
             
@@ -455,9 +464,11 @@ namespace MonocleViewExtension.PackageUsage
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                DynamoViewModel.Model.Logger.LogWarning($"Monocle- GetCustomPackageList fallback failed: {e.Message}", WarningLevel.Mild);
+                // The search-element scan above already produced a list; this only adds packages
+                // that are installed but unused, so a failure degrades rather than breaks.
+                Log.Warn("Could not add locally installed packages to the package list.", e);
             }
 
             return addOns.Distinct().ToList();
@@ -501,17 +512,20 @@ namespace MonocleViewExtension.PackageUsage
         public string GetPackageVersion(NodeModel node)
         {
             string version = "";
-            //event handlers for when changes are made
             try
             {
                 if (Globals.PmExtension?.PackageLoader == null) return "";
-                var packageName = GetPackageName(node).SimplifyString();
-                var targetInfo = Globals.PmExtension.PackageLoader.LocalPackages.FirstOrDefault(x => x.Name.SimplifyString() == packageName);
 
-                version = $"v.{targetInfo.VersionName}";
+                var packageName = GetPackageName(node).SimplifyString();
+                var targetInfo = Globals.PmExtension.PackageLoader.LocalPackages
+                    .FirstOrDefault(x => x.Name.SimplifyString() == packageName);
+
+                // A node whose package is not installed locally simply has no version to show.
+                version = targetInfo == null ? "" : $"v.{targetInfo.VersionName}";
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Log.Info($"Could not resolve the package version for '{node?.Name}': {e.Message}");
                 version = "";
             }
             return version;

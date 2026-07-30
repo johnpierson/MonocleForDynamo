@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -126,13 +126,13 @@ namespace MonocleViewExtension
                 new DelegateFeature("Node Swapper", (ctx, menu) => NodeSwapperCommand.AddMenuItem(menu, ctx.LoadedParams)),
                 new FocaFeature(),
                 new InlineNodeConnectomaticFeature(),
-                new DelegateFeature("Simple Search", (ctx, menu) => SimpleSearchCommand.AddMenuItem(ctx.LoadedParams, menu, this)),
+                new SimpleSearchFeature(this),
                 new DelegateFeature("Standard Views",
                     (ctx, menu) => standardViews = StandardViewsCommand.EnableStandardViews(ctx.LoadedParams),
                     () => standardViews?.Dispose()),
                 new DelegateFeature("Settings", (ctx, menu) => MonocleSettingsCommand.AddMenuItem(menu, ctx)),
-                new DelegateFeature("Fancy Paste", (ctx, menu) => FancyPasteCommand.AddMenuItem(ctx.LoadedParams)),
-                new DelegateFeature("Better Save", (ctx, menu) => BetterSaveCommand.AddMenuItem(ctx.LoadedParams)),
+                new FancyPasteFeature(),
+                new BetterSaveFeature(),
                 new DelegateFeature("Graph Information", (ctx, menu) => GraphInformationCommand.AddMenuItem(menu, ctx.LoadedParams)),
                 new DelegateFeature("Node Documentation", (ctx, menu) => NodeDocumentationCommand.AddMenuItem(menu, ctx.LoadedParams))
             };

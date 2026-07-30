@@ -58,11 +58,13 @@ namespace MonocleViewExtension.NodeSwapper
 
         private int _currentStep = 0;
         private NodeSwapperPaintBrush _paintBrush;
+        private readonly Core.IMonocleLogger _log;
 
         private WorkspaceView _workspaceView;
         public NodeSwapperViewModel(NodeSwapperModel m, NodeModel node = null)
         {
             Model = m;
+            _log = new Core.MonocleLog(m.dynamoViewModel);
             _workspaceView = Model.dynamoView.FindVisualChildren<WorkspaceView>().First();
 
             //set paint brush settings
@@ -249,11 +251,12 @@ namespace MonocleViewExtension.NodeSwapper
                 {
                     Model.dynamoViewModel.ExecuteCommand(connectionCommand);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    //suppress, this happens when you are replacing a node with one with more outputs
+                    // Expected when the replacement has a different set of ports; the remaining
+                    // connections are still worth attempting.
+                    _log.Info($"Could not reconnect one wire during the swap: {e.Message}");
                 }
-             
             }
 
             //if the original node was in a group, put the new node in it now
@@ -329,7 +332,7 @@ namespace MonocleViewExtension.NodeSwapper
                     }
                     catch (Exception exception)
                     {
-                        Model.dynamoViewModel.Model.Logger.LogWarning($"Monocle- {exception.Message}", WarningLevel.Mild);
+                        _log.Error("Could not swap that node.", exception);
                     }
                  
                 }

@@ -31,11 +31,14 @@ namespace MonocleViewExtension.Foca
         public DynamoView DynamoView { get; }
         public ViewLoadedParams LoadedParams { get; }
         public DynamoViewModel DynamoViewModel { get; }
+        internal IMonocleLogger Log { get; }
+
         public FocaModel(ViewLoadedParams p)
         {
             DynamoView = p.DynamoWindow as DynamoView;
             LoadedParams = p;
             DynamoViewModel = p.DynamoWindow.DataContext as DynamoViewModel;
+            Log = new MonocleLog(DynamoViewModel);
         }
 
 
@@ -48,6 +51,10 @@ namespace MonocleViewExtension.Foca
 
             var nodes = DynamoViewModel.CurrentSpace.CurrentSelection.ToList();
 
+            /* Each tool is caught individually so one unhappy node does not abort the whole
+               gesture, and every failure is logged. These used to be silent, which meant a tool
+               that no longer worked against a newer Dynamo looked exactly like a tool that had
+               nothing to do. */
             switch (command)
             {
                 case "combinifier":
@@ -60,54 +67,42 @@ namespace MonocleViewExtension.Foca
                         {
                             ReplaceDropdown(n);
                         }
-                        catch (Exception)
+                        catch (Exception e)
                         {
-                            //this error is silenced
+                            Log.Warn($"Dropdown Converter could not convert '{n.Name}'.", e);
                         }
-
                     }
-                        
                     break;
                 case "powList":
                     try
                     {
                         PowList(nodes);
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        //this error is silenced
+                        Log.Error("Pow List failed.", e);
                     }
                     break;
                 case "fundleBundle":
                     try
                     {
-                        PowList(nodes,true);
+                        PowList(nodes, true);
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        //this error is silenced
+                        Log.Error("Fundle Bundle failed.", e);
                     }
                     break;
                 case "nodeSwapper":
                     try
                     {
                         var lastNode = nodes.Last();
-
-                        //for some reason we need to make a temporary node to get the selection to freakin stop
-                        //var codeBlock = new CodeBlockNodeModel("you see nothing", 0, 0, DynamoViewModel.Model.LibraryServices, DynamoViewModel.Model.CurrentWorkspace.ElementResolver);
-                        //DynamoViewModel.Model.ExecuteCommand(
-                        //new DynamoModel.CreateNodeCommand(codeBlock, 0, 0, false, false));
-
-                        //var tempNode = DynamoViewModel.CurrentSpaceViewModel.Nodes.Last();
-
-                        //DynamoViewModel.Model.ExecuteCommand(new DynamoModel.DeleteModelCommand(tempNode.Id));
-
                         var m = new NodeSwapperModel(DynamoViewModel, LoadedParams);
-                        var viewModel = new NodeSwapperViewModel(m, lastNode);
+                        _ = new NodeSwapperViewModel(m, lastNode);
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        //this error is silenced
+                        Log.Error("Node Swapper could not start.", e);
                     }
                     break;
             }
@@ -135,8 +130,10 @@ namespace MonocleViewExtension.Foca
             {
                 outports = nodeModel.AllConnectors.ToList();
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                // Nothing downstream requires wires, so carry on without them - but say so.
+                Log.Warn($"Could not read the connectors on '{nodeModel.Name}'; converting without rewiring.", e);
                 outports = null;
             }
 
@@ -164,8 +161,10 @@ namespace MonocleViewExtension.Foca
 
                     codeBlock = new CodeBlockNodeModel($"//{nodeModel.CachedValue.StringData};Revit.Elements.ElementSelector.ByElementId({elementId});", 0, 0, DynamoViewModel.Model.LibraryServices, DynamoViewModel.Model.CurrentWorkspace.ElementResolver);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    // Reaches into Revit's types by name, so it breaks whenever those move.
+                    Log.Warn($"Could not read the Revit element behind '{nodeModel.Name}', so it was left alone.", e);
                     return;
                 }
             }
@@ -228,13 +227,12 @@ namespace MonocleViewExtension.Foca
 
                 //delete the original node
                 //DynamoViewModel.ExecuteCommand(new DynamoModel.DeleteModelCommand(nodeModel.GUID));
-                codeBlock.Name = $"{nodeModel.Name} â½á¶œáµ’â¿áµ›áµ‰Ê³áµ—áµ‰áµˆ áµˆÊ³áµ’áµ–áµˆáµ’Ê·â¿â¾";
+                codeBlock.Name = $"{nodeModel.Name} ⁽ᶜᵒⁿᵛᵉʳᵗᵉᵈ ᵈʳᵒᵖᵈᵒʷⁿ⁾";
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                //
+                Log.Error($"Could not place the converted code block for '{nodeModel.Name}'.", e);
             }
-
         }
         public void Combinify(List<NodeModel> nodeModel)
         {
@@ -335,7 +333,7 @@ namespace MonocleViewExtension.Foca
 
 
                 //rename code block
-                codeBlock.Name = "ðŸ’£";
+                codeBlock.Name = "💣";
             }
         }
 #endregion
@@ -347,8 +345,10 @@ namespace MonocleViewExtension.Foca
             {
                 selectedGroupCount = DynamoViewModel.CurrentSpaceViewModel.Annotations.Count(a => a.PreviewState.Equals(PreviewState.Selection));
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                // Runs on every selection change, so log quietly rather than filling the log.
+                Log.Info($"Could not count selected groups, assuming none: {e.Message}");
                 selectedGroupCount = 0;
             }
             if (!DynamoViewModel.CurrentSpace.CurrentSelection.Any() || selectedGroupCount > 0)
@@ -526,9 +526,9 @@ namespace MonocleViewExtension.Foca
                         DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().FontSize = fontSize;
                         DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().Background = colorToUse;
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        //silent fail
+                        Log.Error($"Could not create the '{groupText}' group.", e);
                     }
                 }
             }
@@ -543,9 +543,9 @@ namespace MonocleViewExtension.Foca
                     DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().FontSize = 24;
                     DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().Background = colorToUse;
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    //silent fail
+                    Log.Error($"Could not create the '{groupText}' group around the selected note.", e);
                 }
             }
         }
@@ -743,7 +743,7 @@ namespace MonocleViewExtension.Foca
                     }
                     break;
             }
-            //this updates the wire representation. Â¯\_(ãƒ„)_/Â¯
+            //this updates the wire representation. ¯\_(ツ)_/¯
             try
             {
                 if (superNodes.Any())
@@ -752,11 +752,12 @@ namespace MonocleViewExtension.Foca
                     var undoCommand = new DynamoModel.UndoRedoCommand(DynamoModel.UndoRedoCommand.Operation.Undo);
                     DynamoViewModel.Model.ExecuteCommand(undoCommand);
                 }
-
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                //do nothing
+                // Cosmetic only - the nodes have already moved. Worth knowing about, not worth
+                // interrupting the user over.
+                Log.Info($"Wires may look stale until the next redraw: {e.Message}");
             }
 
         }

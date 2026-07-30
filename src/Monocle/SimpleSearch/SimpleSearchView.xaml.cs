@@ -37,18 +37,11 @@ namespace MonocleViewExtension.SimpleSearch
         }
         private void UIElement_OnMouseDown(object sender, MouseButtonEventArgs e)
         {
-            var svm = this.DataContext as SimpleSearchViewModel;
+            if (!(this.DataContext is SimpleSearchViewModel svm)) return;
+            if (this.Nodes.SelectedItems.Count == 0) return;
+            if (!(this.Nodes.SelectedItems[0] is NodeSearchElement nse)) return;
 
-            try
-            {
-                var nse = this.Nodes.SelectedItems[0] as NodeSearchElement;
-
-                PlaceNode(svm.dynamoViewModel,nse);
-            }
-            catch (Exception)
-            {
-               //
-            }
+            PlaceNode(svm.dynamoViewModel, nse);
         }
 
         private void Filter_OnKeyDown(object sender, KeyEventArgs e)
@@ -76,9 +69,9 @@ namespace MonocleViewExtension.SimpleSearch
             var nM = NodeModelFactory.Construct(nse);
             dvm.ExecuteCommand(new DynamoModel.CreateNodeCommand(nM, 0, 0, true, false));
 
-            if (SimpleSearchCommand.SimpleSearchPopup != null)
+            if (SimpleSearchFeature.SimpleSearchPopup != null)
             {
-                SimpleSearchCommand.SimpleSearchPopup.IsOpen = false;
+                SimpleSearchFeature.SimpleSearchPopup.IsOpen = false;
             }
         }
 
@@ -102,15 +95,12 @@ namespace MonocleViewExtension.SimpleSearch
 
         private void Nodes_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            try
-            {
-                var svm = this.DataContext as SimpleSearchViewModel;
-                svm.SelectedNode = e.AddedItems as NodeSearchElement;
-            }
-            catch (Exception)
-            {
-                // suppress for now
-            }
+            if (!(this.DataContext is SimpleSearchViewModel svm)) return;
+
+            /* AddedItems is a list. Casting the list itself to NodeSearchElement always produced
+               null, so SelectedNode was never set and pressing Enter always placed the first
+               result rather than the one the arrow keys had highlighted. */
+            svm.SelectedNode = e.AddedItems.Count > 0 ? e.AddedItems[0] as NodeSearchElement : null;
         }
 
        

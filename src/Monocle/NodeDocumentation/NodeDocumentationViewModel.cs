@@ -137,9 +137,10 @@ namespace MonocleViewExtension.NodeDocumentation
 
                 CanDocumentNode = true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                //suppress for now TODO: Add some kind of alert here
+                Model.Log.Warn("Could not read the selected node, so it cannot be documented.", e);
+                CanDocumentNode = false;
             }
 
         }

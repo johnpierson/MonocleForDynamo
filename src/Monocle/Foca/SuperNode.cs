@@ -33,14 +33,9 @@ namespace MonocleViewExtension.Foca
                         NodeViewModel node = this.Object as NodeViewModel;
                         return node.NodeModel.Width;
                     default:
-                        try
-                        {
-                            return ((ModelBase)Object).Width;
-                        }
-                        catch (Exception)
-                        {
-                            return 0;
-                        }
+                        // Anything else only has a width if it is positionable at all. Zero keeps
+                        // the alignment maths defined for things that are not.
+                        return Object is ModelBase model ? model.Width : 0;
                 }
             }
         }
@@ -60,14 +55,7 @@ namespace MonocleViewExtension.Foca
                         NodeViewModel node = this.Object as NodeViewModel;
                         return node.NodeModel.Height;
                     default:
-                        try
-                        {
-                            return ((ModelBase)Object).Height;
-                        }
-                        catch (Exception)
-                        {
-                            return 0;
-                        }
+                        return Object is ModelBase model ? model.Height : 0;
                 }
             }
         }
