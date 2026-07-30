@@ -119,16 +119,6 @@ namespace MonocleViewExtension.Utilities
     }
     public static class StringUtils
     {
-        public static string SetCustomNodeNotePrefix(string prefix)
-        {
-            if (string.IsNullOrWhiteSpace(prefix))
-            {
-                return "Custom Node: ";
-            }
-
-            return !Char.IsWhiteSpace(prefix[prefix.Length - 1]) ? $"{prefix} " : prefix;
-        }
-
         public static string SimplifyString(this string str)
         {
             return str.ToLower().Replace(" ", "").Replace(".", "");

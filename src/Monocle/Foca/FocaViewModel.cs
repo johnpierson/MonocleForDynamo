@@ -10,6 +10,7 @@ using Dynamo.Graph.Annotations;
 using Dynamo.Logging;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
+using MonocleViewExtension.Core;
 using MonocleViewExtension.SimpleSearch;
 using MonocleViewExtension.Utilities;
 
@@ -296,22 +297,22 @@ namespace MonocleViewExtension.Foca
 
         private void UpdateColors()
         {
-            Globals.MonocleGroupSettings.TryGetValue("Group1", out Settings.GroupSetting color1GroupSetting);
+            Globals.MonocleGroupSettings.TryGetValue("Group1", out GroupSetting color1GroupSetting);
             Color1 = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color1GroupSetting.GroupColor));
 
-            Globals.MonocleGroupSettings.TryGetValue("Group2", out Settings.GroupSetting color2GroupSetting);
+            Globals.MonocleGroupSettings.TryGetValue("Group2", out GroupSetting color2GroupSetting);
             Color2 = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color2GroupSetting.GroupColor));
 
-            Globals.MonocleGroupSettings.TryGetValue("Group3", out Settings.GroupSetting color3GroupSetting);
+            Globals.MonocleGroupSettings.TryGetValue("Group3", out GroupSetting color3GroupSetting);
             Color3 = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color3GroupSetting.GroupColor));
 
-            Globals.MonocleGroupSettings.TryGetValue("Group4", out Settings.GroupSetting color4GroupSetting);
+            Globals.MonocleGroupSettings.TryGetValue("Group4", out GroupSetting color4GroupSetting);
             Color4 = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color4GroupSetting.GroupColor));
 
-            Globals.MonocleGroupSettings.TryGetValue("Group5", out Settings.GroupSetting color5GroupSetting);
+            Globals.MonocleGroupSettings.TryGetValue("Group5", out GroupSetting color5GroupSetting);
             Color5 = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color5GroupSetting.GroupColor));
 
-            Globals.MonocleGroupSettings.TryGetValue("Group6", out Settings.GroupSetting color6GroupSetting);
+            Globals.MonocleGroupSettings.TryGetValue("Group6", out GroupSetting color6GroupSetting);
             Color6 = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color6GroupSetting.GroupColor));
 
             GroupSettings = Globals.MonocleGroupSettings.Values.ToList();
@@ -355,8 +356,8 @@ namespace MonocleViewExtension.Foca
             get => _color6;
             set { _color6 = value; RaisePropertyChanged(nameof(Color6)); }
         }
-        private List<Settings.GroupSetting> _groupSettings;
-        public List<Settings.GroupSetting> GroupSettings
+        private List<GroupSetting> _groupSettings;
+        public List<GroupSetting> GroupSettings
         {
             get => _groupSettings;
             set { _groupSettings = value; RaisePropertyChanged(nameof(GroupSettings)); }

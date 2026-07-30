@@ -18,6 +18,7 @@ using Dynamo.Nodes;
 using Dynamo.Utilities;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
+using MonocleViewExtension.Core;
 using MonocleViewExtension.NodeSwapper;
 using MonocleViewExtension.Utilities;
 using Xceed.Wpf.AvalonDock.Controls;
@@ -470,7 +471,7 @@ namespace MonocleViewExtension.Foca
         }
         public void CreateGroup(string groupName)
         {
-            Globals.MonocleGroupSettings.TryGetValue(groupName, out Settings.GroupSetting groupSetting);
+            Globals.MonocleGroupSettings.TryGetValue(groupName, out GroupSetting groupSetting);
 
             var colorToUse = (Color)ColorConverter.ConvertFromString(groupSetting.GroupColor);
 

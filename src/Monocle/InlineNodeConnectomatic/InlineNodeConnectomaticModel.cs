@@ -19,20 +19,38 @@ namespace MonocleViewExtension.InlineNodeConnectomatic
         public DynamoViewModel dynamoViewModel { get; }
         public ViewLoadedParams LoadedParams { get; }
 
+        private bool _attached;
+
         public InlineNodeConnectomaticModel(DynamoViewModel dvm, ViewLoadedParams loadedParams)
         {
             dynamoView = loadedParams.DynamoWindow as DynamoView;
             dynamoViewModel = dvm;
             LoadedParams = loadedParams;
+        }
+
+        /// <summary>
+        /// Hooks the window-wide mouse handler. Only called while the tool is switched on, so a
+        /// user who never enables it pays nothing.
+        /// </summary>
+        public void Attach()
+        {
+            if (_attached || dynamoView == null) return;
 
             dynamoView.MouseLeftButtonUp += DgOnMouseLeftButtonUp;
+            _attached = true;
+        }
+
+        public void Detach()
+        {
+            if (!_attached || dynamoView == null) return;
+
+            dynamoView.MouseLeftButtonUp -= DgOnMouseLeftButtonUp;
+            _attached = false;
         }
 
         //This section would not be made possible without Konrad Sobon's awesome example here:https://github.com/ksobon/archilab/blob/master/archilabViewExtension/ArchilabViewExtension.cs
         private void DgOnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (!Globals.IsConnectoEnabled) return;
-
             if (!Keyboard.IsKeyDown(Key.LeftAlt)) return;
 
             try
