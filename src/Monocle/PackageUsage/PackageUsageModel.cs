@@ -211,42 +211,29 @@ namespace MonocleViewExtension.PackageUsage
                     //try and fail if user is in older dynamo
                     try
                     {
-                        if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
+                        var border = GetNodeBorder(nv);
+                        if (border != null)
                         {
-                            var border = GetNodeBorder(nv);
-                            if (border != null)
+                            RememberOriginalAppearance(nvm.NodeModel.GUID, border);
+
+                            VisualBrush vb = new VisualBrush();
+                            Rectangle rec = new Rectangle
                             {
-                                VisualBrush vb = new VisualBrush();
-                                Rectangle rec = new Rectangle
-                                {
-                                    Width = border.ActualWidth,
-                                    Height = border.ActualHeight,
-                                    StrokeDashArray = new DoubleCollection { 6, 2 },
-                                    Stroke = new SolidColorBrush(Globals.CustomNodeIdentificationColor),
-                                    Margin = new Thickness(-Globals.CustomNodeBorderThickness),
-                                    RadiusX = 8,
-                                    RadiusY = 8,
-                                    StrokeThickness = Globals.CustomNodeBorderThickness,
-                                };
-                                vb.Visual = rec;
-                                border.BorderBrush = vb;
-                                border.BorderThickness = new Thickness(Globals.CustomNodeBorderThickness);
-                                border.Margin = new Thickness(-Globals.CustomNodeBorderThickness);
-                            }
+                                Width = border.ActualWidth,
+                                Height = border.ActualHeight,
+                                StrokeDashArray = new DoubleCollection { 6, 2 },
+                                Stroke = new SolidColorBrush(Globals.CustomNodeIdentificationColor),
+                                Margin = new Thickness(-Globals.CustomNodeBorderThickness),
+                                RadiusX = 8,
+                                RadiusY = 8,
+                                StrokeThickness = Globals.CustomNodeBorderThickness,
+                            };
+                            vb.Visual = rec;
+                            border.BorderBrush = vb;
+                            border.BorderThickness = new Thickness(Globals.CustomNodeBorderThickness);
+                            border.Margin = new Thickness(-Globals.CustomNodeBorderThickness);
                         }
-                        else
-                        {
-                            var rect = GetNodeRectangle(nv);
-                            if (rect != null)
-                            {
-                                rect.Stroke = new SolidColorBrush(Globals.CustomNodeIdentificationColor);
-                                rect.StrokeThickness = Globals.CustomNodeBorderThickness;
-                                rect.Margin = new Thickness(-Globals.CustomNodeBorderThickness);
-                                rect.RadiusX = 4;
-                                rect.RadiusY = 4;
-                                rect.StrokeDashArray = new DoubleCollection { 6, 2 };
-                            }
-                        }
+
                         //TODO: Enable this for 2.15+
                         //nvm.ImgGlyphOneSource = "/MonocleViewExtension;component/Foca/Resources/customnode-64.png";
                         var nodeBorder = nv.FindName("nodeColorOverlayZoomOut") as Border;
@@ -285,31 +272,65 @@ namespace MonocleViewExtension.PackageUsage
             }
         }
 
+        /// <summary>
+        /// Puts a node's border back the way Dynamo drew it.
+        ///
+        /// This used to write a hard-coded light-theme colour, which meant resetting a highlight
+        /// in dark mode left the node with a near-white border. Stashing the real values when we
+        /// first touch the node keeps it correct in either theme, and in whatever Dynamo does next.
+        /// </summary>
         public void ResetNodeColor(NodeView nv)
         {
-            if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
+            var border = GetNodeBorder(nv);
+            if (border == null) return;
+
+            var guid = nv.ViewModel?.NodeModel?.GUID;
+            if (guid.HasValue && _originalBorders.TryGetValue(guid.Value, out var original))
             {
-                var border = GetNodeBorder(nv);
-                if (border != null)
-                {
-                    border.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF9F9F9"));
-                    border.BorderThickness = new Thickness(1);
-                    border.CornerRadius = new CornerRadius(8, 8, 0, 0);
-                    border.Margin = new Thickness(-1);
-                }
+                original.ApplyTo(border);
+                _originalBorders.Remove(guid.Value);
+                return;
             }
-            else
+
+            // Never highlighted this node, so there is nothing stashed. Clear our decoration
+            // without inventing a colour: leave the brush to Dynamo's own style.
+            border.ClearValue(Border.BorderBrushProperty);
+            border.BorderThickness = new Thickness(1);
+            border.CornerRadius = new CornerRadius(8, 8, 0, 0);
+            border.Margin = new Thickness(-1);
+        }
+
+        private readonly Dictionary<Guid, BorderAppearance> _originalBorders = new Dictionary<Guid, BorderAppearance>();
+
+        private void RememberOriginalAppearance(Guid nodeGuid, Border border)
+        {
+            // Only the first highlight captures the original; a second one would capture our own.
+            if (_originalBorders.ContainsKey(nodeGuid)) return;
+
+            _originalBorders[nodeGuid] = BorderAppearance.Capture(border);
+        }
+
+        private sealed class BorderAppearance
+        {
+            private Brush _brush;
+            private Thickness _thickness;
+            private CornerRadius _cornerRadius;
+            private Thickness _margin;
+
+            public static BorderAppearance Capture(Border border) => new BorderAppearance
             {
-                var rect = GetNodeRectangle(nv);
-                if (rect != null)
-                {
-                    rect.Stroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF5E5C5A"));
-                    rect.StrokeThickness = 1;
-                    rect.Margin = new Thickness(-1);
-                    rect.RadiusX = 0;
-                    rect.RadiusY = 0;
-                    rect.StrokeDashArray.Clear();
-                }
+                _brush = border.BorderBrush,
+                _thickness = border.BorderThickness,
+                _cornerRadius = border.CornerRadius,
+                _margin = border.Margin
+            };
+
+            public void ApplyTo(Border border)
+            {
+                border.BorderBrush = _brush;
+                border.BorderThickness = _thickness;
+                border.CornerRadius = _cornerRadius;
+                border.Margin = _margin;
             }
         }
 
@@ -361,6 +382,8 @@ namespace MonocleViewExtension.PackageUsage
 
                         if (border != null)
                         {
+                            RememberOriginalAppearance(nv.ViewModel.NodeModel.GUID, border);
+
                             border.BorderBrush = new SolidColorBrush(Colors.Aquamarine);
                             border.BorderThickness = new Thickness(Globals.CustomNodeBorderThickness + 2);
                             border.CornerRadius = new CornerRadius(8, 8, 0, 0);
