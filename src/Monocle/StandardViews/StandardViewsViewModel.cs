@@ -9,6 +9,7 @@ using Dynamo.Logging;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
 using HelixToolkit.Wpf.SharpDX;
+using MonocleViewExtension.Utilities;
 
 namespace MonocleViewExtension.StandardViews
 {
@@ -44,7 +45,7 @@ namespace MonocleViewExtension.StandardViews
             {
                 //remove old
                 ViewControlPanel?.Children.Remove(View);
-                ViewControlPanel = FindVisualChildren<StackPanel>(Model.dynamoView).First(s => s.Name == "viewControlPanel");
+                ViewControlPanel = MiscUtils.FindVisualChildren<StackPanel>(Model.dynamoView).First(s => s.Name == "viewControlPanel");
                 ViewControlPanel?.Children.Insert(1, View);
             }
             catch (Exception e)
@@ -56,7 +57,7 @@ namespace MonocleViewExtension.StandardViews
 
         public void OnSetCamera(object view)
         {
-            Viewport3DX threeDeeView =  FindVisualChildren<Viewport3DX>(Model.dynamoView).First();
+            Viewport3DX threeDeeView = MiscUtils.FindVisualChildren<Viewport3DX>(Model.dynamoView).First();
 
             switch (view)
             {
@@ -98,29 +99,6 @@ namespace MonocleViewExtension.StandardViews
             ViewControlPanel?.Children.Remove(View);
             base.Dispose();
         }
-
-
-        #region Helpers
-        public IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
-        {
-            if (depObj != null)
-            {
-                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
-                {
-                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
-                    if (child is T dependencyObject)
-                    {
-                        yield return dependencyObject;
-                    }
-
-                    foreach (T childOfChild in FindVisualChildren<T>(child))
-                    {
-                        yield return childOfChild;
-                    }
-                }
-            }
-        }
-        #endregion
     }
 
 }

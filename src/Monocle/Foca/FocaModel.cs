@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -228,7 +228,7 @@ namespace MonocleViewExtension.Foca
 
                 //delete the original node
                 //DynamoViewModel.ExecuteCommand(new DynamoModel.DeleteModelCommand(nodeModel.GUID));
-                codeBlock.Name = $"{nodeModel.Name} ⁽ᶜᵒⁿᵛᵉʳᵗᵉᵈ ᵈʳᵒᵖᵈᵒʷⁿ⁾";
+                codeBlock.Name = $"{nodeModel.Name} â½á¶œáµ’â¿áµ›áµ‰Ê³áµ—áµ‰áµˆ áµˆÊ³áµ’áµ–áµˆáµ’Ê·â¿â¾";
             }
             catch (Exception)
             {
@@ -335,7 +335,7 @@ namespace MonocleViewExtension.Foca
 
 
                 //rename code block
-                codeBlock.Name = "💣";
+                codeBlock.Name = "ðŸ’£";
             }
         }
 #endregion
@@ -360,7 +360,7 @@ namespace MonocleViewExtension.Foca
 
         public Rect WrapNodes()
         {
-            var allNodeViews = FindVisualChildren<NodeView>(DynamoView);
+            var allNodeViews = MiscUtils.FindVisualChildren<NodeView>(DynamoView);
 
             if (allNodeViews is null) return new Rect();
 
@@ -373,7 +373,7 @@ namespace MonocleViewExtension.Foca
         {
             List<NodeView> selectedNodeViews = new List<NodeView>();
 
-            var allNodeViews = FindVisualChildren<NodeView>(DynamoView).ToList();
+            var allNodeViews = MiscUtils.FindVisualChildren<NodeView>(DynamoView).ToList();
             if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
             {
                 foreach (var nv in allNodeViews)
@@ -397,16 +397,16 @@ namespace MonocleViewExtension.Foca
                 }
             }
             
-            //var nodeViews = Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0 ? FindVisualChildren<NodeView>(DynamoView).Where(nv => ((Border)nv.FindName("selectionBorder")).IsVisible).ToList() : FindVisualChildren<NodeView>(DynamoView).Where(nv => ((System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder")).IsVisible).ToList();
+            //var nodeViews = Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0 ? MiscUtils.FindVisualChildren<NodeView>(DynamoView).Where(nv => ((Border)nv.FindName("selectionBorder")).IsVisible).ToList() : MiscUtils.FindVisualChildren<NodeView>(DynamoView).Where(nv => ((System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder")).IsVisible).ToList();
 
             var leftMostNode = selectedNodeViews.OrderBy(nv => nv.ViewModel.Left).ThenBy(nv => nv.ViewModel.Top).First();
             var topMostNode = selectedNodeViews.OrderBy(nv => nv.ViewModel.Top).First();
-            var expando = FindVisualChildren<Canvas>(leftMostNode)
+            var expando = MiscUtils.FindVisualChildren<Canvas>(leftMostNode)
                 .FirstOrDefault(c => c.Name == "focaHost");
 
             if(expando is null)
             {
-                var grid = FindVisualChildren<Grid>(leftMostNode)
+                var grid = MiscUtils.FindVisualChildren<Grid>(leftMostNode)
                 .FirstOrDefault(c => c.Name.ToLower() == "grid");
 
                 var focaHost = new Canvas()
@@ -431,7 +431,7 @@ namespace MonocleViewExtension.Foca
 
         public Thickness GetThickness(double multiSelect = 0.0)
         {
-            var allNodeViews = FindVisualChildren<NodeView>(DynamoView);
+            var allNodeViews = MiscUtils.FindVisualChildren<NodeView>(DynamoView);
 
             if (allNodeViews is null) return new Thickness();
 
@@ -564,7 +564,7 @@ namespace MonocleViewExtension.Foca
                     {
                         if (superNodes.Any())
                         {
-                            var xAll = GetSelectionAverageX();
+                            var xAll = GetSelectionAverageX(superNodes);
 
                             superNodes.ForEach((x) => { x.CenterX = xAll; });
                         }
@@ -578,7 +578,7 @@ namespace MonocleViewExtension.Foca
                     {
                         if (superNodes.Any(s => s.ObjectType.ToString().Contains("Annotation") || s.ObjectType.ToString().Contains("Note")))
                         {
-                            var xAll = GetSelectionMinX();
+                            var xAll = GetSelectionMinX(superNodes);
 
                             superNodes.ForEach((x) => { x.X = xAll; });
                         }
@@ -593,7 +593,7 @@ namespace MonocleViewExtension.Foca
                     {
                         if (superNodes.Any(s => s.ObjectType.ToString().Contains("Annotation") || s.ObjectType.ToString().Contains("Note")))
                         {
-                            var xAll = GetSelectionMaxX();
+                            var xAll = GetSelectionMaxX(superNodes);
 
                             var width = superNodes.OrderBy(s => s.X).Last().Width;
 
@@ -624,7 +624,7 @@ namespace MonocleViewExtension.Foca
                     {
                         if (superNodes.Any())
                         {
-                            var yAll = GetSelectionAverageY();
+                            var yAll = GetSelectionAverageY(superNodes);
 
                             superNodes.ForEach((x) => { x.CenterY = yAll; });
                         }
@@ -638,7 +638,7 @@ namespace MonocleViewExtension.Foca
                     {
                         if (superNodes.Any(s => s.ObjectType.ToString().Contains("Annotation") || s.ObjectType.ToString().Contains("Note")))
                         {
-                            var yAll = GetSelectionMinY();
+                            var yAll = GetSelectionMinY(superNodes);
                             superNodes.ForEach((x) => { x.Y = yAll; });
                         }
                         else
@@ -651,7 +651,7 @@ namespace MonocleViewExtension.Foca
                     {
                         if (superNodes.Any(s => s.ObjectType.ToString().Contains("Annotation") || s.ObjectType.ToString().Contains("Note")))
                         {
-                            var yAll = GetSelectionMaxY();
+                            var yAll = GetSelectionMaxY(superNodes);
 
                             var height = superNodes.OrderBy(s => s.Y).Last().Height;
 
@@ -681,16 +681,16 @@ namespace MonocleViewExtension.Foca
                     {
                         if (superNodes.Any())
                         {
-                            var yMin = GetSelectionMinY();
-                            var yMax = GetSelectionMaxY();
+                            var yMin = GetSelectionMinY(superNodes);
+                            var yMax = GetSelectionMaxY(superNodes);
                             var spacing = 20.0;
                             var span = yMax - yMin;
 
-                            var nodeHeightSum = GetSelectionHeight();
+                            var nodeHeightSum = GetSelectionHeight(superNodes);
                             if (span > nodeHeightSum)
                             {
                                 spacing = (span - nodeHeightSum)
-                                          / (CurrentSelection().Count - 1);
+                                          / (superNodes.Count - 1);
                             }
                             var cursor = yMin;
 
@@ -712,18 +712,18 @@ namespace MonocleViewExtension.Foca
                     {
                         if (superNodes.Any())
                         {
-                            var xMin = GetSelectionMinX();
-                            var xMax = GetSelectionMaxX();
+                            var xMin = GetSelectionMinX(superNodes);
+                            var xMax = GetSelectionMaxX(superNodes);
                             var spacing = 0.0;
                             var span = xMax - xMin;
 
 
-                            var nodeWidthSum = GetSelectionWidth();
+                            var nodeWidthSum = GetSelectionWidth(superNodes);
 
                             if (span > nodeWidthSum)
                             {
                                 spacing = (span - nodeWidthSum)
-                                          / (CurrentSelection().Count - 1);
+                                          / (superNodes.Count - 1);
                             }
                             var cursor = xMin;
 
@@ -743,7 +743,7 @@ namespace MonocleViewExtension.Foca
                     }
                     break;
             }
-            //this updates the wire representation. ¯\_(ツ)_/¯
+            //this updates the wire representation. Â¯\_(ãƒ„)_/Â¯
             try
             {
                 if (superNodes.Any())
@@ -821,106 +821,28 @@ namespace MonocleViewExtension.Foca
 
             return uniqueSuperNodes.TrueForAll(s => s.ObjectType.Equals("Dynamo.ViewModels.NodeViewModel")) ? new List<SuperNode>() : uniqueSuperNodes;
         }
+        /*
+         * These take the selection they operate on rather than rebuilding it. CurrentSelection()
+         * walks every annotation, note and node in the workspace and de-duplicates the result, and
+         * a single distribute used to call it five times.
+         */
         #region SelectionAverages
-        public double GetSelectionAverageX()
-        {
-            List<double> values = CurrentSelection().Select(s => s.CenterX).ToList();
+        public static double GetSelectionAverageX(List<SuperNode> selection) => selection.Select(s => s.CenterX).Average();
 
-            return values.Average();
-        }
+        public static double GetSelectionAverageY(List<SuperNode> selection) => selection.Select(s => s.CenterY).Average();
 
-        private void NodeOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
+        public static double GetSelectionMinX(List<SuperNode> selection) => selection.Select(s => s.X).Min();
 
-        public double GetSelectionAverageY()
-        {
-            List<double> values = CurrentSelection().Select(s => s.CenterY).ToList();
+        public static double GetSelectionMinY(List<SuperNode> selection) => selection.Select(s => s.Y).Min();
 
-            return values.Average();
-        }
+        public static double GetSelectionMaxX(List<SuperNode> selection) => selection.Select(s => s.X).Max();
 
-        public double GetSelectionMinX()
-        {
-            List<double> values = CurrentSelection().Select(s => s.X).ToList();
+        public static double GetSelectionMaxY(List<SuperNode> selection) => selection.Select(s => s.Y).Max();
 
-            return values.Min();
-        }
+        public static double GetSelectionHeight(List<SuperNode> selection) => selection.Select(s => s.Height).Sum();
 
-        public double GetSelectionMinY()
-        {
-            List<double> values = CurrentSelection().Select(s => s.Y).ToList();
-
-            return values.Min();
-        }
-
-        public double GetSelectionMaxX()
-        {
-            List<double> values = CurrentSelection().Select(s => s.X).ToList();
-
-            return values.Max();
-        }
-
-        public double GetSelectionMaxLeftX()
-        {
-            return DynamoViewModel.CurrentSpace.CurrentSelection.Where((x) => x is ILocatable)
-                           .Cast<ILocatable>()
-                           .Select((x) => x.X)
-                           .Max();
-        }
-
-        public double GetSelectionMaxY()
-        {
-            List<double> values = CurrentSelection().Select(s => s.Y).ToList();
-
-            return values.Max();
-        }
-
-        public double GetSelectionMaxTopY()
-        {
-            return DynamoViewModel.CurrentSpace.CurrentSelection.Where((x) => x is ILocatable)
-                           .Cast<ILocatable>()
-                           .Select((x) => x.Y)
-                           .Max();
-        }
-        public double GetSelectionHeight()
-        {
-            List<double> values = CurrentSelection().Select(s => s.Height).ToList();
-
-            return values.Sum();
-        }
-        public double GetSelectionWidth()
-        {
-            List<double> values = CurrentSelection().Select(s => s.Width).ToList();
-
-            return values.Sum();
-        }
+        public static double GetSelectionWidth(List<SuperNode> selection) => selection.Select(s => s.Width).Sum();
 
         #endregion
-
-        #region Helpers
-        public IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
-        {
-            if (depObj != null)
-            {
-                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
-                {
-                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
-                    if (child != null && child is T dependencyObject)
-                    {
-                        yield return dependencyObject;
-                    }
-
-                    foreach (T childOfChild in FindVisualChildren<T>(child))
-                    {
-                        yield return childOfChild;
-                    }
-                }
-            }
-        }
-        #endregion
-
-
     }
 }

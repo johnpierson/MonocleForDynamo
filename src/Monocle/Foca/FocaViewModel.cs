@@ -154,6 +154,12 @@ namespace MonocleViewExtension.Foca
             ToolboxClick = new DelegateCommand(OnToolboxClick);
         }
 
+        public override void Dispose()
+        {
+            Model.LoadedParams.SelectionCollectionChanged -= LoadedParamsOnSelectionCollectionChanged;
+            base.Dispose();
+        }
+
         public void OnMouseEnter(object o)
         {
             ColorWheelVisibility = true;
@@ -181,18 +187,10 @@ namespace MonocleViewExtension.Foca
 
         private void LoadedParamsOnSelectionCollectionChanged(NotifyCollectionChangedEventArgs obj)
         {
-#if DEBUG
-            try
-            {
-                //test TODO: Verify implementation for release
-                SimpleSearchCommand.SimpleSearchPopup.IsOpen = false;
-            }
-            catch (Exception)
-            {
-                //suppress for now
-            }
-#endif
-
+            // Changing the selection means the in-canvas search popup is no longer about what the
+            // user is looking at, so get it out of the way.
+            var popup = SimpleSearchCommand.SimpleSearchPopup;
+            if (popup != null) popup.IsOpen = false;
 
             CollapseColorWheel();
             RequestRefresh(true);

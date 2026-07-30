@@ -124,7 +124,7 @@ namespace MonocleViewExtension
                 new DelegateFeature("Package Usage", (ctx, menu) => PackageUsageCommand.AddMenuItem(menu, ctx.LoadedParams)),
                 new DelegateFeature("Graph Resizerer", (ctx, menu) => GraphResizererCommand.AddMenuItem(menu, ctx.LoadedParams)),
                 new DelegateFeature("Node Swapper", (ctx, menu) => NodeSwapperCommand.AddMenuItem(menu, ctx.LoadedParams)),
-                new DelegateFeature("FOCA", (ctx, menu) => FocaCommand.EnableFoca(ctx.LoadedParams, menu)),
+                new FocaFeature(),
                 new InlineNodeConnectomaticFeature(),
                 new DelegateFeature("Simple Search", (ctx, menu) => SimpleSearchCommand.AddMenuItem(ctx.LoadedParams, menu, this)),
                 new DelegateFeature("Standard Views",

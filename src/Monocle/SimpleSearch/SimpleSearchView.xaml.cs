@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -7,6 +6,7 @@ using Dynamo.Graph.Nodes;
 using Dynamo.Models;
 using Dynamo.Search.SearchElements;
 using Dynamo.ViewModels;
+using MonocleViewExtension.Utilities;
 
 namespace MonocleViewExtension.SimpleSearch
 {
@@ -73,10 +73,7 @@ namespace MonocleViewExtension.SimpleSearch
 
         private void PlaceNode(DynamoViewModel dvm, NodeSearchElement nse)
         {
-            var dynMethod = nse.GetType().GetMethod("ConstructNewNodeModel",
-                BindingFlags.NonPublic | BindingFlags.Instance);
-            var obj = dynMethod.Invoke(nse, new object[] { });
-            var nM = obj as NodeModel;
+            var nM = NodeModelFactory.Construct(nse);
             dvm.ExecuteCommand(new DynamoModel.CreateNodeCommand(nM, 0, 0, true, false));
 
             if (SimpleSearchCommand.SimpleSearchPopup != null)

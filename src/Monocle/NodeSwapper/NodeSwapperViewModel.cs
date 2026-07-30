@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Windows.Input;
 using Dynamo.Graph.Nodes;
 using Dynamo.Logging;
 using Dynamo.Models;
 using Dynamo.ViewModels;
 using Dynamo.Views;
+using MonocleViewExtension.Utilities;
 using Xceed.Wpf.AvalonDock.Controls;
 using ModifierKeys = Dynamo.Utilities.ModifierKeys;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
@@ -80,17 +80,7 @@ namespace MonocleViewExtension.NodeSwapper
             }
             else
             {
-                _paintBrush = new NodeSwapperPaintBrush()
-                {
-                    // Set the data context for the main grid in the window.
-                    MainGrid = { DataContext = this },
-                    // Set the owner of the window to the Dynamo window.
-                    Owner = m.LoadedParams.DynamoWindow
-                };
-                _paintBrush.Show();
-
-                _workspaceView.MouseLeftButtonUp += WsViewOnMouseUp;
-                _workspaceView.MouseMove += WsViewOnMouseMove;
+                ShowPaintBrush();
             }
         }
 
@@ -108,33 +98,56 @@ namespace MonocleViewExtension.NodeSwapper
             //set the message
             PaintStatusMessage = Properties.Resources.NodeSwapperStatusMessageSelectToReplace;
 
+            ShowPaintBrush();
 
-            _paintBrush = new NodeSwapperPaintBrush()
+            _currentStep++;
+        }
+
+        /// <summary>
+        /// Detaches the workspace handlers and closes the paintbrush. Safe to call more than once:
+        /// it runs both when a pick is abandoned and from the paintbrush's own Closed event, and
+        /// either can happen first.
+        /// </summary>
+        private void Wipeout()
+        {
+            if (_workspaceView != null)
+            {
+                _workspaceView.MouseLeftButtonUp -= WsViewOnMouseUp;
+                _workspaceView.MouseMove -= WsViewOnMouseMove;
+                _workspaceView = null;
+            }
+
+            Model = null;
+
+            if (_paintBrush != null)
+            {
+                var brush = _paintBrush;
+                _paintBrush = null;
+                brush.Closed -= PaintBrushOnClosed;
+                brush.Close();
+            }
+        }
+
+        /// <summary>
+        /// The paintbrush stays open across repeated swaps by design, so closing it is the user's
+        /// way of saying they are done. Without this the workspace handlers outlived the window.
+        /// </summary>
+        private void PaintBrushOnClosed(object sender, EventArgs e) => Wipeout();
+
+        private void ShowPaintBrush()
+        {
+            _paintBrush = new NodeSwapperPaintBrush
             {
                 // Set the data context for the main grid in the window.
                 MainGrid = { DataContext = this },
                 // Set the owner of the window to the Dynamo window.
                 Owner = Model.LoadedParams.DynamoWindow
             };
-
- 
+            _paintBrush.Closed += PaintBrushOnClosed;
             _paintBrush.Show();
 
             _workspaceView.MouseLeftButtonUp += WsViewOnMouseUp;
-            _currentStep++;
-            
             _workspaceView.MouseMove += WsViewOnMouseMove;
-        }
-
-        private void Wipeout()
-        {
-            _workspaceView.MouseLeftButtonUp -= WsViewOnMouseUp;
-            _workspaceView.MouseMove -= WsViewOnMouseMove;
-            _workspaceView = null;
-
-            Model = null;
-            _paintBrush.Close();
-            _paintBrush = null;
         }
 
         private void WsViewOnMouseMove(object sender, MouseEventArgs e)
@@ -170,10 +183,7 @@ namespace MonocleViewExtension.NodeSwapper
                 {
                     var nse = Model.dynamoViewModel.Model.SearchModel.Entries.Where(n => n.IsVisibleInSearch).FirstOrDefault(s =>
                         s.CreationName.Contains(NodeToSwapTo.OriginalName));
-                    var dynMethod = nse.GetType().GetMethod("ConstructNewNodeModel",
-                        BindingFlags.NonPublic | BindingFlags.Instance);
-                    var obj = dynMethod.Invoke(nse, new object[] { });
-                    var nM = obj as NodeModel;
+                    var nM = NodeModelFactory.Construct(nse);
                     Model.dynamoViewModel.ExecuteCommand(new DynamoModel.CreateNodeCommand(nM, NodeToSwap.X, NodeToSwap.Y, false, false));
                 }
             }
