@@ -41,28 +41,9 @@ namespace MonocleViewExtension.SimpleSearch
                 IsCheckable = true
             };
 
-            ssMenuItem.Checked += (sender, args) =>
-            {
-#if D25_OR_GREATER
- SimpleSearchSideBar(p, m);
-#endif
-#if !D25_OR_GREATER
-                SimpleSearchWindow(p, m);
-#endif
-            };
+            ssMenuItem.Checked += (sender, args) => { SimpleSearchSideBar(p, m); };
 
-            ssMenuItem.Unchecked += (sender, args) =>
-            {
-                if (Globals.DynamoVersion.CompareTo(Globals.SidebarMinVersion) >= 0)
-                {
-                    CloseSimpleSearch(p, m);
-                }
-                else
-                {
-                    CloseSimpleSearch();
-                }
-
-            };
+            ssMenuItem.Unchecked += (sender, args) => { CloseSimpleSearch(p, m); };
 
             menuItem.Items.Add(ssMenuItem);
 
@@ -102,61 +83,24 @@ namespace MonocleViewExtension.SimpleSearch
 
         }
 
-        private static void CloseSimpleSearch()
-        {
-            try
-            {
-                ssWindow?.Close();
-            }
-            catch (Exception)
-            {
-                //suppress
-            }
-        }
         private static void CloseSimpleSearch(ViewLoadedParams p, MonocleViewExtension m)
         {
             try
             {
-#if D25_OR_GREATER
-                 p.CloseExtensioninInSideBar(m);
-#endif
+                p.CloseExtensioninInSideBar(m);
             }
             catch (Exception)
             {
                 //suppress this for now. this run is in a pretty old dynamo.
             }
         }
-#if D25_OR_GREATER
-                private static void SimpleSearchSideBar(ViewLoadedParams p, MonocleViewExtension m)
+
+        private static void SimpleSearchSideBar(ViewLoadedParams p, MonocleViewExtension m)
         {
             var dvm = p.DynamoWindow.DataContext as DynamoViewModel;
             ssView = new SimpleSearchView(dvm);
-
-            //ssView.Unloaded += ViewOnUnloaded;
 
             p.AddToExtensionsSideBar(m, ssView);
-        }
-#endif
-
-
-
-        private static Window ssWindow;
-        private static void SimpleSearchWindow(ViewLoadedParams p, MonocleViewExtension m)
-        {
-            var dvm = p.DynamoWindow.DataContext as DynamoViewModel;
-            ssView = new SimpleSearchView(dvm);
-
-            //ssView.Unloaded += ViewOnUnloaded;
-
-            ssWindow = new Window
-            {
-                Title = Header,
-                Content = ssView,
-                Width = 500,
-                Owner = p.DynamoWindow,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner
-            };
-            ssWindow.Show();
         }
 
         internal static void BuildPopup(ViewLoadedParams p)
@@ -224,9 +168,5 @@ namespace MonocleViewExtension.SimpleSearch
         }
 
         private static SimpleSearchView ssView;
-        private static void ViewOnUnloaded(object sender, RoutedEventArgs e)
-        {
-            ssMenuItem.IsChecked = false;
-        }
     }
 }

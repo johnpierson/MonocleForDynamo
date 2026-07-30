@@ -45,12 +45,7 @@ namespace MonocleViewExtension.BetterSave
             switch (command)
             {
                 case "QuickSave":
-#if !D212_OR_GREATER
-                    dynamoViewModel.SaveAs(nameWithTimestamp, true);
-#endif
-#if D212_OR_GREATER
-                    dynamoViewModel.SaveAs(nameWithTimestamp, SaveContext.Copy,true);
-#endif
+                    dynamoViewModel.SaveAs(nameWithTimestamp, SaveContext.Copy, true);
                     break;
                 case "SaveWithNewGuids":
                     MakeWorkspaceUnique(originalName);
@@ -64,12 +59,7 @@ namespace MonocleViewExtension.BetterSave
         private void MakeWorkspaceUnique(string path)
         {
             //first save it as is
-#if !D212_OR_GREATER
-            dynamoViewModel.SaveAs(path, false);
-#endif
-#if D212_OR_GREATER
             dynamoViewModel.SaveAs(path, SaveContext.Save, false);
-#endif
 
             //close it
             dynamoViewModel.CloseHomeWorkspaceCommand.Execute(null);
@@ -140,15 +130,9 @@ namespace MonocleViewExtension.BetterSave
                 $"{dogeWords[random.Next(dogeWords.Count)]} {dogeWords2[random.Next(dogeWords2.Count)]} {graphDescriptors[random.Next(graphDescriptors.Count)]} {random.Next(100)}.dyn";
 
             string userDesktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-#if !D212_OR_GREATER
-            dynamoViewModel.SaveAs(Path.Combine(userDesktop, sloppyFileName),  true);
-#endif
-#if D212_OR_GREATER
-            dynamoViewModel.SaveAs(Path.Combine(userDesktop,sloppyFileName), SaveContext.SaveAs,true);
-#endif
-
+            dynamoViewModel.SaveAs(Path.Combine(userDesktop, sloppyFileName), SaveContext.SaveAs, true);
         }
-#if D212_OR_GREATER
+
         internal void CreateGraphThumbnail()
         {
             if(string.IsNullOrWhiteSpace(dynamoViewModel.CurrentSpaceViewModel.FileName))return;
@@ -177,11 +161,7 @@ namespace MonocleViewExtension.BetterSave
                 dynamoViewModel.CloseHomeWorkspaceCommand.Execute(null);
                 dynamoViewModel.OpenCommand.Execute(dynPath);
             }
-
-
-           
         }
-#endif
     }
 
 }

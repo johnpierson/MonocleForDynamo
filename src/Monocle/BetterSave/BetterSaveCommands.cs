@@ -54,7 +54,6 @@ namespace MonocleViewExtension.BetterSave
 
             flyout.Items.Add(sloppySave);
 
-#if D212_OR_GREATER
             //graph thumbnail maker
             //quick save with timestamp
             var graphThumb = new MenuItem
@@ -76,7 +75,7 @@ namespace MonocleViewExtension.BetterSave
                     menu.Items.Insert(8, graphThumb);
                 }
             }
-#endif
+
             RegisterKeyboardShortcuts(p, betterSaveModel);
 
 #if DEBUG

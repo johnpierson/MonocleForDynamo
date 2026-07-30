@@ -1,0 +1,18 @@
+<Project>
+	<!--
+	  Imported before Microsoft.Common.props, which is the only point where
+	  BaseIntermediateOutputPath can still be redirected. DynamoVersion has to be
+	  defaulted here too, since the obj\ path depends on it.
+	-->
+	<PropertyGroup>
+		<DynamoVersion Condition="'$(DynamoVersion)' == ''">4.2</DynamoVersion>
+		<BaseIntermediateOutputPath>obj\$(DynamoVersion)\</BaseIntermediateOutputPath>
+		<!--
+		  The SDK only auto-excludes the *current* BaseIntermediateOutputPath, so without this
+		  a build for one version compiles the generated .g.cs files left behind by every other.
+		-->
+		<DefaultItemExcludes>$(DefaultItemExcludes);obj\**;bin\**</DefaultItemExcludes>
+	</PropertyGroup>
+
+	<Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+</Project>

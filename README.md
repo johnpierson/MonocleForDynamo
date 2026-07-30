@@ -19,11 +19,34 @@ This tool is not affiliated with Autodesk and was written and provided in a pers
 ## LICENSE
 This code is licensed primarily under [BSD 3-Clause](https://github.com/johnpierson/MonocleForDynamo/blob/master/LICENSE) with a [Commons Clause License](https://commonsclause.com/) attached to that.
 
-## Current Version
-Monocle is currently built against the latest Dynamo stable build. At this time that is 2.17.0. _However, monocle has been tested for Dynamo 2.0.3 - 2.19.0._
+## Supported Dynamo versions
+Monocle ships one build per Dynamo version and the loader downloads the right one for your host on first run.
+
+- **Actively developed:** Dynamo 3.0 – 4.2 (.NET 8 for 3.x, .NET 10 for 4.x).
+- **Frozen:** Dynamo 2.0 – 2.19. These builds still install and work, but they are no longer rebuilt — their DLLs in `deploy/2.*` are immutable artifacts. New features and fixes land in 3.0+ only.
 
 ## Known Issues
 - When installing from the package manager for the first time, you may need to restart Dynamo.
+
+## Building from source
+The supported version matrix lives in [versions.json](versions.json). One build produces one DLL for one Dynamo version:
+
+```bash
+pwsh ./scripts/build-all.ps1
+```
+
+Pass `-Version 3.6` to build a single version, or `-Configuration Debug` for a debug build. Release builds drop `MonocleViewExtension.dll` into `deploy/<version>/`, which is what the loader downloads; debug builds do not touch `deploy/`.
+
+To launch Dynamo when you press F5, create `src/Monocle/Monocle.csproj.user` (gitignored):
+
+```xml
+<Project>
+  <PropertyGroup>
+    <StartAction>Program</StartAction>
+    <StartProgram>C:\path\to\DynamoSandbox.exe</StartProgram>
+  </PropertyGroup>
+</Project>
+```
 
 ## Contributors
 This package is primarily managed by the author of http://designtechunraveled.com, and by [People Like You™](https://github.com/johnpierson/MonocleForDynamo/graphs/contributors).

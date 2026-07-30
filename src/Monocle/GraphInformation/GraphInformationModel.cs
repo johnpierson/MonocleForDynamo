@@ -67,7 +67,6 @@ namespace MonocleViewExtension.GraphInformation
             var centerX = groupRect.X + (groupRect.Width / 2);
             var centerY = groupRect.Y + (groupRect.Height / 2);
 
-#if net8 || net10
             var annotationCommand = new DynamoModel.CreateAnnotationCommand(
                 Guid.NewGuid(),
                 GroupTitle,
@@ -75,15 +74,6 @@ namespace MonocleViewExtension.GraphInformation
                 centerX,
                 centerY,
                 false);
-#endif
-#if !net8 && !net10
-            var annotationCommand = new DynamoModel.CreateAnnotationCommand(
-                Guid.NewGuid(),
-                $"{GroupTitle}{Environment.NewLine}{GroupSubtitle}",
-                centerX,
-                centerY,
-                false);
-#endif
             _dynamoViewModel.Model.ExecuteCommand(annotationCommand);
 
             var group = _dynamoViewModel.CurrentSpaceViewModel.Annotations.LastOrDefault();

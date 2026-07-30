@@ -36,44 +36,14 @@ namespace MonocleViewExtension
         public void Dispose()
         {
             standardViewsViewModel?.Dispose();
-            AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomainOnAssemblyResolve;
-#if net8 || net10
             System.Runtime.Loader.AssemblyLoadContext.Default.Resolving -= AssemblyLoadContext_Resolving;
-#endif
         }
 
         public void Startup(ViewStartupParams viewStartupParams)
         {
-            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainOnAssemblyResolve;
-#if net8 || net10
             System.Runtime.Loader.AssemblyLoadContext.Default.Resolving += AssemblyLoadContext_Resolving;
-#endif
         }
 
-        private Assembly CurrentDomainOnAssemblyResolve(object sender, ResolveEventArgs args)
-        {
-            // Get assembly name
-            var assemblyName = new AssemblyName(args.Name).Name + ".dll";
-
-            // Get resource name
-            var resourceName = Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(x => x.EndsWith(".dll")).ToArray().FirstOrDefault(x => x.EndsWith(assemblyName));
-            if (resourceName == null)
-            {
-                return null;
-            }
-
-            // Load assembly from resource
-            using (var stream = Globals.ExecutingAssembly.GetManifestResourceStream(resourceName))
-            {
-                using (var memoryStream = new MemoryStream())
-                {
-                    stream.CopyTo(memoryStream);
-                    return Assembly.Load(memoryStream.ToArray());
-                }
-            }
-        }
-
-#if net8 || net10
         private Assembly AssemblyLoadContext_Resolving(System.Runtime.Loader.AssemblyLoadContext context, AssemblyName assemblyName)
         {
             var assemblyNameStr = new AssemblyName(assemblyName.Name).Name + ".dll";
@@ -87,14 +57,11 @@ namespace MonocleViewExtension
                 return context.LoadFromStream(stream);
             }
         }
-#endif
 
         public void Loaded(ViewLoadedParams p)
         {
             //store the package manager extension for getting package versions
-#if D30_OR_GREATER
             Globals.PmExtension = p.ViewStartupParams.ExtensionManager.Extensions.OfType<PackageManagerExtension>().FirstOrDefault();
-#endif
 
             /*if the user is holding down the left shift key, don't load monocle. I added this because I needed it for when I record videos that shouldn't have packages loaded.
             And yes. this is a deep reference to my roots in AutoCAD, https://knowledge.autodesk.com/support/autocad/learn-explore/caas/sfdcarticles/sfdcarticles/How-to-reset-AutoCAD-to-defaults.html

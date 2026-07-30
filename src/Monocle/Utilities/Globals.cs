@@ -11,11 +11,7 @@ namespace MonocleViewExtension.Utilities
 {
     public class Globals
     {
-#if D30_OR_GREATER
         public static PackageManagerExtension PmExtension { get; set; }
-#else
-        public static object PmExtension { get; set; }
-#endif
         public static Assembly ExecutingAssembly = Assembly.GetExecutingAssembly();
         public static readonly string Version = ExecutingAssembly.GetName().Version.ToString();
 

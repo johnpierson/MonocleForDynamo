@@ -18,18 +18,10 @@ namespace MonocleViewExtension.NodeSwapper
             var NodeSwapperMenu = new MenuItem { Header = Properties.Resources.NodeSwapperMenuItemHeader };
 
             NodeSwapperMenu.Click += (sender, args) =>
-            {   
+            {
+                // The view model shows its own paintbrush window from the constructor.
                 var m = new NodeSwapperModel(dvm, p);
-                var viewModel = new NodeSwapperViewModel(m);
-
-                //var window = new NodeSwapperView()
-                //{
-                //    // Set the data context for the main grid in the window.
-                //    MainGrid = { DataContext = viewModel },
-                //    // Set the owner of the window to the Dynamo window.
-                //    Owner = p.DynamoWindow
-                //};
-               
+                _ = new NodeSwapperViewModel(m);
             };
 
             //add the graph resizerer menu
