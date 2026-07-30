@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<!--
+	  Deliberately does NOT reference Monocle.csproj: that project drags in Dynamo, Helix and
+	  SharpDX and builds once per Dynamo version. Instead it link-compiles the parts of Monocle
+	  that are meant to be free of Dynamo types. If a linked file starts needing Dynamo, this
+	  project stops compiling - which is the point.
+	-->
+	<PropertyGroup>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<UseWPF>true</UseWPF>
+		<IsPackable>false</IsPackable>
+		<RootNamespace>Monocle.Tests</RootNamespace>
+		<Nullable>disable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="..\..\src\Monocle\Core\MonocleSettings.cs" Link="Linked\MonocleSettings.cs" />
+		<Compile Include="..\..\src\Monocle\Core\MonocleSettingsService.cs" Link="Linked\MonocleSettingsService.cs" />
+		<Compile Include="..\..\src\Monocle\Core\IMonocleLogger.cs" Link="Linked\IMonocleLogger.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+		<PackageReference Include="xunit" Version="2.9.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+	</ItemGroup>
+
+</Project>
