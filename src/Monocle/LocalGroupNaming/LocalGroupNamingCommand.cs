@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -65,6 +66,7 @@ namespace MonocleViewExtension.LocalGroupNaming
                     catch (Exception exception)
                     {
                         toggle.IsChecked = false;
+                        setupWindow?.CompleteAndClose();
                         MessageBox.Show(
                             viewLoadedParams.DynamoWindow,
                             exception.Message,
@@ -100,55 +102,31 @@ namespace MonocleViewExtension.LocalGroupNaming
             if (group == null) throw new ArgumentNullException(nameof(group));
             if (client == null) throw new ArgumentNullException(nameof(client));
 
-            var nodes = group.Nodes
+            var nodeNames = group.Nodes
                 .OfType<NodeModel>()
-                .Select(node => new GroupNodeSummary(node.Name))
+                .Select(node => node.Name)
                 .ToList();
 
             // The create-groups flyout also supports empty groups. Keep its configured
             // title when there are no node names from which to infer a purpose.
-            if (nodes.Count == 0) return;
+            if (nodeNames.Count == 0) return;
 
             var indicator = new LocalGroupNamingIndicator(owner);
             indicator.Show();
             try
             {
-                var nodeNames = nodes.Select(node => node.Name).ToList();
-                var prompt = GroupNamingPromptBuilder.Build(nodes);
-
-                var response = await client
-                    .SuggestNameAsync(prompt, CancellationToken.None)
-                    .ConfigureAwait(false);
-
-                var hasValidSuggestion = GroupNameValidator.TryNormalize(
-                    response,
-                    out var suggestion,
-                    out var validationError);
-                if (!hasValidSuggestion ||
-                    GroupNameValidator.IsApiStyleIdentifier(suggestion) ||
-                    GroupNameValidator.MatchesNodeName(suggestion, nodeNames))
-                {
-                    var retryPrompt = GroupNamingPromptBuilder.BuildRetry(prompt, response);
-                    response = await client
-                        .SuggestNameAsync(retryPrompt, CancellationToken.None)
-                        .ConfigureAwait(false);
-
-                    hasValidSuggestion = GroupNameValidator.TryNormalize(
-                        response,
-                        out suggestion,
-                        out validationError);
-                    if (!hasValidSuggestion ||
-                        GroupNameValidator.IsApiStyleIdentifier(suggestion) ||
-                        GroupNameValidator.MatchesNodeName(suggestion, nodeNames))
-                    {
-                        throw new InvalidOperationException(validationError ??
-                            "The local model copied a node name instead of naming the complete group.");
-                    }
-                }
+                var prompt = GroupNamingPromptBuilder.Build(nodeNames);
+                var suggestion = await RequestValidNameAsync(client, prompt, nodeNames).ConfigureAwait(false);
 
                 owner.Dispatcher.Invoke(() =>
                 {
-                    group.AnnotationText = suggestion;
+                    if (!owner.IsLoaded) return;
+
+                    // The user may have undone, deleted, or switched away from the
+                    // group while the model was thinking; skip the rename then.
+                    var annotations = dynamoViewModel.CurrentSpaceViewModel?.Annotations;
+                    if (annotations == null || annotations.All(a => a.AnnotationModel.GUID != group.GUID)) return;
+
                     var updateCommand = new DynamoModel.UpdateModelValueCommand(
                         group.GUID,
                         "TextBlockText",
@@ -156,12 +134,19 @@ namespace MonocleViewExtension.LocalGroupNaming
                     dynamoViewModel.Model.ExecuteCommand(updateCommand);
                 });
             }
+            catch (OperationCanceledException)
+            {
+                // Naming was turned off or cancelled while the request was in flight.
+            }
             catch (Exception exception)
             {
-                if (!owner.Dispatcher.HasShutdownStarted)
+                if (client.IsEnabled && !owner.Dispatcher.HasShutdownStarted)
                 {
                     owner.Dispatcher.Invoke(() =>
                     {
+                        indicator.Dismiss();
+                        if (!owner.IsLoaded) return;
+
                         MessageBox.Show(
                             owner,
                             exception.Message,
@@ -178,6 +163,50 @@ namespace MonocleViewExtension.LocalGroupNaming
                     owner.Dispatcher.Invoke(indicator.Dismiss);
                 }
             }
+        }
+
+        private static async Task<string> RequestValidNameAsync(
+            LocalLlamaServerClient client,
+            string prompt,
+            IReadOnlyList<string> nodeNames)
+        {
+            var response = await client
+                .SuggestNameAsync(prompt, CancellationToken.None)
+                .ConfigureAwait(false);
+            if (TryGetValidName(response, nodeNames, out var suggestion, out var validationError))
+            {
+                return suggestion;
+            }
+
+            var retryPrompt = GroupNamingPromptBuilder.BuildRetry(prompt, response);
+            response = await client
+                .SuggestNameAsync(retryPrompt, CancellationToken.None)
+                .ConfigureAwait(false);
+            if (TryGetValidName(response, nodeNames, out suggestion, out validationError))
+            {
+                return suggestion;
+            }
+
+            throw new InvalidOperationException(validationError ??
+                "The local model copied a node name instead of naming the complete group.");
+        }
+
+        private static bool TryGetValidName(
+            string response,
+            IReadOnlyList<string> nodeNames,
+            out string suggestion,
+            out string error)
+        {
+            if (!GroupNameValidator.TryNormalize(response, out suggestion, out error)) return false;
+
+            if (GroupNameValidator.IsApiStyleIdentifier(suggestion) ||
+                GroupNameValidator.MatchesNodeName(suggestion, nodeNames))
+            {
+                suggestion = null;
+                return false;
+            }
+
+            return true;
         }
     }
 }

@@ -118,32 +118,38 @@ namespace MonocleViewExtension.LocalGroupNaming
 
             if (!GetCursorPosition(out var nativeCursor)) return;
 
+            //Window.Left/Top report the restore bounds while the owner is maximized,
+            //so clamp against the owner's actual on-screen rectangle instead.
+            var ownerHandle = new WindowInteropHelper(ownerWindow).Handle;
+            if (ownerHandle == IntPtr.Zero || !GetWindowBounds(ownerHandle, out var nativeOwnerBounds)) return;
+
             var presentationSource = PresentationSource.FromVisual(ownerWindow);
             if (presentationSource?.CompositionTarget == null) return;
 
-            var cursor = presentationSource.CompositionTarget.TransformFromDevice.Transform(
-                new Point(nativeCursor.X, nativeCursor.Y));
+            var transform = presentationSource.CompositionTarget.TransformFromDevice;
+            var cursor = transform.Transform(new Point(nativeCursor.X, nativeCursor.Y));
+            var ownerTopLeft = transform.Transform(new Point(nativeOwnerBounds.Left, nativeOwnerBounds.Top));
+            var ownerBottomRight = transform.Transform(new Point(nativeOwnerBounds.Right, nativeOwnerBounds.Bottom));
+
             const double cursorOffset = 16;
             const double windowInset = 8;
-            var ownerRight = ownerWindow.Left + ownerWindow.ActualWidth;
-            var ownerBottom = ownerWindow.Top + ownerWindow.ActualHeight;
 
             var left = cursor.X + cursorOffset;
-            if (left + ActualWidth > ownerRight - windowInset)
+            if (left + ActualWidth > ownerBottomRight.X - windowInset)
             {
                 left = cursor.X - ActualWidth - cursorOffset;
             }
 
             var top = cursor.Y + cursorOffset;
-            if (top + ActualHeight > ownerBottom - windowInset)
+            if (top + ActualHeight > ownerBottomRight.Y - windowInset)
             {
                 top = cursor.Y - ActualHeight - cursorOffset;
             }
 
-            Left = Math.Max(ownerWindow.Left + windowInset,
-                Math.Min(left, ownerRight - ActualWidth - windowInset));
-            Top = Math.Max(ownerWindow.Top + windowInset,
-                Math.Min(top, ownerBottom - ActualHeight - windowInset));
+            Left = Math.Max(ownerTopLeft.X + windowInset,
+                Math.Min(left, ownerBottomRight.X - ActualWidth - windowInset));
+            Top = Math.Max(ownerTopLeft.Y + windowInset,
+                Math.Min(top, ownerBottomRight.Y - ActualHeight - windowInset));
         }
 
         private void OnSourceInitialized(object sender, EventArgs args)
@@ -163,6 +169,9 @@ namespace MonocleViewExtension.LocalGroupNaming
         [DllImport("user32.dll", EntryPoint = "GetCursorPos")]
         private static extern bool GetCursorPosition(out NativePoint point);
 
+        [DllImport("user32.dll", EntryPoint = "GetWindowRect")]
+        private static extern bool GetWindowBounds(IntPtr windowHandle, out NativeRect rect);
+
         [DllImport("user32.dll", EntryPoint = "GetWindowLongPtrW")]
         private static extern IntPtr GetWindowLongPtr(IntPtr windowHandle, int index);
 
@@ -174,6 +183,15 @@ namespace MonocleViewExtension.LocalGroupNaming
         {
             public int X;
             public int Y;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct NativeRect
+        {
+            public int Left;
+            public int Top;
+            public int Right;
+            public int Bottom;
         }
     }
 }

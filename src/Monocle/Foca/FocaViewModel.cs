@@ -21,7 +21,7 @@ namespace MonocleViewExtension.Foca
         public FocaModel Model { get; set; }
 
         public FocaView View;
-        private bool isCreatingGroup;
+        private bool isNamingGroup;
 
         public DelegateCommand CreateGroup { get; set; }
         public DelegateCommand MouseEnter { get; set; }
@@ -164,24 +164,24 @@ namespace MonocleViewExtension.Foca
 
         public async void OnCreateGroup(object o)
         {
-            if (isCreatingGroup) return;
+            var group = Model.CreateGroup(o.ToString());
+            if (group == null || Model.LocalGroupNamingClient?.IsEnabled != true) return;
 
-            isCreatingGroup = true;
+            //Only debounce the naming call; group creation itself must always work.
+            if (isNamingGroup) return;
+
+            isNamingGroup = true;
             try
             {
-                var group = Model.CreateGroup(o.ToString());
-                if (group != null && Model.LocalGroupNamingClient?.IsEnabled == true)
-                {
-                    await LocalGroupNamingCommand.SuggestAndRenameAsync(
-                        Model.LoadedParams.DynamoWindow,
-                        Model.DynamoViewModel,
-                        group.AnnotationModel,
-                        Model.LocalGroupNamingClient);
-                }
+                await LocalGroupNamingCommand.SuggestAndRenameAsync(
+                    Model.LoadedParams.DynamoWindow,
+                    Model.DynamoViewModel,
+                    group.AnnotationModel,
+                    Model.LocalGroupNamingClient);
             }
             finally
             {
-                isCreatingGroup = false;
+                isNamingGroup = false;
             }
         }
 

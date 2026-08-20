@@ -7,8 +7,10 @@ namespace MonocleViewExtension.LocalGroupNaming
         public const string ModelFileName = "Qwen3-4B-Q4_K_M.gguf";
         public const long ModelFileSize = 2497280640;
         public const string ModelSha256 = "AB27B9BFA375A178D6CBA48F3AD892B94B7739659DCC7AAE8058CE0FFED6B328";
+        //Pinned to the repository revision the checksum was computed from, so a
+        //re-uploaded 'main' cannot change what gets downloaded.
         public const string ModelDownloadUrl =
-            "https://huggingface.co/ggml-org/Qwen3-4B-GGUF/resolve/main/Qwen3-4B-Q4_K_M.gguf?download=true";
+            "https://huggingface.co/ggml-org/Qwen3-4B-GGUF/resolve/2f3b082b1356a6123f7ed71e65aea340da25d53c/Qwen3-4B-Q4_K_M.gguf?download=true";
         public const string ModelLicenseUrl =
             "https://huggingface.co/Qwen/Qwen3-4B/blob/main/LICENSE";
 

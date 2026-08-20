@@ -34,9 +34,9 @@ namespace Monocle.LocalGroupNaming.Tests
         {
             var prompt = GroupNamingPromptBuilder.Build(new[]
             {
-                new GroupNodeSummary("Number Slider"),
-                new GroupNodeSummary("Point.ByCoordinates"),
-                new GroupNodeSummary("List Create")
+                "Number Slider",
+                "Point.ByCoordinates",
+                "List Create"
             });
 
             AssertContains(prompt, "Given the following nodes in this group in Autodesk Dynamo");
@@ -52,10 +52,10 @@ namespace Monocle.LocalGroupNaming.Tests
         {
             var prompt = GroupNamingPromptBuilder.Build(new[]
             {
-                new GroupNodeSummary("Number Slider"),
-                new GroupNodeSummary("Number Slider"),
-                new GroupNodeSummary("Number Slider"),
-                new GroupNodeSummary("Point.ByCoordinates")
+                "Number Slider",
+                "Number Slider",
+                "Number Slider",
+                "Point.ByCoordinates"
             });
 
             AssertContains(prompt, "- Number Slider x3");
@@ -64,7 +64,7 @@ namespace Monocle.LocalGroupNaming.Tests
         private static void TestPromptRejectsEmptyGroups()
         {
             AssertThrows<InvalidOperationException>(() =>
-                GroupNamingPromptBuilder.Build(new List<GroupNodeSummary>()));
+                GroupNamingPromptBuilder.Build(new List<string>()));
         }
 
         private static void TestRetryRejectsCopiedNodeName()
@@ -125,6 +125,8 @@ namespace Monocle.LocalGroupNaming.Tests
         {
             Assert(LocalModelManifest.ModelDownloadUrl.StartsWith("https://", StringComparison.Ordinal),
                 "Expected the model download to use HTTPS.");
+            Assert(!LocalModelManifest.ModelDownloadUrl.Contains("/resolve/main/"),
+                "Expected the model download to pin an immutable revision instead of the mutable main ref.");
             Assert(LocalModelManifest.RuntimeDownloadUrl.StartsWith("https://", StringComparison.Ordinal),
                 "Expected the runtime download to use HTTPS.");
             Assert(IsSha256(LocalModelManifest.ModelSha256),

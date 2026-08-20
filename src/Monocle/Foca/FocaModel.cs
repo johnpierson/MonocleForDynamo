@@ -483,6 +483,11 @@ namespace MonocleViewExtension.Foca
 
             return null;
         }
+        /// <summary>
+        /// Applies the given monocle group setting to the current selection. When the
+        /// selection is already inside a group, that group is recolored in place.
+        /// Returns the annotation only when a new group was created.
+        /// </summary>
         public AnnotationViewModel CreateGroup(string groupName)
         {
             Globals.MonocleGroupSettings.TryGetValue(groupName, out Settings.GroupSetting groupSetting);
@@ -495,7 +500,6 @@ namespace MonocleViewExtension.Foca
 
             if (DynamoViewModel.CurrentSpace.CurrentSelection.Any())
             {
-                DynamoModel.CreateAnnotationCommand annotationCommand;
                 var currentSelection = DynamoViewModel.CurrentSpace.CurrentSelection.First();
 
                 string caseSwitch = currentSelection.GetType().ToString();
@@ -507,7 +511,7 @@ namespace MonocleViewExtension.Foca
                 {
                     group.Background = colorToUse;
                     group.FontSize = fontSize;
-                    return group;
+                    return null;
                 }
 
 
@@ -519,42 +523,13 @@ namespace MonocleViewExtension.Foca
                 }
                 if (caseSwitch.Contains("NodeModel"))
                 {
-
-#if !net8 && !net10
-annotationCommand =
-                        new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
-                            currentSelection.CenterX, currentSelection.CenterY, false);
-#endif
-#if net8 || net10
-                    //TODO: Implement group descriptions in monocle
-                    annotationCommand =
-                        new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,string.Empty,
-                            currentSelection.CenterX, currentSelection.CenterY, false);
-#endif
-                    DynamoViewModel.Model.ExecuteCommand(annotationCommand);
-                    DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().FontSize = fontSize;
-                    DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().Background = colorToUse;
-                    return DynamoViewModel.CurrentSpaceViewModel.Annotations.Last();
+                    return ExecuteCreateAnnotation(groupText, fontSize, colorToUse, currentSelection.CenterX, currentSelection.CenterY);
                 }
                 else
                 {
                     try
                     {
-#if !net8 && !net10
-annotationCommand =
-                        new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
-                            currentSelection.CenterX, currentSelection.CenterY, false);
-#endif
-#if net8 || net10
-                        //TODO: Implement group descriptions in monocle
-                        annotationCommand =
-                            new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText, string.Empty,
-                                currentSelection.CenterX, currentSelection.CenterY, false);
-#endif
-                        DynamoViewModel.Model.ExecuteCommand(annotationCommand);
-                        DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().FontSize = fontSize;
-                        DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().Background = colorToUse;
-                        return DynamoViewModel.CurrentSpaceViewModel.Annotations.Last();
+                        return ExecuteCreateAnnotation(groupText, fontSize, colorToUse, currentSelection.CenterX, currentSelection.CenterY);
                     }
                     catch (Exception)
                     {
@@ -566,19 +541,7 @@ annotationCommand =
             {
                 try
                 {
-#if !net8 && !net10
-var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
-                        0, 0, false);
-#endif
-#if net8 || net10
-                    var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,string.Empty,
-                        0, 0, false);
-#endif
-
-                    DynamoViewModel.Model.ExecuteCommand(annotationCommand);
-                    DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().FontSize = 24;
-                    DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().Background = colorToUse;
-                    return DynamoViewModel.CurrentSpaceViewModel.Annotations.Last();
+                    return ExecuteCreateAnnotation(groupText, 24, colorToUse, 0, 0);
                 }
                 catch (Exception)
                 {
@@ -587,6 +550,29 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
             }
 
             return null;
+        }
+
+        private AnnotationViewModel ExecuteCreateAnnotation(string groupText, int fontSize, Color colorToUse, double centerX, double centerY)
+        {
+            var groupId = Guid.NewGuid();
+#if !net8 && !net10
+            var annotationCommand = new DynamoModel.CreateAnnotationCommand(groupId, groupText, centerX, centerY, false);
+#endif
+#if net8 || net10
+            //TODO: Implement group descriptions in monocle
+            var annotationCommand = new DynamoModel.CreateAnnotationCommand(groupId, groupText, string.Empty, centerX, centerY, false);
+#endif
+            DynamoViewModel.Model.ExecuteCommand(annotationCommand);
+
+            //Dynamo skips creation for some selections (e.g. a node already in a group),
+            //so resolve the new annotation by its id instead of assuming Last() is it.
+            var created = DynamoViewModel.CurrentSpaceViewModel.Annotations
+                .FirstOrDefault(a => a.AnnotationModel.GUID == groupId);
+            if (created == null) return null;
+
+            created.FontSize = fontSize;
+            created.Background = colorToUse;
+            return created;
         }
 
         public void AlignSelected(string alignment)

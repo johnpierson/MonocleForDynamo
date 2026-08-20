@@ -6,7 +6,6 @@
     <Nullable>disable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\src\Monocle\LocalGroupNaming\GroupNodeSummary.cs" Link="GroupNodeSummary.cs" />
     <Compile Include="..\..\src\Monocle\LocalGroupNaming\GroupNamingPromptBuilder.cs" Link="GroupNamingPromptBuilder.cs" />
     <Compile Include="..\..\src\Monocle\LocalGroupNaming\GroupNameValidator.cs" Link="GroupNameValidator.cs" />
     <Compile Include="..\..\src\Monocle\LocalGroupNaming\LocalModelManifest.cs" Link="LocalModelManifest.cs" />

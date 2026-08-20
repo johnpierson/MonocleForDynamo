@@ -31,6 +31,9 @@ namespace MonocleViewExtension.LocalGroupNaming
         private const string AgreementFileName = "third-party-licenses.accepted";
         private const string RuntimeMarkerFileName = ".runtime.complete";
         private const string ModelMarkerFileName = ".model.complete";
+        private const string InstallLockFileName = ".install.lock";
+        private const string StagingDirectoryName = "runtime-staging";
+        private const string DownloadExtension = ".download";
         private readonly LocalLlamaServerOptions options;
 
         public LocalModelProvisioner(LocalLlamaServerOptions options)
@@ -89,25 +92,32 @@ namespace MonocleViewExtension.LocalGroupNaming
                     "The third-party runtime and model license terms must be accepted before downloading.");
             }
 
-            EnsureAvailableDiskSpace();
             Directory.CreateDirectory(options.InstallationDirectory);
 
-            using (var httpClient = new HttpClient { Timeout = TimeSpan.FromHours(6) })
+            //The installation directory is shared by every Dynamo host (Sandbox,
+            //Revit, Civil 3D); only one process may install into it at a time.
+            using (AcquireInstallLock())
             {
-                httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("MonocleForDynamo/2026.6");
+                CleanUpStaleDownloads();
+                EnsureAvailableDiskSpace();
 
-                if (!RuntimeIsInstalled())
+                using (var httpClient = new HttpClient { Timeout = TimeSpan.FromHours(6) })
                 {
-                    await InstallRuntimeAsync(httpClient, progress, cancellationToken).ConfigureAwait(false);
+                    httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("MonocleForDynamo/2026.6");
+
+                    if (!RuntimeIsInstalled())
+                    {
+                        await InstallRuntimeAsync(httpClient, progress, cancellationToken).ConfigureAwait(false);
+                    }
+
+                    if (!ModelIsInstalled())
+                    {
+                        await InstallModelAsync(httpClient, progress, cancellationToken).ConfigureAwait(false);
+                    }
                 }
 
-                if (!ModelIsInstalled())
-                {
-                    await InstallModelAsync(httpClient, progress, cancellationToken).ConfigureAwait(false);
-                }
+                options.Validate();
             }
-
-            options.Validate();
         }
 
         private bool RuntimeIsInstalled()
@@ -136,10 +146,13 @@ namespace MonocleViewExtension.LocalGroupNaming
             IProgress<LocalModelDownloadProgress> progress,
             CancellationToken cancellationToken)
         {
-            var archivePath = Path.Combine(options.InstallationDirectory, LocalModelManifest.RuntimeArchiveName + ".download");
-            var stagingDirectory = Path.Combine(options.InstallationDirectory, "runtime-staging");
+            var archivePath = Path.Combine(options.InstallationDirectory, LocalModelManifest.RuntimeArchiveName + DownloadExtension);
+            var stagingDirectory = Path.Combine(options.InstallationDirectory, StagingDirectoryName);
             var runtimeDirectory = Path.GetDirectoryName(options.ServerPath);
 
+            //Invalidate the marker before touching the runtime directory so a failed
+            //reinstall is retried instead of being reported as complete.
+            DeleteFileIfPresent(Path.Combine(options.InstallationDirectory, RuntimeMarkerFileName));
             DeleteFileIfPresent(archivePath);
             DeleteDirectoryIfPresent(stagingDirectory);
 
@@ -150,6 +163,7 @@ namespace MonocleViewExtension.LocalGroupNaming
                     LocalModelManifest.RuntimeDownloadUrl,
                     archivePath,
                     "llama.cpp runtime",
+                    null,
                     progress,
                     cancellationToken).ConfigureAwait(false);
 
@@ -186,8 +200,9 @@ namespace MonocleViewExtension.LocalGroupNaming
             CancellationToken cancellationToken)
         {
             var modelDirectory = Path.GetDirectoryName(options.ModelPath);
-            var temporaryPath = options.ModelPath + ".download";
+            var temporaryPath = options.ModelPath + DownloadExtension;
             Directory.CreateDirectory(modelDirectory);
+            DeleteFileIfPresent(Path.Combine(options.InstallationDirectory, ModelMarkerFileName));
             DeleteFileIfPresent(temporaryPath);
 
             try
@@ -197,6 +212,7 @@ namespace MonocleViewExtension.LocalGroupNaming
                     LocalModelManifest.ModelDownloadUrl,
                     temporaryPath,
                     "Qwen3 4B model",
+                    LocalModelManifest.ModelFileSize,
                     progress,
                     cancellationToken).ConfigureAwait(false);
 
@@ -225,6 +241,7 @@ namespace MonocleViewExtension.LocalGroupNaming
             string url,
             string destinationPath,
             string component,
+            long? expectedBytes,
             IProgress<LocalModelDownloadProgress> progress,
             CancellationToken cancellationToken)
         {
@@ -235,6 +252,12 @@ namespace MonocleViewExtension.LocalGroupNaming
             {
                 response.EnsureSuccessStatusCode();
                 var totalBytes = response.Content.Headers.ContentLength;
+                if (expectedBytes.HasValue && totalBytes.HasValue && totalBytes.Value != expectedBytes.Value)
+                {
+                    throw new InvalidDataException(
+                        $"The {component} download reports {totalBytes.Value} bytes; expected {expectedBytes.Value} bytes.");
+                }
+
                 var buffer = new byte[1024 * 1024];
                 long bytesReceived = 0;
 
@@ -260,6 +283,12 @@ namespace MonocleViewExtension.LocalGroupNaming
                             bytesRead,
                             cancellationToken).ConfigureAwait(false);
                         bytesReceived += bytesRead;
+                        if (expectedBytes.HasValue && bytesReceived > expectedBytes.Value)
+                        {
+                            throw new InvalidDataException(
+                                $"The {component} download exceeded the expected {expectedBytes.Value} bytes.");
+                        }
+
                         progress?.Report(new LocalModelDownloadProgress(component, bytesReceived, totalBytes));
                     }
                 }
@@ -322,6 +351,30 @@ namespace MonocleViewExtension.LocalGroupNaming
             {
                 CopyDirectory(directory, Path.Combine(destinationDirectory, Path.GetFileName(directory)));
             }
+        }
+
+        private FileStream AcquireInstallLock()
+        {
+            try
+            {
+                return new FileStream(
+                    Path.Combine(options.InstallationDirectory, InstallLockFileName),
+                    FileMode.OpenOrCreate,
+                    FileAccess.ReadWrite,
+                    FileShare.None);
+            }
+            catch (IOException)
+            {
+                throw new InvalidOperationException(
+                    "Another Dynamo instance is currently installing local group naming. Wait for that installation to finish and try again.");
+            }
+        }
+
+        private void CleanUpStaleDownloads()
+        {
+            DeleteFileIfPresent(options.ModelPath + DownloadExtension);
+            DeleteFileIfPresent(Path.Combine(options.InstallationDirectory, LocalModelManifest.RuntimeArchiveName + DownloadExtension));
+            DeleteDirectoryIfPresent(Path.Combine(options.InstallationDirectory, StagingDirectoryName));
         }
 
         private void EnsureAvailableDiskSpace()

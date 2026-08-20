@@ -7,13 +7,13 @@ namespace MonocleViewExtension.LocalGroupNaming
 {
     internal static class GroupNamingPromptBuilder
     {
-        public static string Build(IEnumerable<GroupNodeSummary> nodes)
+        public static string Build(IEnumerable<string> nodeNames)
         {
-            if (nodes == null) throw new ArgumentNullException(nameof(nodes));
+            if (nodeNames == null) throw new ArgumentNullException(nameof(nodeNames));
 
-            var nodeCounts = nodes
-                .Where(node => node != null && !string.IsNullOrWhiteSpace(node.Name))
-                .GroupBy(node => Clean(node.Name), StringComparer.OrdinalIgnoreCase)
+            var nodeCounts = nodeNames
+                .Where(name => !string.IsNullOrWhiteSpace(name))
+                .GroupBy(Clean, StringComparer.OrdinalIgnoreCase)
                 .Select(group => new { Name = group.Key, Count = group.Count() })
                 .ToList();
 

@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -16,9 +17,14 @@ namespace MonocleViewExtension.LocalGroupNaming
     {
         private readonly LocalLlamaServerOptions options;
         private readonly SemaphoreSlim startupLock = new SemaphoreSlim(1, 1);
+        // Guards serverProcess/httpClient/sessionCancellation: Disable() runs on the
+        // UI thread while requests run on threadpool continuations.
+        private readonly object stateLock = new object();
         private HttpClient httpClient;
         private Process serverProcess;
+        private CancellationTokenSource sessionCancellation;
         private string lastServerError;
+        private bool stopRequested;
         private bool disposed;
 
         public bool IsEnabled { get; private set; }
@@ -32,8 +38,24 @@ namespace MonocleViewExtension.LocalGroupNaming
         {
             if (string.IsNullOrWhiteSpace(prompt)) throw new ArgumentException("A prompt is required.", nameof(prompt));
             ThrowIfDisposed();
+            ThrowIfDisabled();
 
             await EnsureStartedAsync(cancellationToken).ConfigureAwait(false);
+
+            HttpClient client;
+            CancellationTokenSource session;
+            lock (stateLock)
+            {
+                client = httpClient;
+                session = sessionCancellation;
+            }
+
+            if (client == null || session == null)
+            {
+                throw new OperationCanceledException("Local group naming was turned off.");
+            }
+
+            var sessionToken = session.Token;
 
             var request = new JObject
             {
@@ -56,30 +78,44 @@ namespace MonocleViewExtension.LocalGroupNaming
                 ["stream"] = false
             };
 
-            using (var content = new StringContent(request.ToString(Formatting.None), Encoding.UTF8, "application/json"))
-            using (var response = await httpClient.PostAsync("v1/chat/completions", content, cancellationToken).ConfigureAwait(false))
+            try
             {
-                var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                if (!response.IsSuccessStatusCode)
+                using (var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, sessionToken))
+                using (var content = new StringContent(request.ToString(Formatting.None), Encoding.UTF8, "application/json"))
+                using (var response = await client.PostAsync("v1/chat/completions", content, linked.Token).ConfigureAwait(false))
                 {
-                    throw new InvalidOperationException(
-                        $"The local model server returned {(int)response.StatusCode} ({response.ReasonPhrase}): {body}");
-                }
+                    var body = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        throw new InvalidOperationException(
+                            $"The local model server returned {(int)response.StatusCode} ({response.ReasonPhrase}): {body}");
+                    }
 
-                var result = JObject.Parse(body);
-                var suggestion = result.SelectToken("choices[0].message.content")?.Value<string>();
-                if (string.IsNullOrWhiteSpace(suggestion))
-                {
-                    throw new InvalidOperationException("The local model server response did not contain a suggestion.");
-                }
+                    var result = JObject.Parse(body);
+                    var suggestion = result.SelectToken("choices[0].message.content")?.Value<string>();
+                    if (string.IsNullOrWhiteSpace(suggestion))
+                    {
+                        throw new InvalidOperationException("The local model server response did not contain a suggestion.");
+                    }
 
-                return suggestion;
+                    return suggestion;
+                }
+            }
+            catch (ObjectDisposedException)
+            {
+                // Disable() disposed the HttpClient while the request was in flight.
+                throw new OperationCanceledException("Local group naming was turned off.");
+            }
+            catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested && !sessionToken.IsCancellationRequested)
+            {
+                throw new TimeoutException("The local model server did not respond in time.");
             }
         }
 
         public async Task EnableAsync(CancellationToken cancellationToken)
         {
             ThrowIfDisposed();
+            stopRequested = false;
             await EnsureStartedAsync(cancellationToken).ConfigureAwait(false);
             IsEnabled = true;
         }
@@ -87,21 +123,46 @@ namespace MonocleViewExtension.LocalGroupNaming
         public void Disable()
         {
             IsEnabled = false;
+            stopRequested = true;
+
+            CancellationTokenSource cancellation;
+            lock (stateLock)
+            {
+                cancellation = sessionCancellation;
+            }
+
+            // Cancelled but left in place (and not disposed): a racing request that
+            // already snapshotted it must observe the cancellation, not a stale token.
+            // The next startup replaces it; an undisposed CTS holds no unmanaged resources.
+            cancellation?.Cancel();
+
             StopServer();
         }
 
         private async Task EnsureStartedAsync(CancellationToken cancellationToken)
         {
-            if (serverProcess != null && !serverProcess.HasExited && httpClient != null) return;
+            if (IsServerRunning()) return;
 
             await startupLock.WaitAsync(cancellationToken).ConfigureAwait(false);
             try
             {
-                if (serverProcess != null && !serverProcess.HasExited && httpClient != null) return;
+                ThrowIfDisposed();
+                ThrowIfStopRequested();
+                if (IsServerRunning()) return;
 
                 options.Validate();
                 var port = FindAvailablePort();
                 lastServerError = null;
+
+                // Published before the process starts so a concurrent Disable() can
+                // always cancel the startup instead of missing the not-yet-set fields;
+                // the re-check under the lock makes the handoff atomic with Disable().
+                var cancellation = new CancellationTokenSource();
+                lock (stateLock)
+                {
+                    ThrowIfStopRequested();
+                    sessionCancellation = cancellation;
+                }
 
                 var startInfo = new ProcessStartInfo
                 {
@@ -114,21 +175,34 @@ namespace MonocleViewExtension.LocalGroupNaming
                     WorkingDirectory = Path.GetDirectoryName(options.ServerPath)
                 };
 
-                serverProcess = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
-                serverProcess.ErrorDataReceived += OnServerErrorDataReceived;
-                if (!serverProcess.Start())
+                var process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
+                process.ErrorDataReceived += OnServerErrorDataReceived;
+                if (!process.Start())
                 {
+                    process.Dispose();
                     throw new InvalidOperationException("The local model server could not be started.");
                 }
 
-                serverProcess.BeginErrorReadLine();
-                httpClient = new HttpClient
+                KillOnCloseJobObject.TryAssign(process);
+                process.BeginErrorReadLine();
+                var client = new HttpClient
                 {
                     BaseAddress = new Uri($"http://127.0.0.1:{port}/"),
                     Timeout = TimeSpan.FromSeconds(45)
                 };
+                lock (stateLock)
+                {
+                    serverProcess = process;
+                    httpClient = client;
+                }
 
-                await WaitUntilHealthyAsync(cancellationToken).ConfigureAwait(false);
+                using (var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cancellation.Token))
+                {
+                    await WaitUntilHealthyAsync(process, client, linked.Token).ConfigureAwait(false);
+                }
+
+                // Disable() may have raced the startup; tear the server back down.
+                ThrowIfStopRequested();
             }
             catch
             {
@@ -141,14 +215,22 @@ namespace MonocleViewExtension.LocalGroupNaming
             }
         }
 
-        private async Task WaitUntilHealthyAsync(CancellationToken cancellationToken)
+        private bool IsServerRunning()
+        {
+            lock (stateLock)
+            {
+                return serverProcess != null && !HasExitedSafe(serverProcess) && httpClient != null;
+            }
+        }
+
+        private async Task WaitUntilHealthyAsync(Process process, HttpClient client, CancellationToken cancellationToken)
         {
             var timeoutAt = DateTime.UtcNow.AddSeconds(90);
             while (DateTime.UtcNow < timeoutAt)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                if (serverProcess == null || serverProcess.HasExited)
+                if (HasExitedSafe(process))
                 {
                     throw new InvalidOperationException(
                         $"The local model server exited during startup. {lastServerError}".Trim());
@@ -156,7 +238,7 @@ namespace MonocleViewExtension.LocalGroupNaming
 
                 try
                 {
-                    using (var response = await httpClient.GetAsync("health", cancellationToken).ConfigureAwait(false))
+                    using (var response = await client.GetAsync("health", cancellationToken).ConfigureAwait(false))
                     {
                         if (response.StatusCode == HttpStatusCode.OK) return;
                     }
@@ -164,6 +246,10 @@ namespace MonocleViewExtension.LocalGroupNaming
                 catch (HttpRequestException)
                 {
                     // The server socket is not ready yet.
+                }
+                catch (ObjectDisposedException)
+                {
+                    throw new OperationCanceledException("Local group naming was turned off.");
                 }
                 catch (TaskCanceledException) when (!cancellationToken.IsCancellationRequested)
                 {
@@ -200,22 +286,49 @@ namespace MonocleViewExtension.LocalGroupNaming
             return "\"" + value.Replace("\"", "\\\"") + "\"";
         }
 
+        private static bool HasExitedSafe(Process process)
+        {
+            try
+            {
+                return process.HasExited;
+            }
+            catch (InvalidOperationException)
+            {
+                // The process was disposed by a concurrent StopServer.
+                return true;
+            }
+        }
+
         private void StopServer()
         {
-            httpClient?.Dispose();
-            httpClient = null;
-
-            if (serverProcess == null) return;
-
-            serverProcess.ErrorDataReceived -= OnServerErrorDataReceived;
-            if (!serverProcess.HasExited)
+            HttpClient clientToDispose;
+            Process processToStop;
+            lock (stateLock)
             {
-                serverProcess.Kill();
-                serverProcess.WaitForExit(3000);
+                clientToDispose = httpClient;
+                httpClient = null;
+                processToStop = serverProcess;
+                serverProcess = null;
             }
 
-            serverProcess.Dispose();
-            serverProcess = null;
+            clientToDispose?.Dispose();
+            if (processToStop == null) return;
+
+            processToStop.ErrorDataReceived -= OnServerErrorDataReceived;
+            try
+            {
+                if (!processToStop.HasExited) processToStop.Kill();
+            }
+            catch (InvalidOperationException)
+            {
+                // The process exited or was disposed between the check and the kill.
+            }
+            catch (Win32Exception)
+            {
+                // The process is already terminating.
+            }
+
+            processToStop.Dispose();
         }
 
         private void ThrowIfDisposed()
@@ -223,12 +336,23 @@ namespace MonocleViewExtension.LocalGroupNaming
             if (disposed) throw new ObjectDisposedException(nameof(LocalLlamaServerClient));
         }
 
+        private void ThrowIfDisabled()
+        {
+            if (!IsEnabled) throw new OperationCanceledException("Local group naming is turned off.");
+        }
+
+        private void ThrowIfStopRequested()
+        {
+            if (stopRequested) throw new OperationCanceledException("Local group naming is turned off.");
+        }
+
         public void Dispose()
         {
             if (disposed) return;
             disposed = true;
             Disable();
-            startupLock.Dispose();
+            // The SemaphoreSlim is deliberately not disposed: an in-flight startup may
+            // still release it, and an undisposed SemaphoreSlim holds no unmanaged resources.
         }
     }
 }
