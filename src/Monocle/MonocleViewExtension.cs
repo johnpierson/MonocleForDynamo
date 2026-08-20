@@ -181,7 +181,7 @@ namespace MonocleViewExtension
 
             jacobSmallSpecial.Click += (sender, args) =>
             {
-                Process.Start(@"https://forum.dynamobim.com/t/2022-1-latest-revit-update-broke-dynamo/73412/3");
+                Process.Start(new ProcessStartInfo(@"https://forum.dynamobim.com/t/2022-1-latest-revit-update-broke-dynamo/73412/3") { UseShellExecute = true });
             };
 
             myDynamoNoWorkie.Items.Add(wrapPanel);

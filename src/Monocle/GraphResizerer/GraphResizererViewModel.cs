@@ -74,7 +74,7 @@ namespace MonocleViewExtension.GraphResizerer
 
         private void OnLink(object o)
         {
-            Process.Start("https://forum.dynamobim.com/t/graph-resizer-for-dynamo-2-13/75612");
+            Process.Start(new ProcessStartInfo("https://forum.dynamobim.com/t/graph-resizer-for-dynamo-2-13/75612") { UseShellExecute = true });
         }
         private void OnClose(object o)
         {
