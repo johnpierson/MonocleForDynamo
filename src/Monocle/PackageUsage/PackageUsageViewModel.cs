@@ -4,8 +4,10 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Dynamo.Extensions;
 using Dynamo.Graph.Nodes;
+using Dynamo.Graph.Workspaces;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
 using MonocleViewExtension.Utilities;
@@ -18,6 +20,8 @@ namespace MonocleViewExtension.PackageUsage
     {
         public PackageUsageModel Model { get; set; }
         private readonly ReadyParams _readyParams;
+        private IWorkspaceModel _subscribedWorkspace;
+        private bool _refreshPending;
 
         public DelegateCommand AnnotateNodes { get; set; }
         public DelegateCommand ClearNotes { get; set; }
@@ -123,8 +127,8 @@ namespace MonocleViewExtension.PackageUsage
             ActiveCustomNodes = Model.GetCustomNodeInfos();
             PackagesInUse = string.Join("\n", ActiveCustomNodes.OrderBy(c => c.PackageName).Select(c => c.PackageName).Distinct());
 
-            _readyParams.CurrentWorkspaceModel.NodeAdded += CurrentWorkspaceModel_NodesChanged;
-            _readyParams.CurrentWorkspaceModel.NodeRemoved += CurrentWorkspaceModel_NodesChanged;
+            Subscribe(_readyParams.CurrentWorkspaceModel);
+            _readyParams.CurrentWorkspaceChanged += OnCurrentWorkspaceChanged;
 
             _customNodePrefix = Globals.CustomNodeNotePrefix;
 
@@ -165,16 +169,58 @@ namespace MonocleViewExtension.PackageUsage
             }
         }
 
-        private void CurrentWorkspaceModel_NodesChanged(NodeModel obj)
+        private void CurrentWorkspaceModel_NodesChanged(NodeModel obj) => RequestRefresh();
+
+        /// <summary>
+        /// The node handlers are attached to a specific workspace, so opening another graph would
+        /// otherwise leave them on the one that was open when this window was created.
+        /// </summary>
+        private void OnCurrentWorkspaceChanged(IWorkspaceModel workspace)
         {
-            ActiveCustomNodes = Model.GetCustomNodeInfos();
-            PackagesInUse = string.Join("\n", ActiveCustomNodes.Select(c => c.PackageName).Distinct());
+            Unsubscribe(_subscribedWorkspace);
+            Subscribe(workspace);
+            RequestRefresh();
+        }
+
+        private void Subscribe(IWorkspaceModel workspace)
+        {
+            if (workspace == null) return;
+
+            workspace.NodeAdded += CurrentWorkspaceModel_NodesChanged;
+            workspace.NodeRemoved += CurrentWorkspaceModel_NodesChanged;
+            _subscribedWorkspace = workspace;
+        }
+
+        private void Unsubscribe(IWorkspaceModel workspace)
+        {
+            if (workspace == null) return;
+
+            workspace.NodeAdded -= CurrentWorkspaceModel_NodesChanged;
+            workspace.NodeRemoved -= CurrentWorkspaceModel_NodesChanged;
+            _subscribedWorkspace = null;
+        }
+
+        /// <summary>
+        /// Rescanning walks every node and resolves its package, so pasting fifty nodes must not
+        /// mean fifty full scans. Coalesce them into one pass once the dispatcher goes idle.
+        /// </summary>
+        private void RequestRefresh()
+        {
+            if (_refreshPending) return;
+
+            _refreshPending = true;
+            Application.Current?.Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+            {
+                _refreshPending = false;
+                ActiveCustomNodes = Model.GetCustomNodeInfos();
+                PackagesInUse = string.Join("\n", ActiveCustomNodes.Select(c => c.PackageName).Distinct());
+            }));
         }
 
         public override void Dispose()
         {
-            _readyParams.CurrentWorkspaceModel.NodeAdded -= CurrentWorkspaceModel_NodesChanged;
-            _readyParams.CurrentWorkspaceModel.NodeRemoved -= CurrentWorkspaceModel_NodesChanged;
+            _readyParams.CurrentWorkspaceChanged -= OnCurrentWorkspaceChanged;
+            Unsubscribe(_subscribedWorkspace);
         }
     }
 }

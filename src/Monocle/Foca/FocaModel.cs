@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -18,6 +18,7 @@ using Dynamo.Nodes;
 using Dynamo.Utilities;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
+using MonocleViewExtension.Core;
 using MonocleViewExtension.NodeSwapper;
 using MonocleViewExtension.Utilities;
 using Xceed.Wpf.AvalonDock.Controls;
@@ -30,11 +31,14 @@ namespace MonocleViewExtension.Foca
         public DynamoView DynamoView { get; }
         public ViewLoadedParams LoadedParams { get; }
         public DynamoViewModel DynamoViewModel { get; }
+        internal IMonocleLogger Log { get; }
+
         public FocaModel(ViewLoadedParams p)
         {
             DynamoView = p.DynamoWindow as DynamoView;
             LoadedParams = p;
             DynamoViewModel = p.DynamoWindow.DataContext as DynamoViewModel;
+            Log = new MonocleLog(DynamoViewModel);
         }
 
 
@@ -47,6 +51,10 @@ namespace MonocleViewExtension.Foca
 
             var nodes = DynamoViewModel.CurrentSpace.CurrentSelection.ToList();
 
+            /* Each tool is caught individually so one unhappy node does not abort the whole
+               gesture, and every failure is logged. These used to be silent, which meant a tool
+               that no longer worked against a newer Dynamo looked exactly like a tool that had
+               nothing to do. */
             switch (command)
             {
                 case "combinifier":
@@ -59,54 +67,42 @@ namespace MonocleViewExtension.Foca
                         {
                             ReplaceDropdown(n);
                         }
-                        catch (Exception)
+                        catch (Exception e)
                         {
-                            //this error is silenced
+                            Log.Warn($"Dropdown Converter could not convert '{n.Name}'.", e);
                         }
-
                     }
-                        
                     break;
                 case "powList":
                     try
                     {
                         PowList(nodes);
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        //this error is silenced
+                        Log.Error("Pow List failed.", e);
                     }
                     break;
                 case "fundleBundle":
                     try
                     {
-                        PowList(nodes,true);
+                        PowList(nodes, true);
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        //this error is silenced
+                        Log.Error("Fundle Bundle failed.", e);
                     }
                     break;
                 case "nodeSwapper":
                     try
                     {
                         var lastNode = nodes.Last();
-
-                        //for some reason we need to make a temporary node to get the selection to freakin stop
-                        //var codeBlock = new CodeBlockNodeModel("you see nothing", 0, 0, DynamoViewModel.Model.LibraryServices, DynamoViewModel.Model.CurrentWorkspace.ElementResolver);
-                        //DynamoViewModel.Model.ExecuteCommand(
-                        //new DynamoModel.CreateNodeCommand(codeBlock, 0, 0, false, false));
-
-                        //var tempNode = DynamoViewModel.CurrentSpaceViewModel.Nodes.Last();
-
-                        //DynamoViewModel.Model.ExecuteCommand(new DynamoModel.DeleteModelCommand(tempNode.Id));
-
                         var m = new NodeSwapperModel(DynamoViewModel, LoadedParams);
-                        var viewModel = new NodeSwapperViewModel(m, lastNode);
+                        _ = new NodeSwapperViewModel(m, lastNode);
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        //this error is silenced
+                        Log.Error("Node Swapper could not start.", e);
                     }
                     break;
             }
@@ -126,12 +122,7 @@ namespace MonocleViewExtension.Foca
             {
                 return;
             }
-#if !D26_OR_GREATER
-            string creationName = nodeView.ViewModel.Name;
-#endif
-#if D26_OR_GREATER
             string creationName = nodeView.ViewModel.OriginalName;
-#endif
             //to build our code block and connect it
             CodeBlockNodeModel codeBlock = null;
             List<ConnectorModel> outports;
@@ -139,8 +130,10 @@ namespace MonocleViewExtension.Foca
             {
                 outports = nodeModel.AllConnectors.ToList();
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                // Nothing downstream requires wires, so carry on without them - but say so.
+                Log.Warn($"Could not read the connectors on '{nodeModel.Name}'; converting without rewiring.", e);
                 outports = null;
             }
 
@@ -168,8 +161,10 @@ namespace MonocleViewExtension.Foca
 
                     codeBlock = new CodeBlockNodeModel($"//{nodeModel.CachedValue.StringData};Revit.Elements.ElementSelector.ByElementId({elementId});", 0, 0, DynamoViewModel.Model.LibraryServices, DynamoViewModel.Model.CurrentWorkspace.ElementResolver);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    // Reaches into Revit's types by name, so it breaks whenever those move.
+                    Log.Warn($"Could not read the Revit element behind '{nodeModel.Name}', so it was left alone.", e);
                     return;
                 }
             }
@@ -234,11 +229,10 @@ namespace MonocleViewExtension.Foca
                 //DynamoViewModel.ExecuteCommand(new DynamoModel.DeleteModelCommand(nodeModel.GUID));
                 codeBlock.Name = $"{nodeModel.Name} ⁽ᶜᵒⁿᵛᵉʳᵗᵉᵈ ᵈʳᵒᵖᵈᵒʷⁿ⁾";
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                //
+                Log.Error($"Could not place the converted code block for '{nodeModel.Name}'.", e);
             }
-
         }
         public void Combinify(List<NodeModel> nodeModel)
         {
@@ -289,7 +283,6 @@ namespace MonocleViewExtension.Foca
 
                 var values = cachedValue.GetElements().ToList();
 
-#if D216_OR_GREATER
                 if (customSelectionOption)
                 {
                     //create the list.create node
@@ -317,7 +310,7 @@ namespace MonocleViewExtension.Foca
 
                     return;
                 }
-#endif
+
                 var count = values.Count > 20 ? 20 : values.Count;
 
                 string codeBlockString = string.Empty;
@@ -352,8 +345,10 @@ namespace MonocleViewExtension.Foca
             {
                 selectedGroupCount = DynamoViewModel.CurrentSpaceViewModel.Annotations.Count(a => a.PreviewState.Equals(PreviewState.Selection));
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                // Runs on every selection change, so log quietly rather than filling the log.
+                Log.Info($"Could not count selected groups, assuming none: {e.Message}");
                 selectedGroupCount = 0;
             }
             if (!DynamoViewModel.CurrentSpace.CurrentSelection.Any() || selectedGroupCount > 0)
@@ -365,7 +360,7 @@ namespace MonocleViewExtension.Foca
 
         public Rect WrapNodes()
         {
-            var allNodeViews = FindVisualChildren<NodeView>(DynamoView);
+            var allNodeViews = MiscUtils.FindVisualChildren<NodeView>(DynamoView);
 
             if (allNodeViews is null) return new Rect();
 
@@ -378,7 +373,7 @@ namespace MonocleViewExtension.Foca
         {
             List<NodeView> selectedNodeViews = new List<NodeView>();
 
-            var allNodeViews = FindVisualChildren<NodeView>(DynamoView).ToList();
+            var allNodeViews = MiscUtils.FindVisualChildren<NodeView>(DynamoView).ToList();
             if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
             {
                 foreach (var nv in allNodeViews)
@@ -402,16 +397,16 @@ namespace MonocleViewExtension.Foca
                 }
             }
             
-            //var nodeViews = Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0 ? FindVisualChildren<NodeView>(DynamoView).Where(nv => ((Border)nv.FindName("selectionBorder")).IsVisible).ToList() : FindVisualChildren<NodeView>(DynamoView).Where(nv => ((System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder")).IsVisible).ToList();
+            //var nodeViews = Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0 ? MiscUtils.FindVisualChildren<NodeView>(DynamoView).Where(nv => ((Border)nv.FindName("selectionBorder")).IsVisible).ToList() : MiscUtils.FindVisualChildren<NodeView>(DynamoView).Where(nv => ((System.Windows.Shapes.Rectangle)nv.FindName("selectionBorder")).IsVisible).ToList();
 
             var leftMostNode = selectedNodeViews.OrderBy(nv => nv.ViewModel.Left).ThenBy(nv => nv.ViewModel.Top).First();
             var topMostNode = selectedNodeViews.OrderBy(nv => nv.ViewModel.Top).First();
-            var expando = FindVisualChildren<Canvas>(leftMostNode)
+            var expando = MiscUtils.FindVisualChildren<Canvas>(leftMostNode)
                 .FirstOrDefault(c => c.Name == "focaHost");
 
             if(expando is null)
             {
-                var grid = FindVisualChildren<Grid>(leftMostNode)
+                var grid = MiscUtils.FindVisualChildren<Grid>(leftMostNode)
                 .FirstOrDefault(c => c.Name.ToLower() == "grid");
 
                 var focaHost = new Canvas()
@@ -436,7 +431,7 @@ namespace MonocleViewExtension.Foca
 
         public Thickness GetThickness(double multiSelect = 0.0)
         {
-            var allNodeViews = FindVisualChildren<NodeView>(DynamoView);
+            var allNodeViews = MiscUtils.FindVisualChildren<NodeView>(DynamoView);
 
             if (allNodeViews is null) return new Thickness();
 
@@ -476,7 +471,7 @@ namespace MonocleViewExtension.Foca
         }
         public void CreateGroup(string groupName)
         {
-            Globals.MonocleGroupSettings.TryGetValue(groupName, out Settings.GroupSetting groupSetting);
+            Globals.MonocleGroupSettings.TryGetValue(groupName, out GroupSetting groupSetting);
 
             var colorToUse = (Color)ColorConverter.ConvertFromString(groupSetting.GroupColor);
 
@@ -511,17 +506,10 @@ namespace MonocleViewExtension.Foca
                 if (caseSwitch.Contains("NodeModel"))
                 {
 
-#if !net8 && !net10
-annotationCommand =
-                        new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
-                            currentSelection.CenterX, currentSelection.CenterY, false);
-#endif
-#if net8 || net10
                     //TODO: Implement group descriptions in monocle
                     annotationCommand =
-                        new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,string.Empty,
+                        new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText, string.Empty,
                             currentSelection.CenterX, currentSelection.CenterY, false);
-#endif
                     DynamoViewModel.Model.ExecuteCommand(annotationCommand);
                     DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().FontSize = fontSize;
                     DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().Background = colorToUse;
@@ -530,24 +518,17 @@ annotationCommand =
                 {
                     try
                     {
-#if !net8 && !net10
-annotationCommand =
-                        new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
-                            currentSelection.CenterX, currentSelection.CenterY, false);
-#endif
-#if net8 || net10
                         //TODO: Implement group descriptions in monocle
                         annotationCommand =
                             new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText, string.Empty,
                                 currentSelection.CenterX, currentSelection.CenterY, false);
-#endif
                         DynamoViewModel.Model.ExecuteCommand(annotationCommand);
                         DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().FontSize = fontSize;
                         DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().Background = colorToUse;
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        //silent fail
+                        Log.Error($"Could not create the '{groupText}' group.", e);
                     }
                 }
             }
@@ -555,22 +536,16 @@ annotationCommand =
             {
                 try
                 {
-#if !net8 && !net10
-var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,
+                    var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText, string.Empty,
                         0, 0, false);
-#endif
-#if net8 || net10
-                    var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), groupText,string.Empty,
-                        0, 0, false);
-#endif
 
                     DynamoViewModel.Model.ExecuteCommand(annotationCommand);
                     DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().FontSize = 24;
                     DynamoViewModel.CurrentSpaceViewModel.Annotations.Last().Background = colorToUse;
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    //silent fail
+                    Log.Error($"Could not create the '{groupText}' group around the selected note.", e);
                 }
             }
         }
@@ -589,7 +564,7 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
                     {
                         if (superNodes.Any())
                         {
-                            var xAll = GetSelectionAverageX();
+                            var xAll = GetSelectionAverageX(superNodes);
 
                             superNodes.ForEach((x) => { x.CenterX = xAll; });
                         }
@@ -603,7 +578,7 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
                     {
                         if (superNodes.Any(s => s.ObjectType.ToString().Contains("Annotation") || s.ObjectType.ToString().Contains("Note")))
                         {
-                            var xAll = GetSelectionMinX();
+                            var xAll = GetSelectionMinX(superNodes);
 
                             superNodes.ForEach((x) => { x.X = xAll; });
                         }
@@ -618,7 +593,7 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
                     {
                         if (superNodes.Any(s => s.ObjectType.ToString().Contains("Annotation") || s.ObjectType.ToString().Contains("Note")))
                         {
-                            var xAll = GetSelectionMaxX();
+                            var xAll = GetSelectionMaxX(superNodes);
 
                             var width = superNodes.OrderBy(s => s.X).Last().Width;
 
@@ -649,7 +624,7 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
                     {
                         if (superNodes.Any())
                         {
-                            var yAll = GetSelectionAverageY();
+                            var yAll = GetSelectionAverageY(superNodes);
 
                             superNodes.ForEach((x) => { x.CenterY = yAll; });
                         }
@@ -663,7 +638,7 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
                     {
                         if (superNodes.Any(s => s.ObjectType.ToString().Contains("Annotation") || s.ObjectType.ToString().Contains("Note")))
                         {
-                            var yAll = GetSelectionMinY();
+                            var yAll = GetSelectionMinY(superNodes);
                             superNodes.ForEach((x) => { x.Y = yAll; });
                         }
                         else
@@ -676,7 +651,7 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
                     {
                         if (superNodes.Any(s => s.ObjectType.ToString().Contains("Annotation") || s.ObjectType.ToString().Contains("Note")))
                         {
-                            var yAll = GetSelectionMaxY();
+                            var yAll = GetSelectionMaxY(superNodes);
 
                             var height = superNodes.OrderBy(s => s.Y).Last().Height;
 
@@ -706,16 +681,16 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
                     {
                         if (superNodes.Any())
                         {
-                            var yMin = GetSelectionMinY();
-                            var yMax = GetSelectionMaxY();
+                            var yMin = GetSelectionMinY(superNodes);
+                            var yMax = GetSelectionMaxY(superNodes);
                             var spacing = 20.0;
                             var span = yMax - yMin;
 
-                            var nodeHeightSum = GetSelectionHeight();
+                            var nodeHeightSum = GetSelectionHeight(superNodes);
                             if (span > nodeHeightSum)
                             {
                                 spacing = (span - nodeHeightSum)
-                                          / (CurrentSelection().Count - 1);
+                                          / (superNodes.Count - 1);
                             }
                             var cursor = yMin;
 
@@ -737,18 +712,18 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
                     {
                         if (superNodes.Any())
                         {
-                            var xMin = GetSelectionMinX();
-                            var xMax = GetSelectionMaxX();
+                            var xMin = GetSelectionMinX(superNodes);
+                            var xMax = GetSelectionMaxX(superNodes);
                             var spacing = 0.0;
                             var span = xMax - xMin;
 
 
-                            var nodeWidthSum = GetSelectionWidth();
+                            var nodeWidthSum = GetSelectionWidth(superNodes);
 
                             if (span > nodeWidthSum)
                             {
                                 spacing = (span - nodeWidthSum)
-                                          / (CurrentSelection().Count - 1);
+                                          / (superNodes.Count - 1);
                             }
                             var cursor = xMin;
 
@@ -777,11 +752,12 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
                     var undoCommand = new DynamoModel.UndoRedoCommand(DynamoModel.UndoRedoCommand.Operation.Undo);
                     DynamoViewModel.Model.ExecuteCommand(undoCommand);
                 }
-
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                //do nothing
+                // Cosmetic only - the nodes have already moved. Worth knowing about, not worth
+                // interrupting the user over.
+                Log.Info($"Wires may look stale until the next redraw: {e.Message}");
             }
 
         }
@@ -846,106 +822,28 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
 
             return uniqueSuperNodes.TrueForAll(s => s.ObjectType.Equals("Dynamo.ViewModels.NodeViewModel")) ? new List<SuperNode>() : uniqueSuperNodes;
         }
+        /*
+         * These take the selection they operate on rather than rebuilding it. CurrentSelection()
+         * walks every annotation, note and node in the workspace and de-duplicates the result, and
+         * a single distribute used to call it five times.
+         */
         #region SelectionAverages
-        public double GetSelectionAverageX()
-        {
-            List<double> values = CurrentSelection().Select(s => s.CenterX).ToList();
+        public static double GetSelectionAverageX(List<SuperNode> selection) => selection.Select(s => s.CenterX).Average();
 
-            return values.Average();
-        }
+        public static double GetSelectionAverageY(List<SuperNode> selection) => selection.Select(s => s.CenterY).Average();
 
-        private void NodeOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
+        public static double GetSelectionMinX(List<SuperNode> selection) => selection.Select(s => s.X).Min();
 
-        public double GetSelectionAverageY()
-        {
-            List<double> values = CurrentSelection().Select(s => s.CenterY).ToList();
+        public static double GetSelectionMinY(List<SuperNode> selection) => selection.Select(s => s.Y).Min();
 
-            return values.Average();
-        }
+        public static double GetSelectionMaxX(List<SuperNode> selection) => selection.Select(s => s.X).Max();
 
-        public double GetSelectionMinX()
-        {
-            List<double> values = CurrentSelection().Select(s => s.X).ToList();
+        public static double GetSelectionMaxY(List<SuperNode> selection) => selection.Select(s => s.Y).Max();
 
-            return values.Min();
-        }
+        public static double GetSelectionHeight(List<SuperNode> selection) => selection.Select(s => s.Height).Sum();
 
-        public double GetSelectionMinY()
-        {
-            List<double> values = CurrentSelection().Select(s => s.Y).ToList();
-
-            return values.Min();
-        }
-
-        public double GetSelectionMaxX()
-        {
-            List<double> values = CurrentSelection().Select(s => s.X).ToList();
-
-            return values.Max();
-        }
-
-        public double GetSelectionMaxLeftX()
-        {
-            return DynamoViewModel.CurrentSpace.CurrentSelection.Where((x) => x is ILocatable)
-                           .Cast<ILocatable>()
-                           .Select((x) => x.X)
-                           .Max();
-        }
-
-        public double GetSelectionMaxY()
-        {
-            List<double> values = CurrentSelection().Select(s => s.Y).ToList();
-
-            return values.Max();
-        }
-
-        public double GetSelectionMaxTopY()
-        {
-            return DynamoViewModel.CurrentSpace.CurrentSelection.Where((x) => x is ILocatable)
-                           .Cast<ILocatable>()
-                           .Select((x) => x.Y)
-                           .Max();
-        }
-        public double GetSelectionHeight()
-        {
-            List<double> values = CurrentSelection().Select(s => s.Height).ToList();
-
-            return values.Sum();
-        }
-        public double GetSelectionWidth()
-        {
-            List<double> values = CurrentSelection().Select(s => s.Width).ToList();
-
-            return values.Sum();
-        }
+        public static double GetSelectionWidth(List<SuperNode> selection) => selection.Select(s => s.Width).Sum();
 
         #endregion
-
-        #region Helpers
-        public IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
-        {
-            if (depObj != null)
-            {
-                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
-                {
-                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
-                    if (child != null && child is T dependencyObject)
-                    {
-                        yield return dependencyObject;
-                    }
-
-                    foreach (T childOfChild in FindVisualChildren<T>(child))
-                    {
-                        yield return childOfChild;
-                    }
-                }
-            }
-        }
-        #endregion
-
-
     }
 }

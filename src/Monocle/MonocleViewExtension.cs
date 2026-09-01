@@ -1,16 +1,15 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Dynamo.Logging;
-using Dynamo.PackageManager;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.About;
 using MonocleViewExtension.BetterSave;
+using MonocleViewExtension.Core;
 using MonocleViewExtension.FancyPaste;
 using MonocleViewExtension.Foca;
 using MonocleViewExtension.GraphInformation;
@@ -31,49 +30,34 @@ namespace MonocleViewExtension
         public string UniqueId => "5A256B35-BD09-423C-82A1-372957143927";
         public string Name => "Monocle View Extension";
 
-        private StandardViewsViewModel standardViewsViewModel;
+        private readonly List<IMonocleFeature> _features = new List<IMonocleFeature>();
+        private MonocleContext _ctx;
 
         public void Dispose()
         {
-            standardViewsViewModel?.Dispose();
-            AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomainOnAssemblyResolve;
-#if net8 || net10
+            foreach (var feature in _features)
+            {
+                try
+                {
+                    feature.Dispose();
+                }
+                catch (Exception e)
+                {
+                    _ctx?.Log.Warn($"Could not clean up '{feature.Name}'.", e);
+                }
+            }
+            _features.Clear();
+
             System.Runtime.Loader.AssemblyLoadContext.Default.Resolving -= AssemblyLoadContext_Resolving;
-#endif
+            MonocleContext.Clear();
+            _ctx = null;
         }
 
         public void Startup(ViewStartupParams viewStartupParams)
         {
-            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainOnAssemblyResolve;
-#if net8 || net10
             System.Runtime.Loader.AssemblyLoadContext.Default.Resolving += AssemblyLoadContext_Resolving;
-#endif
         }
 
-        private Assembly CurrentDomainOnAssemblyResolve(object sender, ResolveEventArgs args)
-        {
-            // Get assembly name
-            var assemblyName = new AssemblyName(args.Name).Name + ".dll";
-
-            // Get resource name
-            var resourceName = Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(x => x.EndsWith(".dll")).ToArray().FirstOrDefault(x => x.EndsWith(assemblyName));
-            if (resourceName == null)
-            {
-                return null;
-            }
-
-            // Load assembly from resource
-            using (var stream = Globals.ExecutingAssembly.GetManifestResourceStream(resourceName))
-            {
-                using (var memoryStream = new MemoryStream())
-                {
-                    stream.CopyTo(memoryStream);
-                    return Assembly.Load(memoryStream.ToArray());
-                }
-            }
-        }
-
-#if net8 || net10
         private Assembly AssemblyLoadContext_Resolving(System.Runtime.Loader.AssemblyLoadContext context, AssemblyName assemblyName)
         {
             var assemblyNameStr = new AssemblyName(assemblyName.Name).Name + ".dll";
@@ -87,58 +71,36 @@ namespace MonocleViewExtension
                 return context.LoadFromStream(stream);
             }
         }
-#endif
 
         public void Loaded(ViewLoadedParams p)
         {
-            //store the package manager extension for getting package versions
-#if D30_OR_GREATER
-            Globals.PmExtension = p.ViewStartupParams.ExtensionManager.Extensions.OfType<PackageManagerExtension>().FirstOrDefault();
-#endif
-
             /*if the user is holding down the left shift key, don't load monocle. I added this because I needed it for when I record videos that shouldn't have packages loaded.
             And yes. this is a deep reference to my roots in AutoCAD, https://knowledge.autodesk.com/support/autocad/learn-explore/caas/sfdcarticles/sfdcarticles/How-to-reset-AutoCAD-to-defaults.html
             */
             if (Keyboard.IsKeyDown(Key.LeftShift)) return;
 
-            //check if the last used settings file exists, if so, use it instead of the defaults.
-            if (File.Exists(Properties.UserSettings.Default.MonocleSettingsFile))
-            {
-                Globals.SettingsFile = Properties.UserSettings.Default.MonocleSettingsFile;
-            }
-            else
-            {
-                Dynamo.Logging.LogMessage.Warning($"Failed to load settings file from, {Properties.UserSettings.Default.MonocleSettingsFile}. Please check if the file exists. Using default settings instead,", WarningLevel.Mild);
-            }
-            //load monocle settings from xml
-            Settings.LoadMonocleSettings();
+            _ctx = MonocleContext.Create(p);
 
-            //resolve the dynamo version by checking which core is loaded
-            var dynamoCore = Assembly.Load("DynamoCore");
-            Globals.DynamoVersion = dynamoCore.GetName().Version;
-
-            //add the top-level menu
+            //add the top-level menu to the dynamo ribbon
             var monocleMenuItem = new MenuItem { Header = "🧐 monocle" };
-            //add the top level menu to the dynamo ribbon
             p.dynamoMenu.Items.Insert(6, monocleMenuItem);
 
-            //add all of our various tools
-            AboutCommand.AddMenuItem(monocleMenuItem, p);
-            PackageUsageCommand.AddMenuItem(monocleMenuItem, p);
-            GraphResizererCommand.AddMenuItem(monocleMenuItem, p);
-            NodeSwapperCommand.AddMenuItem(monocleMenuItem, p);
-            FocaCommand.EnableFoca(p, monocleMenuItem);
-            InlineNodeConnectomaticCommand.AddMenuItem(p, monocleMenuItem);
-            SimpleSearchCommand.AddMenuItem(p, monocleMenuItem, this);
-            //TODO: Check if standard views consistently loads on different file changes
-            standardViewsViewModel = StandardViewsCommand.EnableStandardViews(p);
-            MonocleSettingsCommand.AddMenuItem(monocleMenuItem);
-            FancyPasteCommand.AddMenuItem(p);
-            BetterSaveCommand.AddMenuItem(p);
-            GraphInformationCommand.AddMenuItem(monocleMenuItem, p);
-            ScaffoldTheJacobSmallSpecial(p);
+            _features.AddRange(BuildFeatures());
 
-            NodeDocumentationCommand.AddMenuItem(monocleMenuItem, p);
+            foreach (var feature in _features)
+            {
+                try
+                {
+                    feature.Register(_ctx, monocleMenuItem);
+                }
+                catch (Exception e)
+                {
+                    // One tool failing to load must not cost the user the rest of the menu.
+                    _ctx.Log.Error($"'{feature.Name}' failed to load and will be unavailable.", e);
+                }
+            }
+
+            ScaffoldTheJacobSmallSpecial(p);
 
             /*if the user has plugins loaded in Revit (or otherwise) that use a toolkit called "DevExpress",
             we fix the overrides that toolkit forces on the app.
@@ -147,14 +109,40 @@ namespace MonocleViewExtension
             */
             Compatibility.CheckForDevExpress();
             Compatibility.FixThemesForDevExpress(p.DynamoWindow);
-
         }
 
-        
+        /// <summary>
+        /// Menu order is the registration order, so this list is also the layout of the monocle menu.
+        /// </summary>
+        private IEnumerable<IMonocleFeature> BuildFeatures()
+        {
+            StandardViewsViewModel standardViews = null;
+
+            return new IMonocleFeature[]
+            {
+                new DelegateFeature("About", (ctx, menu) => AboutCommand.AddMenuItem(menu, ctx.LoadedParams)),
+                new DelegateFeature("Package Usage", (ctx, menu) => PackageUsageCommand.AddMenuItem(menu, ctx.LoadedParams)),
+                new DelegateFeature("Graph Resizerer", (ctx, menu) => GraphResizererCommand.AddMenuItem(menu, ctx.LoadedParams)),
+                new DelegateFeature("Node Swapper", (ctx, menu) => NodeSwapperCommand.AddMenuItem(menu, ctx.LoadedParams)),
+                new FocaFeature(),
+                new InlineNodeConnectomaticFeature(),
+                new SimpleSearchFeature(this),
+                new DelegateFeature("Standard Views",
+                    (ctx, menu) => standardViews = StandardViewsCommand.EnableStandardViews(ctx.LoadedParams),
+                    () => standardViews?.Dispose()),
+                new DelegateFeature("Settings", (ctx, menu) => MonocleSettingsCommand.AddMenuItem(menu, ctx)),
+                new FancyPasteFeature(),
+                new BetterSaveFeature(),
+                new DelegateFeature("Graph Information", (ctx, menu) => GraphInformationCommand.AddMenuItem(menu, ctx.LoadedParams)),
+                new DelegateFeature("Node Documentation", (ctx, menu) => NodeDocumentationCommand.AddMenuItem(menu, ctx.LoadedParams))
+            };
+        }
+
         public void Shutdown()
         {
-            //save monocle settings
-            Settings.SaveMonocleSettings();
+            // Backstop: the settings dialog saves on apply, but a session that only toggled a
+            // menu checkbox still has changes to persist.
+            _ctx?.Settings.Save();
         }
 
         internal void ScaffoldTheJacobSmallSpecial(ViewLoadedParams p)

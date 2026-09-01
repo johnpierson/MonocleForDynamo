@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -16,6 +16,7 @@ using Dynamo.Search.SearchElements;
 using Dynamo.Utilities;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
+using MonocleViewExtension.Core;
 using MonocleViewExtension.Utilities;
 using Border = System.Windows.Controls.Border;
 using Thickness = System.Windows.Thickness;
@@ -27,12 +28,14 @@ namespace MonocleViewExtension.PackageUsage
         public DynamoView DynamoView { get; }
         public DynamoViewModel DynamoViewModel { get; }
         public ViewLoadedParams LoadedParams { get; }
+        internal IMonocleLogger Log { get; }
 
         public PackageUsageModel(DynamoViewModel dvm, ViewLoadedParams loadedParams)
         {
             DynamoView = loadedParams.DynamoWindow as DynamoView;
             DynamoViewModel = dvm;
             LoadedParams = loadedParams;
+            Log = new MonocleLog(dvm);
         }
 
         public ObservableCollection<PackageUsageWrapper> GetCustomNodeInfos()
@@ -102,7 +105,12 @@ namespace MonocleViewExtension.PackageUsage
                             }
                         }
                     }
-                    catch { }
+                    catch (Exception e)
+                    {
+                        // Unpinning is best-effort reflection against an API that has been
+                        // renamed more than once. The note gets deleted either way.
+                        Log.Info($"Could not unpin a note before deleting it: {e.Message}");
+                    }
 
                     DynamoViewModel.Model.ExecuteCommand(new DynamoModel.DeleteModelCommand(note.GUID));
 
@@ -155,7 +163,8 @@ namespace MonocleViewExtension.PackageUsage
                     }
                     catch (Exception e)
                     {
-                        DynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
+                        // The note is created either way; pinning is the part that may not exist.
+                        Log.Info($"Could not pin the package note to its node: {e.Message}");
                     }
                     count++;
                 }
@@ -211,42 +220,29 @@ namespace MonocleViewExtension.PackageUsage
                     //try and fail if user is in older dynamo
                     try
                     {
-                        if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
+                        var border = GetNodeBorder(nv);
+                        if (border != null)
                         {
-                            var border = GetNodeBorder(nv);
-                            if (border != null)
+                            RememberOriginalAppearance(nvm.NodeModel.GUID, border);
+
+                            VisualBrush vb = new VisualBrush();
+                            Rectangle rec = new Rectangle
                             {
-                                VisualBrush vb = new VisualBrush();
-                                Rectangle rec = new Rectangle
-                                {
-                                    Width = border.ActualWidth,
-                                    Height = border.ActualHeight,
-                                    StrokeDashArray = new DoubleCollection { 6, 2 },
-                                    Stroke = new SolidColorBrush(Globals.CustomNodeIdentificationColor),
-                                    Margin = new Thickness(-Globals.CustomNodeBorderThickness),
-                                    RadiusX = 8,
-                                    RadiusY = 8,
-                                    StrokeThickness = Globals.CustomNodeBorderThickness,
-                                };
-                                vb.Visual = rec;
-                                border.BorderBrush = vb;
-                                border.BorderThickness = new Thickness(Globals.CustomNodeBorderThickness);
-                                border.Margin = new Thickness(-Globals.CustomNodeBorderThickness);
-                            }
+                                Width = border.ActualWidth,
+                                Height = border.ActualHeight,
+                                StrokeDashArray = new DoubleCollection { 6, 2 },
+                                Stroke = new SolidColorBrush(Globals.CustomNodeIdentificationColor),
+                                Margin = new Thickness(-Globals.CustomNodeBorderThickness),
+                                RadiusX = 8,
+                                RadiusY = 8,
+                                StrokeThickness = Globals.CustomNodeBorderThickness,
+                            };
+                            vb.Visual = rec;
+                            border.BorderBrush = vb;
+                            border.BorderThickness = new Thickness(Globals.CustomNodeBorderThickness);
+                            border.Margin = new Thickness(-Globals.CustomNodeBorderThickness);
                         }
-                        else
-                        {
-                            var rect = GetNodeRectangle(nv);
-                            if (rect != null)
-                            {
-                                rect.Stroke = new SolidColorBrush(Globals.CustomNodeIdentificationColor);
-                                rect.StrokeThickness = Globals.CustomNodeBorderThickness;
-                                rect.Margin = new Thickness(-Globals.CustomNodeBorderThickness);
-                                rect.RadiusX = 4;
-                                rect.RadiusY = 4;
-                                rect.StrokeDashArray = new DoubleCollection { 6, 2 };
-                            }
-                        }
+
                         //TODO: Enable this for 2.15+
                         //nvm.ImgGlyphOneSource = "/MonocleViewExtension;component/Foca/Resources/customnode-64.png";
                         var nodeBorder = nv.FindName("nodeColorOverlayZoomOut") as Border;
@@ -257,7 +253,7 @@ namespace MonocleViewExtension.PackageUsage
                     }
                     catch (Exception e)
                     {
-                        DynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
+                        Log.Warn($"Could not highlight '{nvm.NodeModel.Name}'.", e);
                     }
                 }
             }
@@ -279,37 +275,71 @@ namespace MonocleViewExtension.PackageUsage
                     }
                     catch (Exception e)
                     {
-                        DynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
+                        Log.Warn($"Could not reset the highlight on '{nvm.NodeModel.Name}'.", e);
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// Puts a node's border back the way Dynamo drew it.
+        ///
+        /// This used to write a hard-coded light-theme colour, which meant resetting a highlight
+        /// in dark mode left the node with a near-white border. Stashing the real values when we
+        /// first touch the node keeps it correct in either theme, and in whatever Dynamo does next.
+        /// </summary>
         public void ResetNodeColor(NodeView nv)
         {
-            if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
+            var border = GetNodeBorder(nv);
+            if (border == null) return;
+
+            var guid = nv.ViewModel?.NodeModel?.GUID;
+            if (guid.HasValue && _originalBorders.TryGetValue(guid.Value, out var original))
             {
-                var border = GetNodeBorder(nv);
-                if (border != null)
-                {
-                    border.BorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF9F9F9"));
-                    border.BorderThickness = new Thickness(1);
-                    border.CornerRadius = new CornerRadius(8, 8, 0, 0);
-                    border.Margin = new Thickness(-1);
-                }
+                original.ApplyTo(border);
+                _originalBorders.Remove(guid.Value);
+                return;
             }
-            else
+
+            // Never highlighted this node, so there is nothing stashed. Clear our decoration
+            // without inventing a colour: leave the brush to Dynamo's own style.
+            border.ClearValue(Border.BorderBrushProperty);
+            border.BorderThickness = new Thickness(1);
+            border.CornerRadius = new CornerRadius(8, 8, 0, 0);
+            border.Margin = new Thickness(-1);
+        }
+
+        private readonly Dictionary<Guid, BorderAppearance> _originalBorders = new Dictionary<Guid, BorderAppearance>();
+
+        private void RememberOriginalAppearance(Guid nodeGuid, Border border)
+        {
+            // Only the first highlight captures the original; a second one would capture our own.
+            if (_originalBorders.ContainsKey(nodeGuid)) return;
+
+            _originalBorders[nodeGuid] = BorderAppearance.Capture(border);
+        }
+
+        private sealed class BorderAppearance
+        {
+            private Brush _brush;
+            private Thickness _thickness;
+            private CornerRadius _cornerRadius;
+            private Thickness _margin;
+
+            public static BorderAppearance Capture(Border border) => new BorderAppearance
             {
-                var rect = GetNodeRectangle(nv);
-                if (rect != null)
-                {
-                    rect.Stroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FF5E5C5A"));
-                    rect.StrokeThickness = 1;
-                    rect.Margin = new Thickness(-1);
-                    rect.RadiusX = 0;
-                    rect.RadiusY = 0;
-                    rect.StrokeDashArray.Clear();
-                }
+                _brush = border.BorderBrush,
+                _thickness = border.BorderThickness,
+                _cornerRadius = border.CornerRadius,
+                _margin = border.Margin
+            };
+
+            public void ApplyTo(Border border)
+            {
+                border.BorderBrush = _brush;
+                border.BorderThickness = _thickness;
+                border.CornerRadius = _cornerRadius;
+                border.Margin = _margin;
             }
         }
 
@@ -361,6 +391,8 @@ namespace MonocleViewExtension.PackageUsage
 
                         if (border != null)
                         {
+                            RememberOriginalAppearance(nv.ViewModel.NodeModel.GUID, border);
+
                             border.BorderBrush = new SolidColorBrush(Colors.Aquamarine);
                             border.BorderThickness = new Thickness(Globals.CustomNodeBorderThickness + 2);
                             border.CornerRadius = new CornerRadius(8, 8, 0, 0);
@@ -386,7 +418,7 @@ namespace MonocleViewExtension.PackageUsage
                 }
                 catch (Exception e)
                 {
-                    DynamoViewModel.Model.Logger.LogWarning($"Monocle- {e.Message}", WarningLevel.Mild);
+                    Log.Warn($"Could not animate the input node '{nv.ViewModel?.NodeModel?.Name}'.", e);
                 }
             }
             
@@ -397,13 +429,7 @@ namespace MonocleViewExtension.PackageUsage
         public List<string> GetCustomPackageList()
         {
 
-#if net8 || net10
             List<NodeSearchElement> libraries = DynamoViewModel.Model.SearchModel.Entries.ToList();
-#endif
-
-#if !net8 && !net10
-            List<NodeSearchElement> libraries = DynamoViewModel.Model.SearchModel.SearchEntries.ToList();
-#endif
 
             List<string> addOns = new List<string>();
             foreach (var element in libraries)
@@ -426,7 +452,6 @@ namespace MonocleViewExtension.PackageUsage
             
             try
             {
-#if D30_OR_GREATER
                 if (Globals.PmExtension?.PackageLoader != null)
                 {
                     var packageNames = Globals.PmExtension.PackageLoader.LocalPackages.Select(p => p.Name).ToList();
@@ -438,38 +463,16 @@ namespace MonocleViewExtension.PackageUsage
                         }
                     }
                 }
-#endif
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                DynamoViewModel.Model.Logger.LogWarning($"Monocle- GetCustomPackageList fallback failed: {e.Message}", WarningLevel.Mild);
+                // The search-element scan above already produced a list; this only adds packages
+                // that are installed but unused, so a failure degrades rather than breaks.
+                Log.Warn("Could not add locally installed packages to the package list.", e);
             }
 
             return addOns.Distinct().ToList();
         }
-        //public string AllCustomNodes()
-        //{
-        //    List<NodeSearchElement> libraries = DynamoViewModel.Model.SearchModel.SearchEntries.ToList();
-        //    List<string> addOns = new List<string>();
-        //    foreach (var element in libraries)
-        //    {
-        //        // Only include packages and custom nodes
-        //        if (element.ElementType.HasFlag(ElementTypes.Packaged) || element.ElementType.HasFlag(ElementTypes.CustomNode))
-        //        {
-        //            // Ordered list of all categories for the search element including all nested categories
-        //            var allAddOns = element.Categories.ToList();
-        //            // Construct all categories levels for the element starting at the top level
-        //            for (int i = 0; i < allAddOns.Count; i++)
-        //            {
-        //                if (i == 0 && !allAddOns[i].StartsWith("Core"))
-        //                {
-        //                    addOns.Add("{" + "\"" + element.CreationName.Split('@').First() + "\"" + "," + "\"" + allAddOns[i] + "\"" + "},");
-        //                }
-        //            }
-        //        }
-        //    }
-        //    return string.Join("\n", addOns.Distinct().ToList());
-        //}
         public bool IsCustomNode(NodeModel node)
         {
             bool result = GetCustomPackageList().Any(x => node.Category.StartsWith(x, StringComparison.OrdinalIgnoreCase));
@@ -509,19 +512,20 @@ namespace MonocleViewExtension.PackageUsage
         public string GetPackageVersion(NodeModel node)
         {
             string version = "";
-            //event handlers for when changes are made
             try
             {
-#if D30_OR_GREATER
                 if (Globals.PmExtension?.PackageLoader == null) return "";
-                var packageName = GetPackageName(node).SimplifyString();
-                var targetInfo = Globals.PmExtension.PackageLoader.LocalPackages.FirstOrDefault(x => x.Name.SimplifyString() == packageName);
 
-                version = $"v.{targetInfo.VersionName}";
-#endif
+                var packageName = GetPackageName(node).SimplifyString();
+                var targetInfo = Globals.PmExtension.PackageLoader.LocalPackages
+                    .FirstOrDefault(x => x.Name.SimplifyString() == packageName);
+
+                // A node whose package is not installed locally simply has no version to show.
+                version = targetInfo == null ? "" : $"v.{targetInfo.VersionName}";
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Log.Info($"Could not resolve the package version for '{node?.Name}': {e.Message}");
                 version = "";
             }
             return version;

@@ -19,20 +19,40 @@ namespace MonocleViewExtension.InlineNodeConnectomatic
         public DynamoViewModel dynamoViewModel { get; }
         public ViewLoadedParams LoadedParams { get; }
 
+        private bool _attached;
+        private readonly Core.IMonocleLogger _log;
+
         public InlineNodeConnectomaticModel(DynamoViewModel dvm, ViewLoadedParams loadedParams)
         {
             dynamoView = loadedParams.DynamoWindow as DynamoView;
             dynamoViewModel = dvm;
             LoadedParams = loadedParams;
+            _log = new Core.MonocleLog(dvm);
+        }
+
+        /// <summary>
+        /// Hooks the window-wide mouse handler. Only called while the tool is switched on, so a
+        /// user who never enables it pays nothing.
+        /// </summary>
+        public void Attach()
+        {
+            if (_attached || dynamoView == null) return;
 
             dynamoView.MouseLeftButtonUp += DgOnMouseLeftButtonUp;
+            _attached = true;
+        }
+
+        public void Detach()
+        {
+            if (!_attached || dynamoView == null) return;
+
+            dynamoView.MouseLeftButtonUp -= DgOnMouseLeftButtonUp;
+            _attached = false;
         }
 
         //This section would not be made possible without Konrad Sobon's awesome example here:https://github.com/ksobon/archilab/blob/master/archilabViewExtension/ArchilabViewExtension.cs
         private void DgOnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (!Globals.IsConnectoEnabled) return;
-
             if (!Keyboard.IsKeyDown(Key.LeftAlt)) return;
 
             try
@@ -107,11 +127,10 @@ namespace MonocleViewExtension.InlineNodeConnectomatic
                 dynamoViewModel?.ExecuteCommand(
                     new DynamoModel.MakeConnectionCommand(end.Owner.GUID, end.Index, PortType.Input, DynamoModel.MakeConnectionCommand.Mode.End));
             }
-            catch (System.Exception)
+            catch (System.Exception exception)
             {
-                // do nothin
+                _log.Warn("Could not splice the node into that wire.", exception);
             }
-            
         }
 
         internal List<DependencyObject> HitResultsList = new List<DependencyObject>();

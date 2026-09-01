@@ -16,12 +16,7 @@ namespace MonocleViewExtension.Foca
         public DynamoViewModel Dvm { get; set; }
         private double _x;
         private double _y;
-        //private double _centerX;
-        //private double _centerY;
-        //private double _width;
-        //private double _height;
 
-        
         public override double Width
         {
             get
@@ -38,14 +33,9 @@ namespace MonocleViewExtension.Foca
                         NodeViewModel node = this.Object as NodeViewModel;
                         return node.NodeModel.Width;
                     default:
-                        try
-                        {
-                            return ((ModelBase)Object).Width;
-                        }
-                        catch (Exception)
-                        {
-                            return 0;
-                        }
+                        // Anything else only has a width if it is positionable at all. Zero keeps
+                        // the alignment maths defined for things that are not.
+                        return Object is ModelBase model ? model.Width : 0;
                 }
             }
         }
@@ -65,14 +55,7 @@ namespace MonocleViewExtension.Foca
                         NodeViewModel node = this.Object as NodeViewModel;
                         return node.NodeModel.Height;
                     default:
-                        try
-                        {
-                            return ((ModelBase)Object).Height;
-                        }
-                        catch (Exception)
-                        {
-                            return 0;
-                        }
+                        return Object is ModelBase model ? model.Height : 0;
                 }
             }
         }
@@ -140,81 +123,15 @@ namespace MonocleViewExtension.Foca
                 }
             }
         }
-        //public new double CenterY
-        //{
-        //    get => this._centerY;
-        //    set
-        //    {
-        //        switch (this.ObjectType)
-        //        {
-        //            case "Dynamo.ViewModels.AnnotationViewModel":
-        //                AnnotationViewModel group = this.Object as AnnotationViewModel;
-        //                double ogGroupLocation = group.AnnotationModel.CenterY;
-        //                group.AnnotationModel.CenterY = value;
-        //                double translation = ogGroupLocation - (value);
-        //                foreach (var n in group.Nodes)
-        //                {
-        //                    n.CenterY = n.CenterY - translation;
-        //                }
-
-        //                _centerY = value;
-        //                break;
-        //            case "Dynamo.Graph.Notes.NoteModel":
-        //                NoteModel note = this.Object as NoteModel;
-        //                note.CenterY = value;
-        //                _centerY = value;
-        //                break;
-        //            default:
-        //                NodeModel node = this.Object as NodeModel;
-        //                node.CenterY = value;
-        //                _centerY = value;
-        //                break;
-        //        }
-        //    }
-        //}
-
+        // SuperNode is an in-memory wrapper only; it is never persisted to a .dyn.
         protected override void SerializeCore(XmlElement element, SaveContext context)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException($"{nameof(SuperNode)} is not serializable.");
         }
 
         protected override void DeserializeCore(XmlElement nodeElement, SaveContext context)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException($"{nameof(SuperNode)} is not serializable.");
         }
-
-        //public new double CenterX
-        //{
-        //    get => this._centerX;
-        //    set
-        //    {
-        //        switch (this.ObjectType)
-        //        {
-        //            case "Dynamo.ViewModels.AnnotationViewModel":
-        //                AnnotationViewModel group = this.Object as AnnotationViewModel;
-        //                double ogGroupLocation = group.AnnotationModel.CenterX;
-        //                group.AnnotationModel.CenterX = value;
-        //                double translation = ogGroupLocation - (value);
-        //                foreach (var n in group.Nodes)
-        //                {
-        //                    n.CenterX = n.CenterX - translation;
-        //                }
-        //                _centerX = value;
-        //                break;
-        //            case "Dynamo.Graph.Notes.NoteModel":
-        //                NoteModel note = this.Object as NoteModel;
-        //                note.CenterX = value;
-        //                _centerX = value;
-        //                break;
-        //            default:
-        //                NodeModel node = this.Object as NodeModel;
-        //                node.CenterX = value;
-        //                _centerX = value;
-        //                break;
-        //        }
-        //    }
-        //}
     }
-
-
 }

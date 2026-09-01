@@ -1,0 +1,30 @@
+{
+  "_comment": "Single source of truth for the Dynamo version matrix. 'frozen' versions are no longer built - their DLLs in deploy/ are immutable artifacts that existing installs download from master. 'active' versions are built by scripts/build-all.ps1 and CI.",
+  "frozen": [
+    "2.0",
+    "2.1",
+    "2.2",
+    "2.3",
+    "2.5",
+    "2.6",
+    "2.10",
+    "2.12",
+    "2.13",
+    "2.16",
+    "2.17",
+    "2.18",
+    "2.19"
+  ],
+  "active": [
+    "3.0",
+    "3.1",
+    "3.2",
+    "3.3",
+    "3.4",
+    "3.5",
+    "3.6",
+    "4.0",
+    "4.1",
+    "4.2"
+  ]
+}

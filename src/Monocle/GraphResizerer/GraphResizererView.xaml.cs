@@ -18,14 +18,9 @@ namespace MonocleViewExtension.GraphResizerer
             if(!IsLoaded) return;
 
             if (AutoRunCheckbox.IsChecked != null && !AutoRunCheckbox.IsChecked.Value) return;
-            try
+            if (this.MainGrid.DataContext is GraphResizererViewModel vm)
             {
-                var vm = this.MainGrid.DataContext as GraphResizererViewModel;
                 vm.ResizeGraph.Execute(this);
-            }
-            catch (Exception)
-            {
-                // suppress warnings for now
             }
            
 
@@ -34,14 +29,9 @@ namespace MonocleViewExtension.GraphResizerer
         private void AutoRunCheckbox_OnChecked(object sender, RoutedEventArgs e)
         {
             if (!IsLoaded) return;
-            try
+            if (this.MainGrid.DataContext is GraphResizererViewModel vm)
             {
-                var vm = this.MainGrid.DataContext as GraphResizererViewModel;
                 vm.ResizeGraph.Execute(this);
-            }
-            catch (Exception)
-            {
-                // suppress warnings for now
             }
 
         }

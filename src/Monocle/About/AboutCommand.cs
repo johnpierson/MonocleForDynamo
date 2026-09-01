@@ -1,8 +1,10 @@
 ﻿using System;
-using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Dynamo.Wpf.Extensions;
+using MonocleViewExtension.Core;
 using MonocleViewExtension.Utilities;
 using Newtonsoft.Json;
 
@@ -10,6 +12,8 @@ namespace MonocleViewExtension.About
 {
     public class AboutCommand
     {
+        private static readonly HttpClient Http = CreateClient();
+
         /// <summary>
         /// Create the about menu
         /// </summary>
@@ -17,10 +21,9 @@ namespace MonocleViewExtension.About
         /// <param name="p">our view loaded parameters for dynamo</param>
         public static void AddMenuItem(MenuItem menuItem, ViewLoadedParams p)
         {
-
             var viewModel = new AboutViewModel(p);
 
-            var aboutMenu = new MenuItem{Header = Properties.Resources.AboutMenuItemHeader };
+            var aboutMenu = new MenuItem { Header = Properties.Resources.AboutMenuItemHeader };
 
             aboutMenu.Click += (sender, args) =>
             {
@@ -39,47 +42,63 @@ namespace MonocleViewExtension.About
             menuItem.Items.Add(aboutMenu);
             menuItem.Items.Add(new Separator());
 
-
-            //check to see if an update is available
-            if (MiscUtils.CheckForInternetConnection() && CheckForUpdate("johnpierson","monoclefordynamo"))
-            {
-                aboutMenu.Foreground = new SolidColorBrush(Colors.LawnGreen);
-                aboutMenu.Header = $"{Properties.Resources.AboutMenuItemUpdateHeader}{Latest}";
-                aboutMenu.ToolTip = Properties.Resources.AboutMenuItemUpdateTooltip;
-            }
-
+            /* Look for a newer release in the background. This used to run inline here: a one
+               second ICMP ping followed by a synchronous HTTPS call, both on the UI thread, so a
+               firewalled or slow network added seconds to Dynamo's startup before the window
+               appeared. Nothing depends on the answer, so it can arrive whenever it arrives. */
+            _ = ShowUpdateBadgeWhenAvailableAsync(aboutMenu);
         }
 
         internal static string Latest;
-        private static bool CheckForUpdate(string username, string repoName)
+
+        private static async Task ShowUpdateBadgeWhenAvailableAsync(MenuItem aboutMenu)
         {
             try
             {
-                using (WebClient webClient = new WebClient())
+                if (!await IsUpdateAvailableAsync("johnpierson", "monoclefordynamo").ConfigureAwait(true))
                 {
-                    webClient.Headers.Add("User-Agent", "Unity web player");
-
-                    string address = $"https://api.github.com/repos/{username}/{repoName}/releases/latest";
-                    Uri uri = new Uri(address);
-
-                    string releases = webClient.DownloadString(uri);
-
-                    var json = JsonConvert.DeserializeObject<LatestReleaseVersion>(releases);
-
-                    Latest = json.TagName;
-
-                    Version currentVersion = Version.Parse(Globals.Version);
-
-                    Version latestVersion = Version.Parse($"{Latest}");
-
-                    return currentVersion.CompareTo(latestVersion) <= 0;
+                    return;
                 }
+
+                // ConfigureAwait(true) put us back on the UI thread, but be explicit: this touches
+                // a live MenuItem.
+                aboutMenu.Dispatcher.Invoke(() =>
+                {
+                    aboutMenu.Foreground = new SolidColorBrush(Colors.LawnGreen);
+                    aboutMenu.Header = $"{Properties.Resources.AboutMenuItemUpdateHeader}{Latest}";
+                    aboutMenu.ToolTip = Properties.Resources.AboutMenuItemUpdateTooltip;
+                });
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return false;
+                MonocleContext.Current?.Log.Info($"Update check did not complete: {e.Message}");
             }
-            
+        }
+
+        private static async Task<bool> IsUpdateAvailableAsync(string username, string repoName)
+        {
+            var address = $"https://api.github.com/repos/{username}/{repoName}/releases/latest";
+
+            var body = await Http.GetStringAsync(address).ConfigureAwait(false);
+
+            var json = JsonConvert.DeserializeObject<LatestReleaseVersion>(body);
+            if (json?.TagName == null) return false;
+
+            Latest = json.TagName;
+
+            // Releases are CalVer tags. Anything that is not a plain version (a prerelease suffix,
+            // a "v" prefix) is not something to prompt the user about.
+            if (!Version.TryParse(Latest, out var latestVersion)) return false;
+            if (!Version.TryParse(Globals.Version, out var currentVersion)) return false;
+
+            return currentVersion < latestVersion;
+        }
+
+        private static HttpClient CreateClient()
+        {
+            var client = new HttpClient { Timeout = TimeSpan.FromSeconds(5) };
+            client.DefaultRequestHeaders.Add("User-Agent", "monocle-for-dynamo");
+            return client;
         }
 
         internal class LatestReleaseVersion

@@ -1,0 +1,9 @@
+<Project>
+	<!-- Shared assembly metadata for every project under src\. -->
+	<PropertyGroup>
+		<AssemblyVersion>2026.6.1</AssemblyVersion>
+		<FileVersion>2026.6.1</FileVersion>
+		<Copyright>Copyright© 2026 john pierson</Copyright>
+		<Company>john pierson</Company>
+	</PropertyGroup>
+</Project>
