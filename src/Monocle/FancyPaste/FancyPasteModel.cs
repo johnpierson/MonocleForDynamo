@@ -47,8 +47,26 @@ namespace MonocleViewExtension.FancyPaste
             switch (command)
             {
                 case "PasteWithoutWires":
-                    clipBoard.RemoveAll(n => n is ConnectorModel);
-                    dynamoViewModel.Model.Paste();
+                    // Dynamo exposes its clipboard collection directly. Filter it only
+                    // for this paste and restore the same objects and order afterwards.
+                    var clipboardSnapshot = clipBoard.ToList();
+                    try
+                    {
+                        foreach (var connector in clipboardSnapshot.OfType<ConnectorModel>().ToList())
+                        {
+                            clipBoard.Remove(connector);
+                        }
+
+                        dynamoViewModel.Model.Paste();
+                    }
+                    finally
+                    {
+                        clipBoard.Clear();
+                        foreach (var item in clipboardSnapshot)
+                        {
+                            clipBoard.Add(item);
+                        }
+                    }
                     break;
             }
         }

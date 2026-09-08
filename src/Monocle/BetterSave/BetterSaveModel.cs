@@ -7,6 +7,7 @@ using System.Windows.Shapes;
 using Dynamo.Controls;
 using Dynamo.Core;
 using Dynamo.Graph;
+using Dynamo.Logging;
 using Dynamo.Models;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
@@ -38,13 +39,22 @@ namespace MonocleViewExtension.BetterSave
 
             var originalName = dynamoViewModel.CurrentSpace.FileName;
 
-            var timestamp = $"{DateTime.Now.ToString(Globals.QuickSaveDateFormat)}.dyn";
-
-            var nameWithTimestamp = originalName.Replace(".dyn", timestamp);
-
             switch (command)
             {
                 case "QuickSave":
+                    string nameWithTimestamp;
+                    try
+                    {
+                        nameWithTimestamp = QuickSavePathBuilder.Build(
+                            originalName,
+                            Globals.QuickSaveDateFormat,
+                            DateTime.Now);
+                    }
+                    catch (ArgumentException exception)
+                    {
+                        LogMessage.Warning($"Unable to create Quick Save path: {exception.Message}", WarningLevel.Mild);
+                        return;
+                    }
 #if !D212_OR_GREATER
                     dynamoViewModel.SaveAs(nameWithTimestamp, true);
 #endif

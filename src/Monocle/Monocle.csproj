@@ -364,6 +364,7 @@
 		<DynVersion>$(DynamoVersion)</DynVersion>
 		<BuildOutput>$(DynamoOutput)</BuildOutput>
 		<FolderPackages>$(MSBuildProjectDirectory)\..\..\deploy\$(BuildOutput)\</FolderPackages>
+		<DynamoPackagesPath Condition="'$(DynamoPackagesPath)' == ''">$(ProgramFiles)\Autodesk\Revit 2022\AddIns\DynamoForRevit\DynamoPackages.dll</DynamoPackagesPath>
 	</PropertyGroup>
 	<PropertyGroup>
 		<StartAction>Program</StartAction>
@@ -503,8 +504,8 @@
 		</Reference>
 	</ItemGroup>
 	<ItemGroup>
-		<Reference Include="DynamoPackages">
-			<HintPath>C:\Program Files\Autodesk\Revit 2022\AddIns\DynamoForRevit\DynamoPackages.dll</HintPath>
+		<Reference Include="DynamoPackages" Condition="Exists('$(DynamoPackagesPath)')">
+			<HintPath>$(DynamoPackagesPath)</HintPath>
 			<Private>False</Private>
 		</Reference>
 		<Reference Include="PresentationCore" />
@@ -609,7 +610,8 @@
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</EmbeddedResource>
 	</ItemGroup>
-	<Target Name="CopyFiles" AfterTargets="CoreBuild" Condition="'$(OS)' =='Windows_NT'">
+	<!-- Deployment staging is opt-in so normal builds do not overwrite tracked package files. -->
+	<Target Name="CopyFiles" AfterTargets="CoreBuild" Condition="'$(OS)' =='Windows_NT' And '$(EnableDeploymentCopy)' == 'true'">
 		<Message Text="Build Version $(DynVersion)" Importance="high" />
 		<ItemGroup>
 			<AssemblyFiles Include="$(TargetDir)\MonocleViewExtension.dll" />

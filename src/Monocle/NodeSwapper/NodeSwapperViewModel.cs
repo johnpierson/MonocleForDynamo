@@ -58,6 +58,7 @@ namespace MonocleViewExtension.NodeSwapper
 
         private int _currentStep = 0;
         private NodeSwapperPaintBrush _paintBrush;
+        private bool _isWipedOut;
 
         private WorkspaceView _workspaceView;
         public NodeSwapperViewModel(NodeSwapperModel m, NodeModel node = null)
@@ -128,12 +129,21 @@ namespace MonocleViewExtension.NodeSwapper
 
         private void Wipeout()
         {
-            _workspaceView.MouseLeftButtonUp -= WsViewOnMouseUp;
-            _workspaceView.MouseMove -= WsViewOnMouseMove;
+            if (_isWipedOut) return;
+
+            _isWipedOut = true;
+            if (_workspaceView != null)
+            {
+                _workspaceView.MouseLeftButtonUp -= WsViewOnMouseUp;
+                _workspaceView.MouseMove -= WsViewOnMouseMove;
+            }
             _workspaceView = null;
 
             Model = null;
-            _paintBrush.Close();
+            if (_paintBrush != null)
+            {
+                _paintBrush.Close();
+            }
             _paintBrush = null;
         }
 
@@ -317,12 +327,17 @@ namespace MonocleViewExtension.NodeSwapper
                 {
                     Wipeout();
                 }
+
+                // The first click only chooses the replacement template. Do not let
+                // the second state transition run for the same mouse event.
+                return;
             }
 
             if (_currentStep == 1)
             {
                 NodeToSwap = Model.Selection();
-                if (NodeToSwap != null)
+                if (NodeToSwap != null && NodeToSwapTo != null &&
+                    NodeToSwap.NodeModel.GUID != NodeToSwapTo.NodeModel.GUID)
                 {
                     try
                     {
@@ -338,6 +353,8 @@ namespace MonocleViewExtension.NodeSwapper
                 {
                     Wipeout();
                 }
+
+                return;
             }
 
             if (_currentStep == 2)

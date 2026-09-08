@@ -10,15 +10,16 @@
 	<FileVersion>2026.6.1</FileVersion>
   </PropertyGroup>
   
- <PropertyGroup>
+  <PropertyGroup>
         <StartAction>Program</StartAction>
         <!--<StartProgram>C:\Users\johnpierson\Desktop\Autodesk\DynamoCoreRuntime3.0.4\DynamoSandbox.exe</StartProgram>-->
 		<StartProgram>C:\Users\johnpierson\Desktop\Autodesk\DynamoCoreRuntime3.1.0\DynamoSandbox.exe</StartProgram>
+		<DynamoPackagesPath Condition="'$(DynamoPackagesPath)' == ''">$(ProgramFiles)\Autodesk\Revit 2022\AddIns\DynamoForRevit\DynamoPackages.dll</DynamoPackagesPath>
     </PropertyGroup>
 
   <ItemGroup>
-      <Reference Include="DynamoPackages">
-      <HintPath>C:\Program Files\Autodesk\Revit 2022\AddIns\DynamoForRevit\DynamoPackages.dll</HintPath>
+      <Reference Include="DynamoPackages" Condition="Exists('$(DynamoPackagesPath)')">
+      <HintPath>$(DynamoPackagesPath)</HintPath>
       <Private>False</Private>
     </Reference>
     <PackageReference Include="DynamoVisualProgramming.Core" Version="2.12.1.8246" />

@@ -166,7 +166,8 @@ namespace MonocleViewExtension.Foca
                         }
                     }
 
-                    codeBlock = new CodeBlockNodeModel($"//{nodeModel.CachedValue.StringData};Revit.Elements.ElementSelector.ByElementId({elementId});", 0, 0, DynamoViewModel.Model.LibraryServices, DynamoViewModel.Model.CurrentWorkspace.ElementResolver);
+                    var elementCode = FocaCodeGenerator.BuildRevitElementCode(nodeModel.CachedValue.StringData, elementId);
+                    codeBlock = new CodeBlockNodeModel(elementCode, 0, 0, DynamoViewModel.Model.LibraryServices, DynamoViewModel.Model.CurrentWorkspace.ElementResolver);
                 }
                 catch (Exception)
                 {
