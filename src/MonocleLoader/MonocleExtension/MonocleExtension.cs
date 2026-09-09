@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using Dynamo.Extensions;
+using Dynamo.Logging;
 using System.Net;
 
 namespace MonocleExtension
@@ -47,7 +48,17 @@ namespace MonocleExtension
                 Global.DynamoVersion = dynamoCore.GetName().Version;
 
                 // Download the view extension built for this Dynamo major/minor version.
-                DownloadFile(Global.TruncatedDynVersion, Global.MonocleViewExtensionDll);
+                try
+                {
+                    DownloadFile(Global.TruncatedDynVersion, Global.MonocleViewExtensionDll);
+                }
+                catch (WebException exception)
+                {
+                    LogMessage.Warning(
+                        $"Monocle does not have a view extension build for Dynamo {Global.TruncatedDynVersion}. " +
+                        $"The extension will remain unavailable until a matching build is published: {exception.Message}",
+                        WarningLevel.Mild);
+                }
             }
         }
         internal void DownloadFile(string version, string fileLocation)
