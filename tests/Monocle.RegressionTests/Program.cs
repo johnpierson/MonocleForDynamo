@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Media;
+using MonocleExtension;
 using MonocleViewExtension.BetterSave;
 using MonocleViewExtension.Foca;
 using MonocleViewExtension.NodeDocumentation;
@@ -22,6 +23,7 @@ namespace Monocle.RegressionTests
                 TestQuickSavePathConstruction(testRoot);
                 TestDocumentationHelpers(testRoot);
                 TestFocaCodeGeneration();
+                TestDynamoBuildVersionFallbacks();
                 TestSettingsRoundTripAndAtomicLoad(testRoot);
                 Console.WriteLine("Monocle regression tests passed.");
                 return 0;
@@ -79,6 +81,18 @@ namespace Monocle.RegressionTests
         {
             var code = FocaCodeGenerator.BuildRevitElementCode("Element\r\nselected", 42);
             Assert(code == "//Element  selected\nRevit.Elements.ElementSelector.ByElementId(42);", "FOCA generated executable code inside the comment.");
+        }
+
+        private static void TestDynamoBuildVersionFallbacks()
+        {
+            var candidates = DynamoBuildVersionResolver.GetCandidates(new Version(3, 7, 0)).ToArray();
+            var expected = new[] { "3.7", "3.6", "3.5", "3.4", "3.3", "3.2", "3.1", "3.0" };
+
+            Assert(candidates.SequenceEqual(expected), "Dynamo build fallback candidates were not ordered from closest to oldest.");
+
+            var fourPointZeroCandidates = DynamoBuildVersionResolver.GetCandidates(new Version(4, 0, 0)).ToArray();
+            Assert(fourPointZeroCandidates.SequenceEqual(new[] { "4.0" }), "Dynamo build fallback crossed below the major version boundary.");
+            AssertThrows<ArgumentNullException>(() => DynamoBuildVersionResolver.GetCandidates(null).ToArray(), "Null Dynamo versions were accepted.");
         }
 
         private static void TestSettingsRoundTripAndAtomicLoad(string testRoot)
