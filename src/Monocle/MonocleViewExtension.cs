@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Dynamo.Logging;
 using Dynamo.PackageManager;
+using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.About;
 using MonocleViewExtension.BetterSave;
@@ -16,6 +17,7 @@ using MonocleViewExtension.Foca;
 using MonocleViewExtension.GraphInformation;
 using MonocleViewExtension.GraphResizerer;
 using MonocleViewExtension.InlineNodeConnectomatic;
+using MonocleViewExtension.LocalGroupNaming;
 using MonocleViewExtension.MonocleSettings;
 using MonocleViewExtension.NodeDocumentation;
 using MonocleViewExtension.NodeSwapper;
@@ -33,10 +35,12 @@ namespace MonocleViewExtension
 
         private StandardViewsViewModel standardViewsViewModel;
         private bool settingsInitialized;
+        private LocalLlamaServerClient localGroupNamingClient;
 
         public void Dispose()
         {
             standardViewsViewModel?.Dispose();
+            localGroupNamingClient?.Dispose();
             AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomainOnAssemblyResolve;
 #if net8 || net10
             System.Runtime.Loader.AssemblyLoadContext.Default.Resolving -= AssemblyLoadContext_Resolving;
@@ -128,7 +132,30 @@ namespace MonocleViewExtension
             PackageUsageCommand.AddMenuItem(monocleMenuItem, p);
             GraphResizererCommand.AddMenuItem(monocleMenuItem, p);
             NodeSwapperCommand.AddMenuItem(monocleMenuItem, p);
-            FocaCommand.EnableFoca(p, monocleMenuItem);
+            //local group naming is optional; a bad configuration (e.g. only one of its
+            //environment variables set) must not stop the rest of monocle from loading.
+            LocalModelProvisioner localModelProvisioner = null;
+            try
+            {
+                var localGroupNamingOptions = LocalLlamaServerOptions.CreateDefault();
+                localModelProvisioner = new LocalModelProvisioner(localGroupNamingOptions);
+                localGroupNamingClient = new LocalLlamaServerClient(localGroupNamingOptions);
+            }
+            catch (Exception e)
+            {
+                (p.DynamoWindow.DataContext as DynamoViewModel)?.Model.Logger.LogWarning(
+                    $"Monocle- Local group naming is unavailable: {e.Message}", WarningLevel.Mild);
+            }
+
+            FocaCommand.EnableFoca(p, monocleMenuItem, localGroupNamingClient);
+            if (localGroupNamingClient != null)
+            {
+                LocalGroupNamingCommand.AddModelToggle(
+                    monocleMenuItem,
+                    p,
+                    localGroupNamingClient,
+                    localModelProvisioner);
+            }
             InlineNodeConnectomaticCommand.AddMenuItem(p, monocleMenuItem);
             SimpleSearchCommand.AddMenuItem(p, monocleMenuItem, this);
             //TODO: Check if standard views consistently loads on different file changes

@@ -38,6 +38,10 @@ jobs:
       - name: Setup MSBuild for .NET Framework
         uses: microsoft/setup-msbuild@v1.3
 
+      - name: Run local group naming tests
+        if: matrix.configuration == 'Release 4.2'
+        run: dotnet run --project tests/Monocle.LocalGroupNaming.Tests/Monocle.LocalGroupNaming.Tests.csproj --configuration Release
+
       - name: Build canonical project
         shell: pwsh
         run: >-
