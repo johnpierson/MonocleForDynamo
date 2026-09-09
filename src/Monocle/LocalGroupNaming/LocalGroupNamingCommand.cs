@@ -102,33 +102,93 @@ namespace MonocleViewExtension.LocalGroupNaming
             if (group == null) throw new ArgumentNullException(nameof(group));
             if (client == null) throw new ArgumentNullException(nameof(client));
 
-            var nodeNames = group.Nodes
+            if (!client.TryCaptureSessionGeneration(out var sessionGeneration)) return;
+
+            var request = CaptureRequest(group, sessionGeneration);
+            await SuggestAndRenameAsync(
+                owner,
+                dynamoViewModel,
+                request,
+                client,
+                CancellationToken.None).ConfigureAwait(false);
+        }
+
+        internal static LocalGroupNamingRequest CaptureRequest(AnnotationModel group, long sessionGeneration)
+        {
+            if (group == null) throw new ArgumentNullException(nameof(group));
+
+            var nodes = group.Nodes
                 .OfType<NodeModel>()
-                .Select(node => node.Name)
+                .Select(node => new LocalGroupNodeSnapshot(node.GUID, node.Name))
                 .ToList();
+
+            return new LocalGroupNamingRequest(
+                group.GUID,
+                group.AnnotationText,
+                nodes,
+                sessionGeneration);
+        }
+
+        internal static async Task SuggestAndRenameAsync(
+            Window owner,
+            DynamoViewModel dynamoViewModel,
+            LocalGroupNamingRequest request,
+            LocalLlamaServerClient client,
+            CancellationToken cancellationToken)
+        {
+            if (owner == null) throw new ArgumentNullException(nameof(owner));
+            if (dynamoViewModel == null) throw new ArgumentNullException(nameof(dynamoViewModel));
+            if (request == null) throw new ArgumentNullException(nameof(request));
+            if (client == null) throw new ArgumentNullException(nameof(client));
 
             // The create-groups flyout also supports empty groups. Keep its configured
             // title when there are no node names from which to infer a purpose.
-            if (nodeNames.Count == 0) return;
+            if (request.NodeNames.Count == 0) return;
 
-            var indicator = new LocalGroupNamingIndicator(owner);
-            indicator.Show();
+            LocalGroupNamingIndicator indicator = null;
             try
             {
-                var prompt = GroupNamingPromptBuilder.Build(nodeNames);
-                var suggestion = await RequestValidNameAsync(client, prompt, nodeNames).ConfigureAwait(false);
+                cancellationToken.ThrowIfCancellationRequested();
+                if (!client.IsSessionCurrent(request.SessionGeneration)) return;
+                if (!IsCurrentRequestState(owner, dynamoViewModel, request, client)) return;
 
                 owner.Dispatcher.Invoke(() =>
                 {
-                    if (!owner.IsLoaded) return;
+                    if (!owner.IsLoaded || !client.IsSessionCurrent(request.SessionGeneration)) return;
+
+                    indicator = new LocalGroupNamingIndicator(owner);
+                    indicator.Show();
+                });
+                if (indicator == null) return;
+
+                var prompt = GroupNamingPromptBuilder.Build(request.NodeNames);
+                var suggestion = await RequestValidNameAsync(
+                    client,
+                    prompt,
+                    request.NodeNames,
+                    cancellationToken).ConfigureAwait(false);
+
+                owner.Dispatcher.Invoke(() =>
+                {
+                    if (!owner.IsLoaded || !client.IsSessionCurrent(request.SessionGeneration)) return;
 
                     // The user may have undone, deleted, or switched away from the
-                    // group while the model was thinking; skip the rename then.
+                    // group, edited its title, or changed its nodes while the model
+                    // was thinking; skip the rename then.
                     var annotations = dynamoViewModel.CurrentSpaceViewModel?.Annotations;
-                    if (annotations == null || annotations.All(a => a.AnnotationModel.GUID != group.GUID)) return;
+                    var currentGroup = annotations?
+                        .FirstOrDefault(a => a.AnnotationModel.GUID == request.GroupId)?
+                        .AnnotationModel;
+                    if (currentGroup == null) return;
+                    if (!LocalGroupNamingState.ShouldApplySuggestion(
+                            request,
+                            client.IsSessionCurrent(request.SessionGeneration),
+                            currentGroup.GUID,
+                            currentGroup.AnnotationText,
+                            CaptureNodeSnapshots(currentGroup))) return;
 
                     var updateCommand = new DynamoModel.UpdateModelValueCommand(
-                        group.GUID,
+                        request.GroupId,
                         "TextBlockText",
                         suggestion);
                     dynamoViewModel.Model.ExecuteCommand(updateCommand);
@@ -140,12 +200,12 @@ namespace MonocleViewExtension.LocalGroupNaming
             }
             catch (Exception exception)
             {
-                if (client.IsEnabled && !owner.Dispatcher.HasShutdownStarted)
+                if (client.IsSessionCurrent(request.SessionGeneration) && !owner.Dispatcher.HasShutdownStarted)
                 {
                     owner.Dispatcher.Invoke(() =>
                     {
-                        indicator.Dismiss();
-                        if (!owner.IsLoaded) return;
+                        indicator?.Dismiss();
+                        if (!owner.IsLoaded || !client.IsSessionCurrent(request.SessionGeneration)) return;
 
                         MessageBox.Show(
                             owner,
@@ -158,20 +218,61 @@ namespace MonocleViewExtension.LocalGroupNaming
             }
             finally
             {
-                if (!owner.Dispatcher.HasShutdownStarted)
+                if (indicator != null && !owner.Dispatcher.HasShutdownStarted)
                 {
                     owner.Dispatcher.Invoke(indicator.Dismiss);
                 }
             }
         }
 
+        private static bool IsCurrentRequestState(
+            Window owner,
+            DynamoViewModel dynamoViewModel,
+            LocalGroupNamingRequest request,
+            LocalLlamaServerClient client)
+        {
+            if (!client.IsSessionCurrent(request.SessionGeneration) || owner.Dispatcher.HasShutdownStarted)
+            {
+                return false;
+            }
+
+            var isCurrent = false;
+            owner.Dispatcher.Invoke(() =>
+            {
+                if (!owner.IsLoaded || !client.IsSessionCurrent(request.SessionGeneration)) return;
+
+                var currentGroup = dynamoViewModel.CurrentSpaceViewModel?.Annotations?
+                    .FirstOrDefault(a => a.AnnotationModel.GUID == request.GroupId)?
+                    .AnnotationModel;
+                if (currentGroup == null) return;
+
+                isCurrent = LocalGroupNamingState.ShouldApplySuggestion(
+                    request,
+                    client.IsSessionCurrent(request.SessionGeneration),
+                    currentGroup.GUID,
+                    currentGroup.AnnotationText,
+                    CaptureNodeSnapshots(currentGroup));
+            });
+
+            return isCurrent;
+        }
+
+        private static List<LocalGroupNodeSnapshot> CaptureNodeSnapshots(AnnotationModel group)
+        {
+            return group.Nodes
+                .OfType<NodeModel>()
+                .Select(node => new LocalGroupNodeSnapshot(node.GUID, node.Name))
+                .ToList();
+        }
+
         private static async Task<string> RequestValidNameAsync(
             LocalLlamaServerClient client,
             string prompt,
-            IReadOnlyList<string> nodeNames)
+            IReadOnlyList<string> nodeNames,
+            CancellationToken cancellationToken)
         {
             var response = await client
-                .SuggestNameAsync(prompt, CancellationToken.None)
+                .SuggestNameAsync(prompt, cancellationToken)
                 .ConfigureAwait(false);
             if (TryGetValidName(response, nodeNames, out var suggestion, out var validationError))
             {
@@ -180,7 +281,7 @@ namespace MonocleViewExtension.LocalGroupNaming
 
             var retryPrompt = GroupNamingPromptBuilder.BuildRetry(prompt, response);
             response = await client
-                .SuggestNameAsync(retryPrompt, CancellationToken.None)
+                .SuggestNameAsync(retryPrompt, cancellationToken)
                 .ConfigureAwait(false);
             if (TryGetValidName(response, nodeNames, out suggestion, out validationError))
             {

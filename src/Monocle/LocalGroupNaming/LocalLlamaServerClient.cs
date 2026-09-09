@@ -23,6 +23,7 @@ namespace MonocleViewExtension.LocalGroupNaming
         private HttpClient httpClient;
         private Process serverProcess;
         private CancellationTokenSource sessionCancellation;
+        private long sessionGeneration;
         private string lastServerError;
         private bool stopRequested;
         private bool disposed;
@@ -32,6 +33,33 @@ namespace MonocleViewExtension.LocalGroupNaming
         public LocalLlamaServerClient(LocalLlamaServerOptions options)
         {
             this.options = options ?? throw new ArgumentNullException(nameof(options));
+        }
+
+        internal bool TryCaptureSessionGeneration(out long generation)
+        {
+            lock (stateLock)
+            {
+                if (!IsEnabled || sessionCancellation == null || sessionCancellation.IsCancellationRequested)
+                {
+                    generation = 0;
+                    return false;
+                }
+
+                generation = sessionGeneration;
+                return true;
+            }
+        }
+
+        internal bool IsSessionCurrent(long generation)
+        {
+            lock (stateLock)
+            {
+                return generation != 0 &&
+                       IsEnabled &&
+                       sessionGeneration == generation &&
+                       sessionCancellation != null &&
+                       !sessionCancellation.IsCancellationRequested;
+            }
         }
 
         public async Task<string> SuggestNameAsync(string prompt, CancellationToken cancellationToken)
@@ -115,19 +143,26 @@ namespace MonocleViewExtension.LocalGroupNaming
         public async Task EnableAsync(CancellationToken cancellationToken)
         {
             ThrowIfDisposed();
-            stopRequested = false;
+            lock (stateLock)
+            {
+                stopRequested = false;
+            }
+
             await EnsureStartedAsync(cancellationToken).ConfigureAwait(false);
-            IsEnabled = true;
+            lock (stateLock)
+            {
+                ThrowIfStopRequested();
+                IsEnabled = true;
+            }
         }
 
         public void Disable()
         {
-            IsEnabled = false;
-            stopRequested = true;
-
             CancellationTokenSource cancellation;
             lock (stateLock)
             {
+                IsEnabled = false;
+                stopRequested = true;
                 cancellation = sessionCancellation;
             }
 
@@ -161,6 +196,7 @@ namespace MonocleViewExtension.LocalGroupNaming
                 lock (stateLock)
                 {
                     ThrowIfStopRequested();
+                    sessionGeneration++;
                     sessionCancellation = cancellation;
                 }
 

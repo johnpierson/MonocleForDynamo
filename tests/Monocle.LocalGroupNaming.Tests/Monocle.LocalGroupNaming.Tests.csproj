@@ -8,6 +8,8 @@
   <ItemGroup>
     <Compile Include="..\..\src\Monocle\LocalGroupNaming\GroupNamingPromptBuilder.cs" Link="GroupNamingPromptBuilder.cs" />
     <Compile Include="..\..\src\Monocle\LocalGroupNaming\GroupNameValidator.cs" Link="GroupNameValidator.cs" />
+    <Compile Include="..\..\src\Monocle\LocalGroupNaming\LocalGroupNamingQueue.cs" Link="LocalGroupNamingQueue.cs" />
+    <Compile Include="..\..\src\Monocle\LocalGroupNaming\LocalGroupNamingRequest.cs" Link="LocalGroupNamingRequest.cs" />
     <Compile Include="..\..\src\Monocle\LocalGroupNaming\LocalModelManifest.cs" Link="LocalModelManifest.cs" />
   </ItemGroup>
 </Project>
