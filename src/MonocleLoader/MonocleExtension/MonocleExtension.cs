@@ -47,20 +47,52 @@ namespace MonocleExtension
 
                 Global.DynamoVersion = dynamoCore.GetName().Version;
 
-                // Download the view extension built for this Dynamo major/minor version.
+                // Download the exact view extension build, then fall back to older minor versions
+                // of the same Dynamo major version when the exact build is not published.
                 try
                 {
-                    DownloadFile(Global.TruncatedDynVersion, Global.MonocleViewExtensionDll);
+                    var downloadedVersion = DownloadClosestBuild(Global.DynamoVersion, Global.MonocleViewExtensionDll);
+                    if (!string.Equals(downloadedVersion, Global.TruncatedDynVersion, StringComparison.Ordinal))
+                    {
+                        LogMessage.Warning(
+                            $"Monocle is using the Dynamo {downloadedVersion} view extension build for Dynamo {Global.TruncatedDynVersion}.",
+                            WarningLevel.Mild);
+                    }
                 }
                 catch (WebException exception)
                 {
                     LogMessage.Warning(
-                        $"Monocle does not have a view extension build for Dynamo {Global.TruncatedDynVersion}. " +
-                        $"The extension will remain unavailable until a matching build is published: {exception.Message}",
+                        $"Monocle does not have a view extension build for Dynamo {Global.TruncatedDynVersion} " +
+                        $"or an older compatible build. The extension will remain unavailable: {exception.Message}",
                         WarningLevel.Mild);
                 }
             }
         }
+
+        internal string DownloadClosestBuild(Version dynamoVersion, string fileLocation)
+        {
+            var candidates = new System.Collections.Generic.List<string>(DynamoBuildVersionResolver.GetCandidates(dynamoVersion));
+            WebException lastException = null;
+
+            foreach (var candidate in candidates)
+            {
+                try
+                {
+                    DownloadFile(candidate, fileLocation);
+                    return candidate;
+                }
+                catch (WebException exception)
+                {
+                    lastException = exception;
+                }
+            }
+
+            throw new WebException(
+                $"Tried Dynamo build versions: {string.Join(", ", candidates)}. " +
+                $"The most recent download failed: {lastException?.Message}",
+                lastException);
+        }
+
         internal void DownloadFile(string version, string fileLocation)
         {
             FileInfo fileInfo = new FileInfo(fileLocation);

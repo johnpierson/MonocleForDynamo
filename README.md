@@ -20,7 +20,7 @@ This tool is not affiliated with Autodesk and was written and provided in a pers
 This code is licensed primarily under [BSD 3-Clause](https://github.com/johnpierson/MonocleForDynamo/blob/master/LICENSE) with a [Commons Clause License](https://commonsclause.com/) attached to that.
 
 ## Current Version
-The canonical project contains configurations for Dynamo 2.0 through 2.19 (`net48`), Dynamo 3.0 through 3.6 (`net8.0-windows`), Dynamo 3.7 (`net10.0-windows`), and Dynamo 4.0 through 4.2 (`net10.0-windows`). The Windows CI build matrix covers 2.19, 3.6, 3.7, 4.1, and 4.2. These are build targets; Dynamo/Revit host smoke tests are still required for each supported host version.
+The canonical project contains configurations for Dynamo 2.0 through 2.19 (`net48`), Dynamo 3.0 through 3.6 (`net8.0-windows`), Dynamo 3.7 (`net10.0-windows`), and Dynamo 4.0 through 4.2 (`net10.0-windows`). The Windows CI build matrix covers 2.19, 3.6, 3.7, 4.1, and 4.2. These are build targets; Dynamo/Revit host smoke tests are still required for each supported host version. The loader uses the exact major/minor build when available and falls back to the nearest older minor build within the same major version when it is not.
 
 ## Build and Validation
 Build on Windows with the .NET 8 and .NET 10 SDKs, the .NET Framework 4.8 targeting pack, and MSBuild. Restore and build a configuration with:

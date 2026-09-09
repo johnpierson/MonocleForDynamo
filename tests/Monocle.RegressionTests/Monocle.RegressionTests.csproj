@@ -10,6 +10,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="TestStubs.cs" />
+    <Compile Include="..\..\src\MonocleLoader\MonocleExtension\DynamoBuildVersionResolver.cs" Link="DynamoBuildVersionResolver.cs" />
     <Compile Include="..\..\src\Monocle\BetterSave\QuickSavePathBuilder.cs" Link="QuickSavePathBuilder.cs" />
     <Compile Include="..\..\src\Monocle\Foca\FocaCodeGenerator.cs" Link="FocaCodeGenerator.cs" />
     <Compile Include="..\..\src\Monocle\NodeDocumentation\DocumentationImagePaths.cs" Link="DocumentationImagePaths.cs" />
