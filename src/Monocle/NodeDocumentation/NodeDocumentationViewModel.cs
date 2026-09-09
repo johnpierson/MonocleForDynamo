@@ -147,23 +147,42 @@ namespace MonocleViewExtension.NodeDocumentation
         {
             if(!CanDocumentNode) return;
 
-            _nodeDocumentation.FullDescription = ExtendedDescription;
-            //first save dyn
-            Model.SaveDyn(_nodeDocumentation.SampleGraph);
+            if (!TrySynchronizeDocumentation()) return;
 
-            //now save image
-            Model.ExportImage(SelectedImgMode,_nodeDocumentation.SampleGraphImagePath);
-            
-            //then save md if an extended description exists
-            if (!string.IsNullOrWhiteSpace(ExtendedDescription.Trim()))
+            try
             {
-                Model.ExportMd(NodeName, _nodeDocumentation.SampleGraphImage, _nodeDocumentation.MarkdownPath, ExtendedDescription);
+                //first save dyn
+                Model.SaveDyn(_nodeDocumentation.SampleGraph);
+                if (!File.Exists(_nodeDocumentation.SampleGraph))
+                {
+                    throw new IOException($"Dynamo did not export the sample graph to '{_nodeDocumentation.SampleGraph}'.");
+                }
+
+                //now save image
+                Model.ExportImage(SelectedImgMode, _nodeDocumentation.SampleGraphImagePath);
+                if (!File.Exists(_nodeDocumentation.SampleGraphImagePath))
+                {
+                    throw new IOException($"Dynamo did not export the sample image to '{_nodeDocumentation.SampleGraphImagePath}'.");
+                }
+
+                //then save md if an extended description exists
+                if (!string.IsNullOrWhiteSpace(ExtendedDescription))
+                {
+                    Model.ExportMd(NodeName, _nodeDocumentation.SampleGraphImage, _nodeDocumentation.MarkdownPath, ExtendedDescription);
+                }
+                else
+                {
+                    Model.ExportMdForSampleOnly(NodeName, _nodeDocumentation.SampleGraphImage, _nodeDocumentation.MarkdownPath);
+                }
+
+                FileExists = false;
+                NotificationMessage = "Documentation created successfully.";
             }
-            else
+            catch (Exception exception)
             {
-                Model.ExportMdForSampleOnly(NodeName, _nodeDocumentation.SampleGraphImage, _nodeDocumentation.MarkdownPath);
+                FileExists = true;
+                NotificationMessage = $"Documentation export failed: {exception.Message}";
             }
-           
         }
 
         private void OnPickPath(object o)
@@ -184,21 +203,73 @@ namespace MonocleViewExtension.NodeDocumentation
 
         private void CheckIfDocsExist()
         {
-            if (string.IsNullOrWhiteSpace(Path)) return;
+            if (string.IsNullOrWhiteSpace(Path) || string.IsNullOrWhiteSpace(FullNodeName)) return;
+
+            NodeDocumentation documentation;
+            try
+            {
+                documentation = CreateDocumentationFromCurrentValues();
+            }
+            catch (ArgumentException)
+            {
+                return;
+            }
 
             //check if the file exists to alert user
-            var dynPath = System.IO.Path.Combine(Path, $"{FullNodeName}.dyn");
-            var mdPath = System.IO.Path.Combine(Path, $"{FullNodeName}.md");
+            var dynPath = documentation.SampleGraph;
+            var mdPath = documentation.MarkdownPath;
+            var dynExists = File.Exists(dynPath);
+            var mdExists = File.Exists(mdPath);
 
-            FileExists = File.Exists(dynPath);
+            FileExists = dynExists || mdExists;
 
-            if (FileExists)
+            if (dynExists && mdExists)
             {
                 NotificationMessage = "documentation already exists at given location. 🥺";
 
-                _nodeDocumentation.ReadMarkdown();
+                try
+                {
+                    documentation.ReadMarkdown();
+                    ExtendedDescription = documentation.FullDescription;
+                }
+                catch (Exception exception)
+                {
+                    NotificationMessage = $"Documentation exists, but its markdown could not be read: {exception.Message}";
+                }
+            }
+            else if (dynExists)
+            {
+                NotificationMessage = "A sample graph exists, but its markdown file is missing.";
+            }
+            else if (mdExists)
+            {
+                NotificationMessage = "A markdown file exists, but its sample graph is missing.";
+            }
+        }
 
-                ExtendedDescription = _nodeDocumentation.FullDescription;
+        private NodeDocumentation CreateDocumentationFromCurrentValues()
+        {
+            return new NodeDocumentation(Path, FullNodeName, NodeName)
+            {
+                Description = Description,
+                FullDescription = ExtendedDescription
+            };
+        }
+
+        private bool TrySynchronizeDocumentation()
+        {
+            try
+            {
+                var documentation = CreateDocumentationFromCurrentValues();
+                documentation.Validate();
+                _nodeDocumentation = documentation;
+                return true;
+            }
+            catch (Exception exception)
+            {
+                FileExists = true;
+                NotificationMessage = $"Documentation export cannot start: {exception.Message}";
+                return false;
             }
         }
 

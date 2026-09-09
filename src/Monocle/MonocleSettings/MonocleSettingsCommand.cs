@@ -34,9 +34,15 @@ namespace MonocleViewExtension.MonocleSettings
 
                 if (openFileDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
 
+                var previousSettingsFile = Globals.SettingsFile;
                 Globals.SettingsFile = openFileDialog.FileName;
 
-                Settings.LoadMonocleSettings();
+                if (!Settings.LoadMonocleSettings())
+                {
+                    // Keep the active file and the live values aligned when a user
+                    // selects malformed or incompatible settings.
+                    Globals.SettingsFile = previousSettingsFile;
+                }
             };
             settingsFlyout.Items.Add(loadSettings);
 

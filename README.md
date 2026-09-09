@@ -20,7 +20,22 @@ This tool is not affiliated with Autodesk and was written and provided in a pers
 This code is licensed primarily under [BSD 3-Clause](https://github.com/johnpierson/MonocleForDynamo/blob/master/LICENSE) with a [Commons Clause License](https://commonsclause.com/) attached to that.
 
 ## Current Version
-Monocle is currently built against the latest Dynamo stable build. At this time that is 2.17.0. _However, monocle has been tested for Dynamo 2.0.3 - 2.19.0._
+The canonical project contains configurations for Dynamo 2.0 through 2.19 (`net48`), Dynamo 3.0 through 3.6 (`net8.0-windows`), and Dynamo 4.0 through 4.2 (`net10.0-windows`). The Windows CI build matrix covers 2.19, 3.6, 4.1, and 4.2. These are build targets; Dynamo/Revit host smoke tests are still required for each supported host version.
+
+## Build and Validation
+Build on Windows with the .NET 8 and .NET 10 SDKs, the .NET Framework 4.8 targeting pack, and MSBuild. Restore and build a configuration with:
+
+```powershell
+msbuild src/Monocle/Monocle.sln /p:Configuration="Release 4.1" /p:Platform="Any CPU" /p:EnableDeploymentCopy=false /t:Restore,Build
+```
+
+The pure regression checks can run independently of Dynamo:
+
+```powershell
+dotnet run --project tests/Monocle.RegressionTests/Monocle.RegressionTests.csproj --configuration Release
+```
+
+The canonical project does not stage build output into `deploy` unless explicitly requested. For intentional local packaging, pass `/p:EnableDeploymentCopy=true` to the MSBuild command. The Revit `DynamoPackages.dll` reference is optional and defaults to the Revit 2022 install location; set `/p:DynamoPackagesPath="C:\path\to\DynamoPackages.dll"` when it is installed elsewhere. The separate `Monocle-net8.csproj` is retained as a legacy Dynamo 3.0 package project; its post-build copy is disabled by default and can be enabled with `/p:EnableLegacyPostBuildCopy=true /p:LegacyDynamoPackagePath="C:\path\to\MonocleViewExtension.dll"`.
 
 ## Known Issues
 - When installing from the package manager for the first time, you may need to restart Dynamo.

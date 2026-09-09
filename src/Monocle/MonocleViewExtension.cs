@@ -32,6 +32,7 @@ namespace MonocleViewExtension
         public string Name => "Monocle View Extension";
 
         private StandardViewsViewModel standardViewsViewModel;
+        private bool settingsInitialized;
 
         public void Dispose()
         {
@@ -111,7 +112,7 @@ namespace MonocleViewExtension
                 Dynamo.Logging.LogMessage.Warning($"Failed to load settings file from, {Properties.UserSettings.Default.MonocleSettingsFile}. Please check if the file exists. Using default settings instead,", WarningLevel.Mild);
             }
             //load monocle settings from xml
-            Settings.LoadMonocleSettings();
+            settingsInitialized = Settings.LoadMonocleSettings();
 
             //resolve the dynamo version by checking which core is loaded
             var dynamoCore = Assembly.Load("DynamoCore");
@@ -154,7 +155,10 @@ namespace MonocleViewExtension
         public void Shutdown()
         {
             //save monocle settings
-            Settings.SaveMonocleSettings();
+            if (settingsInitialized)
+            {
+                Settings.SaveMonocleSettings();
+            }
         }
 
         internal void ScaffoldTheJacobSmallSpecial(ViewLoadedParams p)

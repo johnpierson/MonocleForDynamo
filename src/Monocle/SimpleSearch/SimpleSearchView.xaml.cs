@@ -39,11 +39,15 @@ namespace MonocleViewExtension.SimpleSearch
         {
             var svm = this.DataContext as SimpleSearchViewModel;
 
+            if (svm == null || this.Nodes.SelectedItems.Count == 0) return;
+
             try
             {
                 var nse = this.Nodes.SelectedItems[0] as NodeSearchElement;
-
-                PlaceNode(svm.dynamoViewModel,nse);
+                if (nse != null)
+                {
+                    PlaceNode(svm.dynamoViewModel,nse);
+                }
             }
             catch (Exception)
             {
@@ -56,15 +60,23 @@ namespace MonocleViewExtension.SimpleSearch
             var svm = this.DataContext as SimpleSearchViewModel;
             if (e.Key == Key.Enter || e.Key == Key.Tab)
             {
-                if (svm.SelectedNode != null)
+                if (svm == null || svm.dynamoViewModel == null) return;
+
+                var selectedNode = svm.SelectedNode;
+                if (selectedNode != null && System.Linq.Enumerable.Contains(
+                    System.Linq.Enumerable.Cast<object>(svm.Nodes), selectedNode))
                 {
-                    PlaceNode(svm.dynamoViewModel, svm.SelectedNode);
+                    PlaceNode(svm.dynamoViewModel, selectedNode);
                 }
                 else
                 {
+                    svm.SelectedNode = null;
                     svm.Nodes.MoveCurrentToFirst();
                     var nse = svm.Nodes.CurrentItem as NodeSearchElement;
-                    PlaceNode(svm.dynamoViewModel, nse);
+                    if (nse != null)
+                    {
+                        PlaceNode(svm.dynamoViewModel, nse);
+                    }
                 }
 
                 this.Filter.Focus();
@@ -73,6 +85,8 @@ namespace MonocleViewExtension.SimpleSearch
 
         private void PlaceNode(DynamoViewModel dvm, NodeSearchElement nse)
         {
+            if (dvm == null || nse == null) return;
+
             var dynMethod = nse.GetType().GetMethod("ConstructNewNodeModel",
                 BindingFlags.NonPublic | BindingFlags.Instance);
             var obj = dynMethod.Invoke(nse, new object[] { });
@@ -108,7 +122,9 @@ namespace MonocleViewExtension.SimpleSearch
             try
             {
                 var svm = this.DataContext as SimpleSearchViewModel;
-                svm.SelectedNode = e.AddedItems as NodeSearchElement;
+                svm.SelectedNode = e.AddedItems.Count > 0
+                    ? e.AddedItems[0] as NodeSearchElement
+                    : null;
             }
             catch (Exception)
             {

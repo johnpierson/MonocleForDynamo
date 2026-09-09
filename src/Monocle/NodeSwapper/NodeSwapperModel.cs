@@ -28,8 +28,10 @@ namespace MonocleViewExtension.NodeSwapper
         public NodeViewModel Selection(string mode = "")
         {
             if (!dynamoViewModel.CurrentSpaceViewModel.HasSelection) return null;
-            
-            return dynamoViewModel.CurrentSpaceViewModel.Nodes.First(n => n.NodeModel.IsSelected);
+
+            // A workspace selection can contain notes or groups without containing a node.
+            // Treat that as no node so callers can cancel cleanly instead of throwing.
+            return dynamoViewModel.CurrentSpaceViewModel.Nodes.FirstOrDefault(n => n.NodeModel.IsSelected);
         }
        
     }

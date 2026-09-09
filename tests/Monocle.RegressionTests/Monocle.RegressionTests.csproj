@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <ImplicitUsings>disable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="TestStubs.cs" />
+    <Compile Include="..\..\src\Monocle\BetterSave\QuickSavePathBuilder.cs" Link="QuickSavePathBuilder.cs" />
+    <Compile Include="..\..\src\Monocle\Foca\FocaCodeGenerator.cs" Link="FocaCodeGenerator.cs" />
+    <Compile Include="..\..\src\Monocle\NodeDocumentation\DocumentationImagePaths.cs" Link="DocumentationImagePaths.cs" />
+    <Compile Include="..\..\src\Monocle\NodeDocumentation\NodeDocumentation.cs" Link="NodeDocumentation.cs" />
+    <Compile Include="..\..\src\Monocle\Utilities\Settings.cs" Link="Settings.cs" />
+  </ItemGroup>
+</Project>

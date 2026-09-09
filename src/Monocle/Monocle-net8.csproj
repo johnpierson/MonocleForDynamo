@@ -37,19 +37,22 @@
         <RevitVersion>2025</RevitVersion>
         <DebugSymbols>true</DebugSymbols>
         <DebugType>full</DebugType>
-        <DefineConstants>$(DefineConstants);net8;net8_OR_GREATER</DefineConstants>
+        <DefineConstants>$(DefineConstants);net8;net8_OR_GREATER;D30_OR_GREATER</DefineConstants>
 		<TargetFrameworkVersion>net48</TargetFrameworkVersion>
     </PropertyGroup>
     <PropertyGroup Condition="$(Configuration.Contains('Release net8'))">
         <DynamoVersion>3.0</DynamoVersion>
         <DynamoOutput>3.0</DynamoOutput>
         <RevitVersion>2025</RevitVersion>
-        <DefineConstants>$(DefineConstants);net8;net8_OR_GREATER</DefineConstants>
+        <DefineConstants>$(DefineConstants);net8;net8_OR_GREATER;D30_OR_GREATER</DefineConstants>
 		<TargetFrameworkVersion>net8.0-windows</TargetFrameworkVersion>
     </PropertyGroup>
 	
 	<PropertyGroup>
 	  <DynVersion>$(DynamoVersion)</DynVersion>
+	  <DynamoPackagesPath Condition="'$(DynamoPackagesPath)' == ''">$(ProgramFiles)\Autodesk\Revit 2022\AddIns\DynamoForRevit\DynamoPackages.dll</DynamoPackagesPath>
+	  <LegacyDynamoPackagePath Condition="'$(LegacyDynamoPackagePath)' == ''">$(LOCALAPPDATA)\Dynamo\Dynamo Core\3.0\packages\Monocle\bin\MonocleViewExtension.dll</LegacyDynamoPackagePath>
+	  <EnableLegacyPostBuildCopy Condition="'$(EnableLegacyPostBuildCopy)' == ''">false</EnableLegacyPostBuildCopy>
 	</PropertyGroup>
     <PropertyGroup>
         <StartAction>Program</StartAction>
@@ -191,8 +194,8 @@
 		</Reference>
 	</ItemGroup>
   <ItemGroup>
-    <Reference Include="DynamoPackages">
-      <HintPath>C:\Program Files\Autodesk\Revit 2022\AddIns\DynamoForRevit\DynamoPackages.dll</HintPath>
+    <Reference Include="DynamoPackages" Condition="Exists('$(DynamoPackagesPath)')">
+      <HintPath>$(DynamoPackagesPath)</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -308,7 +311,8 @@
       <LastGenOutput>UserSettings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy &quot;$(ProjectDir)bin\Debug net8\net8.0-windows\Monocle8.dll&quot; &quot;C:\Users\Johnpierson\AppData\Roaming\Dynamo\Dynamo Core\3.0\packages\Monocle\bin\MonocleViewExtension.dll&quot;&#xD;&#xA;&#xD;&#xA;" />
+  <!-- This legacy project is retained for the older package layout. Local staging is opt-in. -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(EnableLegacyPostBuildCopy)' == 'true'">
+    <Exec Command="copy &quot;$(ProjectDir)bin\Debug net8\net8.0-windows\Monocle8.dll&quot; &quot;$(LegacyDynamoPackagePath)&quot;&#xD;&#xA;&#xD;&#xA;" />
   </Target>
 </Project>

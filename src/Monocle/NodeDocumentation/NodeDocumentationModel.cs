@@ -52,6 +52,7 @@ namespace MonocleViewExtension.NodeDocumentation
             if (mode == 0)
             {
                 DynamoViewModel.SaveImage(path);
+                return;
             }
 
             //export out only the background, this uses a method that is available as far back as Dynamo 2.0.0
@@ -61,47 +62,71 @@ namespace MonocleViewExtension.NodeDocumentation
 
                 ImageSaveEventArgs backgroundImageArgs = new ImageSaveEventArgs(path);
                 DynamoViewModel.OnRequestSave3DImage("dyn", backgroundImageArgs);
+                return;
             }
 
             if (mode == 2)
             {
                 //DynamoViewModel.BackgroundPreviewViewModel.ZoomToFitCommand.Execute(null);
 
-                //rename to indicate background
-                string backgroundPath = path.Replace("img", "b");
-                //export background first
-                ImageSaveEventArgs backgroundImageArgs = new ImageSaveEventArgs(backgroundPath);
-                DynamoViewModel.OnRequestSave3DImage("dyn", backgroundImageArgs);
-
-                //now export graph view
-                string graphViewPath = path.Replace("img", "f");
-                DynamoViewModel.SaveImage(graphViewPath);
-
-                var combined = OverlayImages(backgroundPath, graphViewPath,1.5);
-
-                //save the combined as the original filename
-                SaveBitmapToJpg(combined,path);
-
-                //delete the other files
-                try
-                {
-                    File.Delete(backgroundPath);
-                }
-                catch (Exception)
-                {
-                    //
-                }
+                // Derive temporary siblings from the filename so directory names and
+                // node names containing "img" are left untouched.
+                var backgroundPath = DocumentationImagePaths.BuildTemporaryPath(path, "_background");
+                var graphViewPath = DocumentationImagePaths.BuildTemporaryPath(path, "_foreground");
+                var backgroundExisted = File.Exists(backgroundPath);
+                var graphViewExisted = File.Exists(graphViewPath);
 
                 try
                 {
-                    File.Delete(graphViewPath);
-                }
-                catch (Exception)
-                {
-                    //
-                }
-                
+                    ImageSaveEventArgs backgroundImageArgs = new ImageSaveEventArgs(backgroundPath);
+                    DynamoViewModel.OnRequestSave3DImage("dyn", backgroundImageArgs);
+                    if (!File.Exists(backgroundPath))
+                    {
+                        throw new IOException($"Dynamo did not export the background image to '{backgroundPath}'.");
+                    }
 
+                    DynamoViewModel.SaveImage(graphViewPath);
+                    if (!File.Exists(graphViewPath))
+                    {
+                        throw new IOException($"Dynamo did not export the workspace image to '{graphViewPath}'.");
+                    }
+
+                    var combined = OverlayImages(backgroundPath, graphViewPath, 1.5);
+                    if (combined == null) throw new IOException("The exported images could not be combined.");
+
+                    using (combined)
+                    {
+                        SaveBitmapToJpg(combined, path);
+                    }
+                }
+                finally
+                {
+                    DeleteTemporaryFile(backgroundPath, backgroundExisted);
+                    DeleteTemporaryFile(graphViewPath, graphViewExisted);
+                }
+
+
+                return;
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(mode), mode, "Unsupported image export mode.");
+        }
+
+        private static void DeleteTemporaryFile(string path, bool existedBeforeExport)
+        {
+            if (existedBeforeExport || !File.Exists(path)) return;
+
+            try
+            {
+                File.Delete(path);
+            }
+            catch (IOException exception)
+            {
+                throw new IOException($"The temporary image '{path}' could not be removed.", exception);
+            }
+            catch (UnauthorizedAccessException exception)
+            {
+                throw new UnauthorizedAccessException($"The temporary image '{path}' could not be removed.", exception);
             }
         }
 
