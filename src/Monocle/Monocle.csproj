@@ -11,8 +11,8 @@
 		<AssemblyVersion>2026.6.1</AssemblyVersion>
 		<FileVersion>2026.6.1</FileVersion>
 		<OutputPath>bin\$(Configuration)\</OutputPath>
-		<Configurations>Debug 2.0;Debug 2.1;Debug 2.10;Debug 2.12;Debug 2.13;Debug 2.16;Debug 2.17;Debug 2.18;Debug 2.19;Debug 2.2;Debug 2.3;Debug 2.5;Debug 2.6;Debug 3.0;Debug 3.1;Debug 3.2;Debug 3.3;Debug 3.4;Debug 3.5;Debug 3.6;Debug 3.7;Debug 4.0;Debug 4.1;Debug 4.2</Configurations>
-		<Configurations>$(Configurations);Release 2.0;Release 2.1;Release 2.10;Release 2.12;Release 2.13;Release 2.16;Release 2.17;Release 2.18;Release 2.19;Release 2.2;Release 2.3;Release 2.5;Release 2.6;Release 3.0;Release 3.1;Release 3.2;Release 3.3;Release 3.4;Release 3.5;Release 3.6;Release 3.7;Release 4.0;Release 4.1;Release 4.2</Configurations>
+		<Configurations>Debug 2.0;Debug 2.1;Debug 2.10;Debug 2.12;Debug 2.13;Debug 2.16;Debug 2.17;Debug 2.18;Debug 2.19;Debug 2.2;Debug 2.3;Debug 2.5;Debug 2.6;Debug 3.0;Debug 3.1;Debug 3.2;Debug 3.3;Debug 3.4;Debug 3.5;Debug 3.6;Debug 3.7;Debug 4.0;Debug 4.1;Debug 4.2;Debug 4.3</Configurations>
+		<Configurations>$(Configurations);Release 2.0;Release 2.1;Release 2.10;Release 2.12;Release 2.13;Release 2.16;Release 2.17;Release 2.18;Release 2.19;Release 2.2;Release 2.3;Release 2.5;Release 2.6;Release 3.0;Release 3.1;Release 3.2;Release 3.3;Release 3.4;Release 3.5;Release 3.6;Release 3.7;Release 4.0;Release 4.1;Release 4.2;Release 4.3</Configurations>
 	</PropertyGroup>
 	<PropertyGroup Condition="$(Configuration.Contains('Debug 2.0'))">
 		<DynamoVersion>2.0</DynamoVersion>
@@ -230,6 +230,19 @@
 
 		<TargetFramework>net10.0-windows</TargetFramework>
 	</PropertyGroup>
+	<PropertyGroup Condition="$(Configuration.Contains('Debug 4.3'))">
+		<DynamoVersion>4.3</DynamoVersion>
+		<!-- Dynamo 4.3 has no stable packages yet; pin the exact beta. Remove once 4.3.0 ships. -->
+		<DynamoPackageVersion>4.3.0-beta6513</DynamoPackageVersion>
+		<!-- DynamoVisualProgramming.Core 4.3 requires Newtonsoft.Json >= 13.0.4. -->
+		<NewtonsoftJsonVersion>13.0.4</NewtonsoftJsonVersion>
+		<DynamoOutput>4.3</DynamoOutput>
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<DefineConstants>$(DefineConstants);net10;D20;D20_OR_GREATER;D21_OR_GREATER;D22_OR_GREATER;D23_OR_GREATER;D25_OR_GREATER;D26_OR_GREATER;D210_OR_GREATER;D212_OR_GREATER;D213_OR_GREATER;D216_OR_GREATER;D217_OR_GREATER;D218_OR_GREATER;D219_OR_GREATER;D30_OR_GREATER;D31_OR_GREATER;D32_OR_GREATER;D33_OR_GREATER;D34_OR_GREATER;D40_OR_GREATER;D41_OR_GREATER;D42_OR_GREATER;D43_OR_GREATER</DefineConstants>
+
+		<TargetFramework>net10.0-windows</TargetFramework>
+	</PropertyGroup>
 	<PropertyGroup Condition="$(Configuration.Contains('Release 2.0'))">
 		<DynamoVersion>2.0</DynamoVersion>
 		<DynamoOutput>2.0</DynamoOutput>
@@ -374,9 +387,21 @@
 		<DefineConstants>$(DefineConstants);net10;D20;D20_OR_GREATER;D21_OR_GREATER;D22_OR_GREATER;D23_OR_GREATER;D25_OR_GREATER;D26_OR_GREATER;D210_OR_GREATER;D212_OR_GREATER;D213_OR_GREATER;D216_OR_GREATER;D217_OR_GREATER;D218_OR_GREATER;D219_OR_GREATER;D30_OR_GREATER;D31_OR_GREATER;D32_OR_GREATER;D33_OR_GREATER;D34_OR_GREATER;D40_OR_GREATER;D41_OR_GREATER;D42_OR_GREATER</DefineConstants>
 		<TargetFramework>net10.0-windows</TargetFramework>
 	</PropertyGroup>
+	<PropertyGroup Condition="$(Configuration.Contains('Release 4.3'))">
+		<DynamoVersion>4.3</DynamoVersion>
+		<!-- Dynamo 4.3 has no stable packages yet; pin the exact beta. Remove once 4.3.0 ships. -->
+		<DynamoPackageVersion>4.3.0-beta6513</DynamoPackageVersion>
+		<!-- DynamoVisualProgramming.Core 4.3 requires Newtonsoft.Json >= 13.0.4. -->
+		<NewtonsoftJsonVersion>13.0.4</NewtonsoftJsonVersion>
+		<DynamoOutput>4.3</DynamoOutput>
+		<DefineConstants>$(DefineConstants);net10;D20;D20_OR_GREATER;D21_OR_GREATER;D22_OR_GREATER;D23_OR_GREATER;D25_OR_GREATER;D26_OR_GREATER;D210_OR_GREATER;D212_OR_GREATER;D213_OR_GREATER;D216_OR_GREATER;D217_OR_GREATER;D218_OR_GREATER;D219_OR_GREATER;D30_OR_GREATER;D31_OR_GREATER;D32_OR_GREATER;D33_OR_GREATER;D34_OR_GREATER;D40_OR_GREATER;D41_OR_GREATER;D42_OR_GREATER;D43_OR_GREATER</DefineConstants>
+		<TargetFramework>net10.0-windows</TargetFramework>
+	</PropertyGroup>
 
 	<PropertyGroup>
 		<DynVersion>$(DynamoVersion)</DynVersion>
+		<DynamoPackageVersion Condition="'$(DynamoPackageVersion)' == ''">$(DynVersion).*</DynamoPackageVersion>
+		<NewtonsoftJsonVersion Condition="'$(NewtonsoftJsonVersion)' == ''">13.0.1</NewtonsoftJsonVersion>
 		<BuildOutput>$(DynamoOutput)</BuildOutput>
 		<FolderPackages>$(MSBuildProjectDirectory)\..\..\deploy\$(BuildOutput)\</FolderPackages>
 		<DynamoPackagesPath Condition="'$(DynamoPackagesPath)' == ''">$(ProgramFiles)\Autodesk\Revit 2022\AddIns\DynamoForRevit\DynamoPackages.dll</DynamoPackagesPath>
@@ -455,10 +480,10 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Cyotek.Drawing.BitmapFont" Version="2.0.0" />
-		<PackageReference Include="DynamoVisualProgramming.Core" Version="$(DynVersion).*" />
-		<PackageReference Include="DynamoVisualProgramming.DynamoServices" Version="$(DynVersion).*" />
-		<PackageReference Include="DynamoVisualProgramming.WpfUILibrary" Version="$(DynVersion).*" />
-		<PackageReference Include="DynamoVisualProgramming.ZeroTouchLibrary" Version="$(DynVersion).*" />
+		<PackageReference Include="DynamoVisualProgramming.Core" Version="$(DynamoPackageVersion)" />
+		<PackageReference Include="DynamoVisualProgramming.DynamoServices" Version="$(DynamoPackageVersion)" />
+		<PackageReference Include="DynamoVisualProgramming.WpfUILibrary" Version="$(DynamoPackageVersion)" />
+		<PackageReference Include="DynamoVisualProgramming.ZeroTouchLibrary" Version="$(DynamoPackageVersion)" />
 		<PackageReference Include="Prism" Version="4.1.0.0" />
 		<PackageReference Include="SharpDX" Version="4.2.0" />
 		<PackageReference Include="SharpDX.D3DCompiler" Version="4.2.0" />
@@ -480,7 +505,7 @@
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows' Or '$(TargetFramework)' == 'net10.0-windows'">
 		<PackageReference Include="CommonServiceLocator" Version="2.0.7" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+		<PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonVersion)" />
 		<PackageReference Include="NUnit" Version="3.14.0" />
 		<PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
 		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
