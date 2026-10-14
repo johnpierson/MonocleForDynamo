@@ -92,6 +92,8 @@ namespace Monocle.RegressionTests
 
             var fourPointZeroCandidates = DynamoBuildVersionResolver.GetCandidates(new Version(4, 0, 0)).ToArray();
             Assert(fourPointZeroCandidates.SequenceEqual(new[] { "4.0" }), "Dynamo build fallback crossed below the major version boundary.");
+            var fourPointThreeCandidates = DynamoBuildVersionResolver.GetCandidates(new Version(4, 3, 0)).ToArray();
+            Assert(fourPointThreeCandidates.SequenceEqual(new[] { "4.3", "4.2", "4.1", "4.0" }), "Dynamo 4.3 build fallback candidates were not ordered from closest to oldest.");
             AssertThrows<ArgumentNullException>(() => DynamoBuildVersionResolver.GetCandidates(null).ToArray(), "Null Dynamo versions were accepted.");
         }
 
