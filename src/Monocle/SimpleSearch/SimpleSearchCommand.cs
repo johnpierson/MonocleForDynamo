@@ -12,7 +12,6 @@ using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using Dynamo.Wpf.Interfaces;
 using MonocleViewExtension.Utilities;
-using Xceed.Wpf.AvalonDock.Controls;
 
 namespace MonocleViewExtension.SimpleSearch
 {
@@ -70,6 +69,8 @@ namespace MonocleViewExtension.SimpleSearch
 
             if (Globals.InCanvasSearchEnabled)
             {
+                // Only registers the Shift+Space binding; the popup (and its sorted copy of the whole library)
+                // is created the first time it is actually used, not during Dynamo startup.
                 BuildPopup(p);
             }
             
@@ -165,19 +166,6 @@ namespace MonocleViewExtension.SimpleSearch
 
             var dvm = p.DynamoWindow.DataContext as DynamoViewModel;
 
-            var newSSView = new SimpleSearchView(dvm);
-            SimpleSearchPopup = new Popup
-            {
-                Child = newSSView,
-                Placement = PlacementMode.MousePoint,
-                IsOpen = false,
-                StaysOpen = false,
-                MaxWidth = 250,
-                MaxHeight = 400,
-                MinWidth = 250,
-                MinHeight = 400
-            };
-          
             try
             {
                 var bindingInCanvs = new CommandBinding(new RoutedUICommand(Header, "SimpleSearchCanvasCommand",
@@ -188,10 +176,9 @@ namespace MonocleViewExtension.SimpleSearch
                 bindingInCanvs.Executed += (sender, args) =>
                 {
                     //don't fire off command if the user is editing a code block
-                    var codeBlockEdits = view.FindVisualChildren<CodeBlockEditor>().ToList();
+                    //(walk up from the focused element instead of searching the whole window on every keypress)
+                    if ((Keyboard.FocusedElement as DependencyObject)?.FindVisualAncestor<CodeBlockEditor>() != null) return;
 
-                    if (codeBlockEdits.Any(c => c.IsKeyboardFocusWithin)) return;
-                    
 
                     SimpleSearchInCanvas(p, dvm);
                 };
@@ -214,8 +201,24 @@ namespace MonocleViewExtension.SimpleSearch
                 return;
             }
 
+            if (SimpleSearchPopup == null)
+            {
+                SimpleSearchPopup = new Popup
+                {
+                    Child = new SimpleSearchView(viewModel),
+                    Placement = PlacementMode.MousePoint,
+                    IsOpen = false,
+                    StaysOpen = false,
+                    MaxWidth = 250,
+                    MaxHeight = 400,
+                    MinWidth = 250,
+                    MinHeight = 400
+                };
+            }
+
             Dispatcher.CurrentDispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, new Action(() =>
             {
+                (SimpleSearchPopup.Child as SimpleSearchView)?.RefreshSelection();
                 SimpleSearchPopup.Child.Visibility = Visibility.Visible;
                 SimpleSearchPopup.Child.UpdateLayout();
                 SimpleSearchPopup.IsOpen = true;

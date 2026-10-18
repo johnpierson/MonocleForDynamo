@@ -4,8 +4,10 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using Dynamo.Extensions;
 using Dynamo.Graph.Nodes;
+using Dynamo.Graph.Workspaces;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
 using MonocleViewExtension.Utilities;
@@ -18,6 +20,8 @@ namespace MonocleViewExtension.PackageUsage
     {
         public PackageUsageModel Model { get; set; }
         private readonly ReadyParams _readyParams;
+        private IWorkspaceModel _subscribedWorkspace;
+        private readonly DispatcherTimer _refreshTimer;
 
         public DelegateCommand AnnotateNodes { get; set; }
         public DelegateCommand ClearNotes { get; set; }
@@ -87,10 +91,10 @@ namespace MonocleViewExtension.PackageUsage
                             "/MonocleViewExtension;component/PackageUsage/DogeImages/dogePreview.png",
                             "/MonocleViewExtension;component/PackageUsage/DogeImages/dogePreview.png",
                             "/MonocleViewExtension;component/PackageUsage/DogeImages/dogePreview.png",
-                            "/MonocleViewExtension;component/PackageUsage/DogeImages/doge_halloween.gif",
+                            "/MonocleViewExtension;component/PackageUsage/DogeImages/doge_halloween.png",
                         };
-                        var selector = randomHalloween.Next(3);
-                        return day == 1 ? "/MonocleViewExtension;component/PackageUsage/DogeImages/dwight-pumpkin.gif" : possibleHalloween[selector];
+                        var selector = randomHalloween.Next(possibleHalloween.Count);
+                        return day == 1 ? "/MonocleViewExtension;component/PackageUsage/DogeImages/dwight-pumpkin.png" : possibleHalloween[selector];
                       
                     case 12:                       
                         return "/MonocleViewExtension;component/PackageUsage/DogeImages/doge_christmas.jpg";
@@ -104,12 +108,12 @@ namespace MonocleViewExtension.PackageUsage
                             "/MonocleViewExtension;component/PackageUsage/DogeImages/dogePreview.png",
                             "/MonocleViewExtension;component/PackageUsage/DogeImages/doge_dapper.jpg",
                             "/MonocleViewExtension;component/PackageUsage/DogeImages/doge_business.jpg",
-                            "/MonocleViewExtension;component/PackageUsage/DogeImages/doge-comfort.png",
-                            "/MonocleViewExtension;component/PackageUsage/DogeImages/doge-comfort.png",
+                            "/MonocleViewExtension;component/PackageUsage/DogeImages/doge-comfort.jpg",
+                            "/MonocleViewExtension;component/PackageUsage/DogeImages/doge-comfort.jpg",
                             "/MonocleViewExtension;component/PackageUsage/DogeImages/doge_heaven.jpg",
                             "/MonocleViewExtension;component/PackageUsage/DogeImages/cheems_heaven.jpg"
                         };
-                        return possibleOthers[rand.Next(7)];
+                        return possibleOthers[rand.Next(possibleOthers.Count)];
                 }
             }
         }
@@ -123,8 +127,12 @@ namespace MonocleViewExtension.PackageUsage
             ActiveCustomNodes = Model.GetCustomNodeInfos();
             PackagesInUse = string.Join("\n", ActiveCustomNodes.OrderBy(c => c.PackageName).Select(c => c.PackageName).Distinct());
 
-            _readyParams.CurrentWorkspaceModel.NodeAdded += CurrentWorkspaceModel_NodesChanged;
-            _readyParams.CurrentWorkspaceModel.NodeRemoved += CurrentWorkspaceModel_NodesChanged;
+            // Recompute at most every 250 ms: opening or pasting a graph raises one NodeAdded per node.
+            _refreshTimer = new DispatcherTimer(DispatcherPriority.Background) { Interval = TimeSpan.FromMilliseconds(250) };
+            _refreshTimer.Tick += RefreshTimerOnTick;
+
+            SubscribeTo(_readyParams.CurrentWorkspaceModel);
+            _readyParams.CurrentWorkspaceChanged += ReadyParamsOnCurrentWorkspaceChanged;
 
             _customNodePrefix = Globals.CustomNodeNotePrefix;
 
@@ -165,16 +173,53 @@ namespace MonocleViewExtension.PackageUsage
             }
         }
 
-        private void CurrentWorkspaceModel_NodesChanged(NodeModel obj)
+        private void SubscribeTo(IWorkspaceModel workspace)
         {
+            if (ReferenceEquals(workspace, _subscribedWorkspace)) return;
+
+            if (_subscribedWorkspace != null)
+            {
+                _subscribedWorkspace.NodeAdded -= CurrentWorkspaceModel_NodesChanged;
+                _subscribedWorkspace.NodeRemoved -= CurrentWorkspaceModel_NodesChanged;
+            }
+
+            _subscribedWorkspace = workspace;
+
+            if (_subscribedWorkspace != null)
+            {
+                _subscribedWorkspace.NodeAdded += CurrentWorkspaceModel_NodesChanged;
+                _subscribedWorkspace.NodeRemoved += CurrentWorkspaceModel_NodesChanged;
+            }
+        }
+
+        private void ReadyParamsOnCurrentWorkspaceChanged(IWorkspaceModel workspace)
+        {
+            SubscribeTo(workspace);
+            ScheduleRefresh();
+        }
+
+        private void CurrentWorkspaceModel_NodesChanged(NodeModel obj) => ScheduleRefresh();
+
+        private void ScheduleRefresh()
+        {
+            // restart the debounce window
+            _refreshTimer.Stop();
+            _refreshTimer.Start();
+        }
+
+        private void RefreshTimerOnTick(object sender, EventArgs e)
+        {
+            _refreshTimer.Stop();
             ActiveCustomNodes = Model.GetCustomNodeInfos();
             PackagesInUse = string.Join("\n", ActiveCustomNodes.Select(c => c.PackageName).Distinct());
         }
 
         public override void Dispose()
         {
-            _readyParams.CurrentWorkspaceModel.NodeAdded -= CurrentWorkspaceModel_NodesChanged;
-            _readyParams.CurrentWorkspaceModel.NodeRemoved -= CurrentWorkspaceModel_NodesChanged;
+            _refreshTimer.Stop();
+            _refreshTimer.Tick -= RefreshTimerOnTick;
+            _readyParams.CurrentWorkspaceChanged -= ReadyParamsOnCurrentWorkspaceChanged;
+            SubscribeTo(null);
         }
     }
 }

@@ -40,7 +40,7 @@ namespace MonocleViewExtension.InlineNodeConnectomatic
                 var pt = e.GetPosition((UIElement)sender);
                 HitResultsList.Clear();
 
-                var nodeViews = MiscUtils.FindVisualChildren<NodeView>(dynamoView);
+                var nodeViews = NodeUtils.GetNodeViews(dynamoView);
 
                 var selectedNodes = nodeViews.Where(n => n.ViewModel.IsSelected).ToList();
 

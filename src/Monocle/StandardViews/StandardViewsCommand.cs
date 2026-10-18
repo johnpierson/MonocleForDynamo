@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Dynamo.Wpf.Extensions;
+using MonocleViewExtension.Utilities;
 
 namespace MonocleViewExtension.StandardViews
 {
@@ -21,7 +22,8 @@ namespace MonocleViewExtension.StandardViews
             var v = new StandardViews() { MainGrid = { DataContext = vm } };
             vm.View = v;
 
-            StackPanel statusBarPanel = FindVisualChildren<StackPanel>(m.dynamoView).First(s => s.Name == "viewControlPanel");
+            StackPanel statusBarPanel = m.dynamoView.FindVisualChild<StackPanel>(s => s.Name == "viewControlPanel");
+            if (statusBarPanel == null) return vm;
 
             statusBarPanel.Children.Insert(1,v);
 
@@ -30,27 +32,5 @@ namespace MonocleViewExtension.StandardViews
             return vm;
         }
 
-
-        #region Helpers
-        public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
-        {
-            if (depObj != null)
-            {
-                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
-                {
-                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
-                    if (child != null && child is T)
-                    {
-                        yield return (T)child;
-                    }
-
-                    foreach (T childOfChild in FindVisualChildren<T>(child))
-                    {
-                        yield return childOfChild;
-                    }
-                }
-            }
-        }
-        #endregion
     }
 }

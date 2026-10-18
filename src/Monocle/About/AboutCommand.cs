@@ -1,15 +1,22 @@
-﻿using System;
-using System.Net;
+using System;
+using System.IO;
+using System.Net.Http;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.Utilities;
-using Newtonsoft.Json;
 
 namespace MonocleViewExtension.About
 {
     public class AboutCommand
     {
+        private const string LatestReleaseUrl = "https://api.github.com/repos/johnpierson/monoclefordynamo/releases/latest";
+
+        private static readonly string UpdateCachePath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Monocle", "update-check.txt");
+
         /// <summary>
         /// Create the about menu
         /// </summary>
@@ -39,53 +46,52 @@ namespace MonocleViewExtension.About
             menuItem.Items.Add(aboutMenu);
             menuItem.Items.Add(new Separator());
 
-
-            //check to see if an update is available
-            if (MiscUtils.CheckForInternetConnection() && CheckForUpdate("johnpierson","monoclefordynamo"))
+            // Check for an update off the UI thread (it used to block Dynamo startup on a ping + GitHub call).
+            var dispatcher = aboutMenu.Dispatcher;
+            Task.Run(() => GetLatestTagAsync()).ContinueWith(task =>
             {
-                aboutMenu.Foreground = new SolidColorBrush(Colors.LawnGreen);
-                aboutMenu.Header = $"{Properties.Resources.AboutMenuItemUpdateHeader}{Latest}";
-                aboutMenu.ToolTip = Properties.Resources.AboutMenuItemUpdateTooltip;
-            }
+                var latest = task.Status == TaskStatus.RanToCompletion ? task.Result : null;
+                if (latest == null || !UpdateCheck.IsNewer(Globals.Version, latest)) return;
 
+                dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(() =>
+                {
+                    Latest = latest;
+                    aboutMenu.Foreground = new SolidColorBrush(Colors.LawnGreen);
+                    aboutMenu.Header = $"{Properties.Resources.AboutMenuItemUpdateHeader}{Latest}";
+                    aboutMenu.ToolTip = Properties.Resources.AboutMenuItemUpdateTooltip;
+                }));
+            }, TaskScheduler.Default);
         }
 
         internal static string Latest;
-        private static bool CheckForUpdate(string username, string repoName)
+
+        /// <summary>
+        /// Latest release tag, from a once-a-day cache when possible (unauthenticated GitHub API calls are rate-limited
+        /// per IP, which a whole office shares). Never throws.
+        /// </summary>
+        private static async Task<string> GetLatestTagAsync()
         {
             try
             {
-                using (WebClient webClient = new WebClient())
+                var now = DateTime.UtcNow;
+                if (UpdateCheck.TryReadCache(UpdateCachePath, out var lastCheck, out var cachedTag) && !UpdateCheck.IsDue(lastCheck, now))
                 {
-                    webClient.Headers.Add("User-Agent", "Unity web player");
+                    return cachedTag;
+                }
 
-                    string address = $"https://api.github.com/repos/{username}/{repoName}/releases/latest";
-                    Uri uri = new Uri(address);
-
-                    string releases = webClient.DownloadString(uri);
-
-                    var json = JsonConvert.DeserializeObject<LatestReleaseVersion>(releases);
-
-                    Latest = json.TagName;
-
-                    Version currentVersion = Version.Parse(Globals.Version);
-
-                    Version latestVersion = Version.Parse($"{Latest}");
-
-                    return currentVersion.CompareTo(latestVersion) <= 0;
+                using (var client = new HttpClient { Timeout = TimeSpan.FromSeconds(5) })
+                {
+                    client.DefaultRequestHeaders.UserAgent.ParseAdd("MonocleForDynamo");
+                    var json = await client.GetStringAsync(LatestReleaseUrl).ConfigureAwait(false);
+                    var tag = UpdateCheck.ParseTagName(json);
+                    if (tag != null) UpdateCheck.WriteCache(UpdateCachePath, now, tag);
+                    return tag;
                 }
             }
             catch (Exception)
             {
-                return false;
+                return null;
             }
-            
-        }
-
-        internal class LatestReleaseVersion
-        {
-            [JsonProperty("tag_name")]
-            public string TagName { get; set; }
         }
     }
 }

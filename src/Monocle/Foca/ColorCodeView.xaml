@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:MonocleViewExtension.Foca"
-             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d" 
              Width="270" Height="300"
              MinWidth="270" MinHeight="300"
@@ -34,7 +33,10 @@
                             <ColumnDefinition Width="48"/>
                         </Grid.ColumnDefinitions>
                         <TextBox Grid.Column="0" Text="{Binding GroupText}" Tag="{Binding GroupId}"/>
-                        <xctk:ColorPicker Grid.Column="2" SelectedColor="{Binding GroupColor}" Tag="{Binding GroupId}"/>
+                        <!-- Plain WPF swatch + system color dialog (replaces Xceed's ColorPicker so Monocle ships no third-party UI DLLs). -->
+                        <Button Grid.Column="2" Height="24" Click="PickColorClick" ToolTip="Pick a color" Tag="{Binding GroupId}" Padding="0" BorderBrush="#FF9A9A9A">
+                            <Border Name="Swatch" Background="{Binding GroupColor}" Width="44" Height="20"/>
+                        </Button>
                         <Button Grid.Column="4" x:Name="Group5Button" Content="" HorizontalAlignment="Left" Height="24" VerticalAlignment="Top" Width="24" Click="ColorButtonClick" Tag="{Binding GroupId}">
                             <Button.Background>
                                 <ImageBrush ImageSource="Resources/action.png"/>
