@@ -25,8 +25,14 @@ namespace MonocleViewExtension.Foca
                 Interval = ToolboxCloseDelay
             };
             _toolboxCloseTimer.Tick += ToolboxCloseTimer_OnTick;
-            LayoutUpdated += FocaView_OnLayoutUpdated;
+
+            // LayoutUpdated is raised after *every* layout pass anywhere in the dispatcher, not just for this control.
+            // Only listen while FOCA is actually in the tree, and coalesce bursts into one clamp update.
+            Loaded += (s, e) => { LayoutUpdated -= FocaView_OnLayoutUpdated; LayoutUpdated += FocaView_OnLayoutUpdated; };
+            Unloaded += (s, e) => LayoutUpdated -= FocaView_OnLayoutUpdated;
         }
+
+        private DispatcherOperation _pendingClampUpdate;
 
        
 
@@ -113,6 +119,14 @@ namespace MonocleViewExtension.Foca
 
         private void FocaView_OnLayoutUpdated(object sender, EventArgs e)
         {
+            if (_pendingClampUpdate != null && _pendingClampUpdate.Status == DispatcherOperationStatus.Pending) return;
+
+            _pendingClampUpdate = Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(UpdateHitTargetClamping));
+        }
+
+        private void UpdateHitTargetClamping()
+        {
+            _pendingClampUpdate = null;
             if (!IsLoaded || !(MainGrid.DataContext is FocaViewModel vm) || !vm.FocaVisible)
             {
                 return;

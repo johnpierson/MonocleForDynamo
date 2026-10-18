@@ -20,7 +20,6 @@ using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.NodeSwapper;
 using MonocleViewExtension.Utilities;
-using Xceed.Wpf.AvalonDock.Controls;
 using Thickness = System.Windows.Thickness;
 
 namespace MonocleViewExtension.Foca
@@ -118,7 +117,7 @@ namespace MonocleViewExtension.Foca
                 return;
             }
 
-            var nodeViews = MiscUtils.FindVisualChildren<NodeView>(DynamoView);
+            var nodeViews = NodeUtils.GetNodeViews(DynamoView);
 
             var nodeView = nodeViews.FirstOrDefault(n => n.ViewModel.Id.Equals(nodeModel.GUID));
 
@@ -366,7 +365,7 @@ namespace MonocleViewExtension.Foca
 
         public Rect WrapNodes()
         {
-            var allNodeViews = FindVisualChildren<NodeView>(DynamoView);
+            var allNodeViews = NodeUtils.GetNodeViews(DynamoView);
 
             if (allNodeViews is null) return new Rect();
 
@@ -379,7 +378,7 @@ namespace MonocleViewExtension.Foca
         {
             List<NodeView> selectedNodeViews = new List<NodeView>();
 
-            var allNodeViews = FindVisualChildren<NodeView>(DynamoView).ToList();
+            var allNodeViews = NodeUtils.GetNodeViews(DynamoView);
             if (Globals.DynamoVersion.CompareTo(Globals.NewUiVersion) >= 0)
             {
                 foreach (var nv in allNodeViews)
@@ -407,12 +406,12 @@ namespace MonocleViewExtension.Foca
 
             var leftMostNode = selectedNodeViews.OrderBy(nv => nv.ViewModel.Left).ThenBy(nv => nv.ViewModel.Top).First();
             var topMostNode = selectedNodeViews.OrderBy(nv => nv.ViewModel.Top).First();
-            var expando = FindVisualChildren<Canvas>(leftMostNode)
+            var expando = leftMostNode.FindVisualChildren<Canvas>()
                 .FirstOrDefault(c => c.Name == "focaHost");
 
             if(expando is null)
             {
-                var grid = FindVisualChildren<Grid>(leftMostNode)
+                var grid = leftMostNode.FindVisualChildren<Grid>()
                 .FirstOrDefault(c => c.Name.ToLower() == "grid");
 
                 var focaHost = new Canvas()
@@ -437,7 +436,7 @@ namespace MonocleViewExtension.Foca
 
         public Thickness GetThickness(double multiSelect = 0.0)
         {
-            var allNodeViews = FindVisualChildren<NodeView>(DynamoView);
+            var allNodeViews = NodeUtils.GetNodeViews(DynamoView);
 
             if (allNodeViews is null) return new Thickness();
 
@@ -926,25 +925,6 @@ var annotationCommand = new DynamoModel.CreateAnnotationCommand(Guid.NewGuid(), 
         #endregion
 
         #region Helpers
-        public IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
-        {
-            if (depObj != null)
-            {
-                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
-                {
-                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
-                    if (child != null && child is T dependencyObject)
-                    {
-                        yield return dependencyObject;
-                    }
-
-                    foreach (T childOfChild in FindVisualChildren<T>(child))
-                    {
-                        yield return childOfChild;
-                    }
-                }
-            }
-        }
         #endregion
 
 

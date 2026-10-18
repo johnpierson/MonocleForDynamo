@@ -8,7 +8,7 @@ using Dynamo.Logging;
 using Dynamo.Models;
 using Dynamo.ViewModels;
 using Dynamo.Views;
-using Xceed.Wpf.AvalonDock.Controls;
+using MonocleViewExtension.Utilities;
 using ModifierKeys = Dynamo.Utilities.ModifierKeys;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 
@@ -64,7 +64,7 @@ namespace MonocleViewExtension.NodeSwapper
         public NodeSwapperViewModel(NodeSwapperModel m, NodeModel node = null)
         {
             Model = m;
-            _workspaceView = Model.dynamoView.FindVisualChildren<WorkspaceView>().First();
+            _workspaceView = NodeUtils.GetWorkspaceView(Model.dynamoView) ?? Model.dynamoView.FindVisualChildren<WorkspaceView>().First();
 
             //set paint brush settings
             PaintStatusMessage =  Properties.Resources.NodeSwapperStatusMessageSelectReplacement;

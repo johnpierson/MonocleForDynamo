@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Data;
@@ -7,28 +7,59 @@ using Dynamo.ViewModels;
 
 namespace MonocleViewExtension.SimpleSearch
 {
-    internal class SimpleSearchViewModel
+    internal class SimpleSearchViewModel : INotifyPropertyChanged
     {
         public DynamoViewModel dynamoViewModel;
 
-        private readonly ICollectionView nodes;
+        private ICollectionView nodes;
         private NodeSearchElement selectedNode;
+
+        // Normalized search key per entry, computed once instead of on every keystroke for every entry.
+        private Dictionary<NodeSearchElement, string> keys = new Dictionary<NodeSearchElement, string>();
+        private int sourceCount = -1;
+        private string normalizedFilter = string.Empty;
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public SimpleSearchViewModel(DynamoViewModel dvm)
         {
             dynamoViewModel = dvm;
+            EnsureFresh();
+        }
+
+        private IEnumerable<NodeSearchElement> SourceEntries
+        {
+            get
+            {
 #if net8 || net10
-            var myNodes = dvm.Model.SearchModel.Entries.Where(s => s.IsVisibleInSearch).OrderBy(n => n.Name);
+                return dynamoViewModel.Model.SearchModel.Entries;
+#else
+                return dynamoViewModel.Model.SearchModel.SearchEntries;
 #endif
+            }
+        }
 
-#if !net8 && !net10
-              var myNodes = dvm.Model.SearchModel.SearchEntries.Where(s => s.IsVisibleInSearch).OrderBy(n => n.Name);
-#endif
-            
-            this.nodes = CollectionViewSource.GetDefaultView(myNodes);
+        /// <summary>
+        /// Rebuild the (sorted, keyed) entry list only when the library changed size, e.g. a package was
+        /// installed or loaded after Monocle started. Called when the search UI is shown.
+        /// </summary>
+        public void EnsureFresh()
+        {
+            var entries = SourceEntries.ToList();
+            if (nodes != null && entries.Count == sourceCount) return;
 
-            //add the filter
-            this.nodes.Filter = ContainsFilter;
+            sourceCount = entries.Count;
+            var visible = entries.Where(s => s.IsVisibleInSearch).OrderBy(n => n.Name).ToList();
+            var newKeys = new Dictionary<NodeSearchElement, string>(visible.Count);
+            foreach (var entry in visible)
+            {
+                if (!newKeys.ContainsKey(entry)) newKeys.Add(entry, SearchKey.Normalize(entry.FullName));
+            }
+
+            keys = newKeys;
+            var view = new ListCollectionView(visible) { Filter = ContainsFilter };
+            nodes = view;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Nodes)));
         }
 
         public ICollectionView Nodes
@@ -67,6 +98,7 @@ namespace MonocleViewExtension.SimpleSearch
                 if (this.filter != value)
                 {
                     this.filter = value;
+                    this.normalizedFilter = SearchKey.Normalize(value);
                     this.Nodes.Refresh();
                 }
             }
@@ -74,22 +106,9 @@ namespace MonocleViewExtension.SimpleSearch
 
         private bool ContainsFilter(object item)
         {
-            if (!(item is NodeSearchElement node))
-            {
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(this.Filter))
-            {
-                return false;
-            }
-
-            if (node.FullName.ToUpperInvariant().Replace(".","").Replace(" ","").Contains(this.Filter.ToUpperInvariant().Replace(".", "").Replace(" ", "")))
-            {
-                return true;
-            }
-
-            return false;
+            return item is NodeSearchElement node &&
+                   keys.TryGetValue(node, out var key) &&
+                   SearchKey.Matches(key, normalizedFilter);
         }
     }
 }

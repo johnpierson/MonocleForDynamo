@@ -1,21 +1,51 @@
 ﻿using Dynamo.Controls;
 using Dynamo.ViewModels;
+using Dynamo.Views;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Xceed.Wpf.AvalonDock.Controls;
 
 namespace MonocleViewExtension.Utilities
 {
     internal static class NodeUtils
     {
+        private static WeakReference<WorkspaceView> _cachedWorkspaceView;
+
+        /// <summary>
+        /// The workspace view currently hosted by the Dynamo window. Cached, and only re-discovered when the
+        /// cached one is no longer loaded inside this window, so callers don't walk the whole window every time.
+        /// </summary>
+        internal static WorkspaceView GetWorkspaceView(DependencyObject dynamoView)
+        {
+            if (dynamoView == null) return null;
+
+            if (_cachedWorkspaceView != null && _cachedWorkspaceView.TryGetTarget(out var cached) &&
+                cached.IsLoaded && cached.IsVisible && cached.IsDescendantOf(dynamoView))
+            {
+                return cached;
+            }
+
+            var found = dynamoView.FindVisualChild<WorkspaceView>(w => w.IsVisible) ?? dynamoView.FindVisualChild<WorkspaceView>();
+            _cachedWorkspaceView = found == null ? null : new WeakReference<WorkspaceView>(found);
+            return found;
+        }
+
+        /// <summary>
+        /// Node views in the current workspace. Walks only the workspace (not the library, sidebars or 3D view)
+        /// and never descends into a node view's own template.
+        /// </summary>
+        internal static List<NodeView> GetNodeViews(DependencyObject dynamoView)
+        {
+            var root = (DependencyObject)GetWorkspaceView(dynamoView) ?? dynamoView;
+            return root.FindVisualChildren<NodeView>(descendIntoMatches: false).ToList();
+        }
+
         internal static Rect GetBoundingRectangle(List<NodeView> nodeViews)
         {
             List<double> yAxis = new List<double>();
@@ -57,63 +87,26 @@ namespace MonocleViewExtension.Utilities
     }
     internal static class ImageUtils
     {
-        public static BitmapImage LoadImage(Assembly a, string name)
+        /// <summary>
+        /// Load a WPF resource (Build Action: Resource) from this assembly, e.g. "Resources/smalls.JPG".
+        /// The previous implementation looked in manifest resources, where these images don't live, so it always failed.
+        /// </summary>
+        public static BitmapImage LoadImage(Assembly a, string relativePath)
         {
-            var img = new BitmapImage();
             try
             {
-                var resourceName = a.GetManifestResourceNames().FirstOrDefault(x => x.Contains(name));
-                var stream = a.GetManifestResourceStream(resourceName);
-
+                var assemblyName = a.GetName().Name;
+                var img = new BitmapImage();
                 img.BeginInit();
-                img.StreamSource = stream;
+                img.UriSource = new Uri($"pack://application:,,,/{assemblyName};component/{relativePath.TrimStart('/')}", UriKind.Absolute);
+                img.CacheOption = BitmapCacheOption.OnLoad;
                 img.EndInit();
+                img.Freeze();
+                return img;
             }
             catch (Exception)
             {
-                // ignored
-            }
-
-            return img;
-        }
-    }
-    public static class MiscUtils
-    {
-        public static IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
-        {
-            if (depObj != null)
-            {
-                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
-                {
-                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
-                    if (child != null && child is T)
-                    {
-                        yield return (T)child;
-                    }
-
-                    foreach (T childOfChild in FindVisualChildren<T>(child))
-                    {
-                        yield return childOfChild;
-                    }
-                }
-            }
-        }
-
-        public static bool CheckForInternetConnection()
-        {
-            try
-            {
-                Ping myPing = new Ping();
-                String host = "google.com";
-                byte[] buffer = new byte[32];
-                int timeout = 1000;
-                PingOptions pingOptions = new PingOptions();
-                PingReply reply = myPing.Send(host, timeout, buffer, pingOptions);
-                return (reply.Status == IPStatus.Success);
-            }
-            catch (Exception)
-            {
-                return false;
+                return null;
             }
         }
     }
@@ -204,16 +197,10 @@ namespace MonocleViewExtension.Utilities
         /// </summary>
         public static void CheckForDevExpress()
         {
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-
-            try
-            {
-                Globals.DevExpress = assemblies.First(a => a.FullName.Contains("DevExpress.Xpf.Core"));
-            }
-            catch (Exception)
-            {
-                Globals.DevExpress = null;
-            }
+            // DevExpress.Xpf.Core.v22.1 etc. (not DevExpress.Xpf.Core.Extensions.*)
+            Globals.DevExpress = AppDomain.CurrentDomain.GetAssemblies()
+                .FirstOrDefault(a => System.Text.RegularExpressions.Regex.IsMatch(a.GetName().Name ?? string.Empty,
+                    @"^DevExpress\.Xpf\.Core(\.v\d+\.\d+)?$", System.Text.RegularExpressions.RegexOptions.IgnoreCase));
 
             Globals.IsDevExpressLoaded = Globals.DevExpress != null;
         }
@@ -228,30 +215,16 @@ namespace MonocleViewExtension.Utilities
 
             try
             {
-                var objType = Enumerable.First<Type>(GetTypesSafely(Globals.DevExpress),
-                    t => t.Name.Equals("ThemeManager"));
-
-                object baseObject = System.Runtime.Serialization.FormatterServices
-                    .GetUninitializedObject(objType);
-
-                objType.InvokeMember("SetThemeName",
-                    BindingFlags.Default | BindingFlags.InvokeMethod, null, baseObject, new object[] { window, "None" });
+                // ThemeManager.SetThemeName(DependencyObject, string) is a static attached-property setter.
+                // Look the type up by name instead of enumerating every type in DevExpress.Xpf.Core.
+                var themeManager = Globals.DevExpress.GetType("DevExpress.Xpf.Core.ThemeManager", false);
+                var setThemeName = themeManager?.GetMethod("SetThemeName", BindingFlags.Public | BindingFlags.Static,
+                    null, new[] { typeof(DependencyObject), typeof(string) }, null);
+                setThemeName?.Invoke(null, new object[] { window, "None" });
             }
             catch (Exception)
             {
                 //do nothing
-            }
-        }
-
-        private static IEnumerable<Type> GetTypesSafely(Assembly assembly)
-        {
-            try
-            {
-                return assembly.GetTypes();
-            }
-            catch (ReflectionTypeLoadException ex)
-            {
-                return ex.Types.Where(x => x != null);
             }
         }
     }

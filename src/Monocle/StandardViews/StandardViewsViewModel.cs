@@ -8,7 +8,7 @@ using System.Windows.Media;
 using Dynamo.Logging;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
-using HelixToolkit.Wpf.SharpDX;
+using MonocleViewExtension.Utilities;
 
 namespace MonocleViewExtension.StandardViews
 {
@@ -44,7 +44,7 @@ namespace MonocleViewExtension.StandardViews
             {
                 //remove old
                 ViewControlPanel?.Children.Remove(View);
-                ViewControlPanel = FindVisualChildren<StackPanel>(Model.dynamoView).First(s => s.Name == "viewControlPanel");
+                ViewControlPanel = Model.dynamoView.FindVisualChild<StackPanel>(s => s.Name == "viewControlPanel");
                 ViewControlPanel?.Children.Insert(1, View);
             }
             catch (Exception e)
@@ -56,7 +56,8 @@ namespace MonocleViewExtension.StandardViews
 
         public void OnSetCamera(object view)
         {
-            Viewport3DX threeDeeView =  FindVisualChildren<Viewport3DX>(Model.dynamoView).First();
+            var threeDeeView = Model.dynamoView.FindVisualChild<FrameworkElement>(CameraController.IsHelixViewport);
+            if (threeDeeView == null) return;
 
             switch (view)
             {
@@ -100,27 +101,6 @@ namespace MonocleViewExtension.StandardViews
         }
 
 
-        #region Helpers
-        public IEnumerable<T> FindVisualChildren<T>(DependencyObject depObj) where T : DependencyObject
-        {
-            if (depObj != null)
-            {
-                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
-                {
-                    DependencyObject child = VisualTreeHelper.GetChild(depObj, i);
-                    if (child is T dependencyObject)
-                    {
-                        yield return dependencyObject;
-                    }
-
-                    foreach (T childOfChild in FindVisualChildren<T>(child))
-                    {
-                        yield return childOfChild;
-                    }
-                }
-            }
-        }
-        #endregion
     }
 
 }

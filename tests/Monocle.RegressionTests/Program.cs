@@ -4,9 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Windows.Media;
 using MonocleExtension;
+using MonocleViewExtension.About;
 using MonocleViewExtension.BetterSave;
 using MonocleViewExtension.Foca;
 using MonocleViewExtension.NodeDocumentation;
+using MonocleViewExtension.PackageUsage;
+using MonocleViewExtension.SimpleSearch;
 using MonocleViewExtension.Utilities;
 
 namespace Monocle.RegressionTests
@@ -25,6 +28,10 @@ namespace Monocle.RegressionTests
                 TestFocaCodeGeneration();
                 TestDynamoBuildVersionFallbacks();
                 TestSettingsRoundTripAndAtomicLoad(testRoot);
+                TestPackageNameResolver();
+                TestUpdateCheck(testRoot);
+                TestSearchKey();
+                TestDeployManifest(testRoot);
                 Console.WriteLine("Monocle regression tests passed.");
                 return 0;
             }
@@ -95,6 +102,87 @@ namespace Monocle.RegressionTests
             var fourPointThreeCandidates = DynamoBuildVersionResolver.GetCandidates(new Version(4, 3, 0)).ToArray();
             Assert(fourPointThreeCandidates.SequenceEqual(new[] { "4.3", "4.2", "4.1", "4.0" }), "Dynamo 4.3 build fallback candidates were not ordered from closest to oldest.");
             AssertThrows<ArgumentNullException>(() => DynamoBuildVersionResolver.GetCandidates(null).ToArray(), "Null Dynamo versions were accepted.");
+        }
+
+        private static void TestPackageNameResolver()
+        {
+            // library order, with duplicates (one entry per node in the library)
+            var roots = new[] { "Clockwork", "archi-lab", "Clockwork", "springs", "Rhythm", "archilab_Bumblebee" };
+            var local = new[]
+            {
+                new System.Collections.Generic.KeyValuePair<string, string>("spring nodes", "204.1.0"),
+                new System.Collections.Generic.KeyValuePair<string, string>("Rhythm", "2026.1.1"),
+                new System.Collections.Generic.KeyValuePair<string, string>("Crumple", "2025.6.1"),
+            };
+            var resolver = new PackageNameResolver(roots, local);
+
+            Assert(resolver.Roots.SequenceEqual(new[] { "Clockwork", "archi-lab", "springs", "Rhythm", "archilab_Bumblebee", "spring nodes", "Crumple" }),
+                "Package roots were not de-duplicated in first-seen order.");
+            Assert(resolver.IsCustomCategory("Clockwork.Lists.Actions"), "Package category was not recognised.");
+            Assert(resolver.IsCustomCategory("rhythm.Revit.Elements"), "Package prefix match should be case-insensitive.");
+            Assert(!resolver.IsCustomCategory("Core.List.Create"), "Core category was treated as a package.");
+            Assert(!resolver.IsCustomCategory(null), "Null category was treated as a package.");
+            Assert(resolver.GetPackageName("Clockwork.Lists") == "Clockwork", "Exact top-level category did not resolve.");
+            Assert(resolver.GetPackageName("springs.Collector") == "spring nodes", "springs was not renamed to spring nodes.");
+            Assert(resolver.GetPackageName("archilab_Bumblebee.Excel") == "BumbleBee", "Bumblebee name fix was lost.");
+            Assert(resolver.GetPackageName("Rhythm.Revit") == "Rhythm", "Package name resolution changed.");
+            Assert(resolver.GetPackageVersion("spring nodes") == "v.204.1.0", "Version lookup did not use the simplified name.");
+            Assert(resolver.GetPackageVersion("Clockwork") == string.Empty, "A package that is not installed got a version.");
+            Assert(PackageNameResolver.Levenshtein("kitten", "sitting") == 3, "Levenshtein distance is wrong.");
+            Assert(PackageNameResolver.Levenshtein("", "abc") == 3 && PackageNameResolver.Levenshtein("abc", "") == 3, "Levenshtein empty cases are wrong.");
+            Assert(new PackageNameResolver(null, null).GetPackageName("Anything.Else") == string.Empty, "An empty library should resolve to an empty name, not throw.");
+        }
+
+        private static void TestUpdateCheck(string testRoot)
+        {
+            Assert(UpdateCheck.ParseTagName("{\"url\":\"x\",\"tag_name\": \"2026.10.1\",\"name\":\"y\"}") == "2026.10.1", "tag_name was not parsed.");
+            Assert(UpdateCheck.ParseTagName("{}") == null, "Missing tag_name should parse as null.");
+            Assert(!UpdateCheck.IsNewer("2026.6.1.0", "2026.6.1"), "Equal versions were reported as an update.");
+            Assert(UpdateCheck.IsNewer("2026.6.1.0", "2026.10.1"), "A newer release was not detected.");
+            Assert(!UpdateCheck.IsNewer("2026.10.1.0", "2026.6.1"), "An older release was reported as an update.");
+            Assert(UpdateCheck.IsNewer("2026.6.1.0", "v2026.6.2"), "A v-prefixed tag was not handled.");
+            Assert(!UpdateCheck.IsNewer("2026.6.1.0", "not-a-version"), "An unparsable tag was reported as an update.");
+
+            var now = new DateTime(2026, 10, 18, 12, 0, 0, DateTimeKind.Utc);
+            Assert(UpdateCheck.IsDue(null, now), "First check should be due.");
+            Assert(!UpdateCheck.IsDue(now.AddHours(-2), now), "Check repeated within a day.");
+            Assert(UpdateCheck.IsDue(now.AddHours(-25), now), "Check not due after a day.");
+            Assert(UpdateCheck.IsDue(now.AddHours(5), now), "A future timestamp (clock change) should force a check.");
+
+            var cache = Path.Combine(testRoot, "update", "update-check.txt");
+            UpdateCheck.WriteCache(cache, now, "2026.10.1");
+            Assert(UpdateCheck.TryReadCache(cache, out var read, out var tag) && read == now && tag == "2026.10.1", "Update cache did not round-trip.");
+            File.WriteAllText(cache, "garbage");
+            Assert(!UpdateCheck.TryReadCache(cache, out _, out _), "A corrupt update cache was accepted.");
+        }
+
+        private static void TestSearchKey()
+        {
+            Assert(SearchKey.Normalize("List.Create Thing") == "LISTCREATETHING", "Search normalization changed.");
+            Assert(SearchKey.Matches(SearchKey.Normalize("Core.List.Create"), SearchKey.Normalize("list create")), "Spaces/dots should be ignored when matching.");
+            Assert(!SearchKey.Matches(SearchKey.Normalize("Core.List.Create"), SearchKey.Normalize("")), "Empty filter should match nothing.");
+            Assert(!SearchKey.Matches(SearchKey.Normalize("Core.List.Create"), SearchKey.Normalize("flatten")), "Unrelated filter matched.");
+        }
+
+        private static void TestDeployManifest(string testRoot)
+        {
+            var a = new string('a', 64);
+            var b = new string('B', 64);
+            var text = $"{a}  2.19/MonocleViewExtension.dll\r\n{b} *4.2/MonocleViewExtension.dll\nnot a line\n{a}  4.3/Other.dll\n";
+            var manifest = DeployManifest.Parse(text);
+            Assert(manifest.Count == 2 && manifest["2.19"] == a && manifest["4.2"] == new string('b', 64), "SHA256SUMS was not parsed (text and binary mode, CRLF).");
+
+            Assert(DeployManifest.ChooseBuild(new Version(4, 3, 0), manifest.Keys) == "4.2", "Closest older build in the same major was not chosen.");
+            Assert(DeployManifest.ChooseBuild(new Version(3, 6, 0), manifest.Keys) == null, "A build from another major version was chosen.");
+            Assert(DeployManifest.ChooseBuild(new Version(2, 19, 5), manifest.Keys) == "2.19", "Exact build was not chosen.");
+            Assert(DeployManifest.IsBuildName("4.2") && DeployManifest.IsBuildName("2.19") && !DeployManifest.IsBuildName("de-DE") && !DeployManifest.IsBuildName("4"), "Build folder detection is wrong.");
+
+            Assert(DeployManifest.DefinitionXml("4.2").Contains(@"<AssemblyPath>..\bin\4.2\MonocleViewExtension.dll</AssemblyPath>"), "Definition does not point at the build folder.");
+            Assert(DeployManifest.DefinitionXml(null).Contains(@"<AssemblyPath>..\bin\MonocleViewExtension.dll</AssemblyPath>"), "Legacy definition path changed.");
+
+            var file = Path.Combine(testRoot, "hash.bin");
+            File.WriteAllText(file, "abc");
+            Assert(DeployManifest.Sha256(file) == "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", "SHA-256 is wrong.");
         }
 
         private static void TestSettingsRoundTripAndAtomicLoad(string testRoot)

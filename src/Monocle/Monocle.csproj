@@ -7,9 +7,9 @@
 		<PlatformTarget>x64</PlatformTarget>
 		<AssemblyTitle>Monocle</AssemblyTitle>
 		<Product>Monocle</Product>
-		<Copyright>Copyright©  2025 john pierson</Copyright>
-		<AssemblyVersion>2026.6.1</AssemblyVersion>
-		<FileVersion>2026.6.1</FileVersion>
+		<Copyright>Copyright©  2026 john pierson</Copyright>
+		<AssemblyVersion>2026.10.1</AssemblyVersion>
+		<FileVersion>2026.10.1</FileVersion>
 		<OutputPath>bin\$(Configuration)\</OutputPath>
 		<Configurations>Debug 2.0;Debug 2.1;Debug 2.10;Debug 2.12;Debug 2.13;Debug 2.16;Debug 2.17;Debug 2.18;Debug 2.19;Debug 2.2;Debug 2.3;Debug 2.5;Debug 2.6;Debug 3.0;Debug 3.1;Debug 3.2;Debug 3.3;Debug 3.4;Debug 3.5;Debug 3.6;Debug 3.7;Debug 4.0;Debug 4.1;Debug 4.2;Debug 4.3</Configurations>
 		<Configurations>$(Configurations);Release 2.0;Release 2.1;Release 2.10;Release 2.12;Release 2.13;Release 2.16;Release 2.17;Release 2.18;Release 2.19;Release 2.2;Release 2.3;Release 2.5;Release 2.6;Release 3.0;Release 3.1;Release 3.2;Release 3.3;Release 3.4;Release 3.5;Release 3.6;Release 3.7;Release 4.0;Release 4.1;Release 4.2;Release 4.3</Configurations>
@@ -232,10 +232,6 @@
 	</PropertyGroup>
 	<PropertyGroup Condition="$(Configuration.Contains('Debug 4.3'))">
 		<DynamoVersion>4.3</DynamoVersion>
-		<!-- Dynamo 4.3 has no stable packages yet; pin the exact beta. Remove once 4.3.0 ships. -->
-		<DynamoPackageVersion>4.3.0-beta6513</DynamoPackageVersion>
-		<!-- DynamoVisualProgramming.Core 4.3 requires Newtonsoft.Json >= 13.0.4. -->
-		<NewtonsoftJsonVersion>13.0.4</NewtonsoftJsonVersion>
 		<DynamoOutput>4.3</DynamoOutput>
 		<DebugSymbols>true</DebugSymbols>
 		<DebugType>full</DebugType>
@@ -389,22 +385,47 @@
 	</PropertyGroup>
 	<PropertyGroup Condition="$(Configuration.Contains('Release 4.3'))">
 		<DynamoVersion>4.3</DynamoVersion>
-		<!-- Dynamo 4.3 has no stable packages yet; pin the exact beta. Remove once 4.3.0 ships. -->
-		<DynamoPackageVersion>4.3.0-beta6513</DynamoPackageVersion>
-		<!-- DynamoVisualProgramming.Core 4.3 requires Newtonsoft.Json >= 13.0.4. -->
-		<NewtonsoftJsonVersion>13.0.4</NewtonsoftJsonVersion>
 		<DynamoOutput>4.3</DynamoOutput>
 		<DefineConstants>$(DefineConstants);net10;D20;D20_OR_GREATER;D21_OR_GREATER;D22_OR_GREATER;D23_OR_GREATER;D25_OR_GREATER;D26_OR_GREATER;D210_OR_GREATER;D212_OR_GREATER;D213_OR_GREATER;D216_OR_GREATER;D217_OR_GREATER;D218_OR_GREATER;D219_OR_GREATER;D30_OR_GREATER;D31_OR_GREATER;D32_OR_GREATER;D33_OR_GREATER;D34_OR_GREATER;D40_OR_GREATER;D41_OR_GREATER;D42_OR_GREATER;D43_OR_GREATER</DefineConstants>
 		<TargetFramework>net10.0-windows</TargetFramework>
 	</PropertyGroup>
 
+	<!--
+	  Compile every build against the LOWEST stable Dynamo patch of its minor version (exact pin, no floating).
+	  A floating X.Y.* reference compiles against the newest patch, so an API added in a later patch would build
+	  fine but throw MissingMethodException for users on an earlier patch of the same minor version.
+	-->
+	<PropertyGroup Condition="'$(DynamoPackageVersion)' == ''">
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '2.0'">[2.0.0.4714]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '2.1'">[2.1.0.7430]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '2.2'">[2.2.0.4565]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '2.3'">[2.3.0.5885]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '2.5'">[2.5.0.7186]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '2.6'">[2.6.0.8406]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '2.10'">[2.10.0.3426]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '2.12'">[2.12.0.5650]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '2.13'">[2.13.0.3437]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '2.16'">[2.16.0.2501]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '2.17'">[2.17.0.3461]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '2.18'">[2.18.0.4827]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '2.19'">[2.19.0.6156]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '3.0'">[3.0.0.7186]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '3.1'">[3.1.0.4721]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '3.2'">[3.2.0.5210]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '3.3'">[3.3.0.6316]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '3.4'">[3.4.0.6892]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '3.5'">[3.5.0.8297]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '3.6'">[3.6.0.9365]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '3.7'">[3.7.0.11437]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '4.0'">[4.0.0.3277]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '4.1'">[4.1.0.4556]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '4.2'">[4.2.0.5855]</DynamoPackageVersion>
+		<DynamoPackageVersion Condition="'$(DynamoOutput)' == '4.3'">[4.3.0.6534]</DynamoPackageVersion>
+	</PropertyGroup>
 	<PropertyGroup>
 		<DynVersion>$(DynamoVersion)</DynVersion>
-		<DynamoPackageVersion Condition="'$(DynamoPackageVersion)' == ''">$(DynVersion).*</DynamoPackageVersion>
-		<NewtonsoftJsonVersion Condition="'$(NewtonsoftJsonVersion)' == ''">13.0.1</NewtonsoftJsonVersion>
 		<BuildOutput>$(DynamoOutput)</BuildOutput>
 		<FolderPackages>$(MSBuildProjectDirectory)\..\..\deploy\$(BuildOutput)\</FolderPackages>
-		<DynamoPackagesPath Condition="'$(DynamoPackagesPath)' == ''">$(ProgramFiles)\Autodesk\Revit 2022\AddIns\DynamoForRevit\DynamoPackages.dll</DynamoPackagesPath>
 	</PropertyGroup>
 	<PropertyGroup>
 		<StartAction>Program</StartAction>
@@ -431,28 +452,21 @@
 		<None Remove="Foca\Resources\button-distributeVerticalBlack.png" />
 		<None Remove="Foca\Resources\ColorCodeHeader.png" />
 		<None Remove="Foca\Resources\customnode-64.png" />
-		<None Remove="Foca\Resources\customnode-64.svg" />
 		<None Remove="PackageUsage\DogeImages\cheems_heaven.jpg" />
-		<None Remove="PackageUsage\DogeImages\david-s-pumpkins.gif" />
-		<None Remove="PackageUsage\DogeImages\doge-comfort.png" />
+		<None Remove="PackageUsage\DogeImages\doge-comfort.jpg" />
 		<None Remove="PackageUsage\DogeImages\dogePreview.png" />
 		<None Remove="PackageUsage\DogeImages\doge_business.jpg" />
 		<None Remove="PackageUsage\DogeImages\doge_christmas.jpg" />
 		<None Remove="PackageUsage\DogeImages\doge_dapper.jpg" />
-		<None Remove="PackageUsage\DogeImages\doge_halloween.gif" />
+		<None Remove="PackageUsage\DogeImages\doge_halloween.png" />
 		<None Remove="PackageUsage\DogeImages\doge_heaven.jpg" />
 		<None Remove="PackageUsage\DogeImages\doge_newyear.png" />
 		<None Remove="PackageUsage\DogeImages\doge_summer.jpg" />
-		<None Remove="PackageUsage\DogeImages\dwight-pumpkin.gif" />
+		<None Remove="PackageUsage\DogeImages\dwight-pumpkin.png" />
 		<None Remove="Resources\about_github.png" />
 		<None Remove="Resources\about_john.png" />
-		<None Remove="Resources\InkDropperIcon.svg" />
 		<None Remove="Resources\monocleLogoRoundedSquare.png" />
-		<None Remove="Resources\PaintBrushIcon.svg" />
 		<None Remove="Resources\smalls.JPG" />
-		<None Remove="Resources\Xceed.Wpf.AvalonDock.dll" />
-		<None Remove="Resources\Xceed.Wpf.AvalonDock.NET5.dll" />
-		<None Remove="Resources\Xceed.Wpf.Toolkit.dll" />
 		<None Remove="SimpleSearch\Resources\magnifyingGlass.png" />
 		<None Remove="SimpleSearch\Resources\monocle.png" />
 		<None Remove="StandardViews\Resources\3d_menu.png" />
@@ -471,83 +485,24 @@
 	</ItemGroup>
 	<ItemGroup>
 		<Page Remove="Resources\IconDictionary.xaml" />
-		<Page Remove="Resources\PaintBrushIcon.xaml" />
 	</ItemGroup>
+	<!--
+	  Dynamo and its dependencies are provided by the host at runtime: compile against them only
+	  (ExcludeAssets=runtime) so a build can never copy Dynamo's own DLLs next to Monocle.
+	  Monocle intentionally has NO other third-party runtime dependencies (no Xceed, Helix, SharpDX, Newtonsoft):
+	  anything it ships or embeds could collide with Dynamo, Revit, or other packages/add-ins in the same process.
+	-->
 	<ItemGroup>
-		<EmbeddedResource Include="Resources\Xceed.Wpf.AvalonDock.NET5.dll" />
-		<EmbeddedResource Include="Resources\Xceed.Wpf.Toolkit.dll" />
-		<EmbeddedResource Include="Resources\Xceed.Wpf.Toolkit.NET5.dll" />
+		<PackageReference Include="DynamoVisualProgramming.Core" Version="$(DynamoPackageVersion)" ExcludeAssets="runtime" />
+		<PackageReference Include="DynamoVisualProgramming.DynamoServices" Version="$(DynamoPackageVersion)" ExcludeAssets="runtime" />
+		<PackageReference Include="DynamoVisualProgramming.WpfUILibrary" Version="$(DynamoPackageVersion)" ExcludeAssets="runtime" />
+		<PackageReference Include="DynamoVisualProgramming.ZeroTouchLibrary" Version="$(DynamoPackageVersion)" ExcludeAssets="runtime" />
 	</ItemGroup>
-	<ItemGroup>
-		<PackageReference Include="Cyotek.Drawing.BitmapFont" Version="2.0.0" />
-		<PackageReference Include="DynamoVisualProgramming.Core" Version="$(DynamoPackageVersion)" />
-		<PackageReference Include="DynamoVisualProgramming.DynamoServices" Version="$(DynamoPackageVersion)" />
-		<PackageReference Include="DynamoVisualProgramming.WpfUILibrary" Version="$(DynamoPackageVersion)" />
-		<PackageReference Include="DynamoVisualProgramming.ZeroTouchLibrary" Version="$(DynamoPackageVersion)" />
-		<PackageReference Include="Prism" Version="4.1.0.0" />
-		<PackageReference Include="SharpDX" Version="4.2.0" />
-		<PackageReference Include="SharpDX.D3DCompiler" Version="4.2.0" />
-		<PackageReference Include="SharpDX.Direct2D1" Version="4.2.0" />
-		<PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
-		<PackageReference Include="SharpDX.Direct3D9" Version="4.2.0" />
-		<PackageReference Include="SharpDX.DXGI" Version="4.2.0" />
-		<PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
-		<PackageReference Include="System.Buffers" Version="4.5.1" />
-		<PackageReference Include="System.Memory" Version="4.5.5" />
-		<PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
-	</ItemGroup>
+	<!-- Dynamo 2.x view models derive from Prism 4.1's NotificationObject; Dynamo ships that DLL, we only compile against it. -->
 	<ItemGroup Condition="'$(TargetFramework)' == 'net48'">
-		<PackageReference Include="CommonServiceLocator" Version="1.0" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-		<PackageReference Include="NUnit" Version="2.6.3" />
-		<PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
-		<PackageReference Include="Extended.Wpf.Toolkit" Version="4.3.0" />
-	</ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows' Or '$(TargetFramework)' == 'net10.0-windows'">
-		<PackageReference Include="CommonServiceLocator" Version="2.0.7" />
-		<PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftJsonVersion)" />
-		<PackageReference Include="NUnit" Version="3.14.0" />
-		<PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
-		<PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
-		<PackageReference Include="Extended.Wpf.Toolkit" Version="4.6.0" />
-	</ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0-windows' Or '$(TargetFramework)' == 'net10.0-windows'">
-		<Reference Include="HelixToolkit">
-			<HintPath>..\..\dynamoResources\net8\HelixToolkit.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="HelixToolkit.Core.Wpf">
-			<HintPath>..\..\dynamoResources\net8\HelixToolkit.Core.Wpf.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="HelixToolkit.SharpDX.Core">
-			<HintPath>..\..\dynamoResources\net8\HelixToolkit.SharpDX.Core.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="HelixToolkit.SharpDX.Core.WPF">
-			<HintPath>..\..\dynamoResources\net8\HelixToolkit.SharpDX.Core.WPF.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-	</ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)' == 'net48'">
-		<Reference Include="HelixToolkit">
-			<HintPath>..\..\dynamoResources\netFramework48\HelixToolkit.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="HelixToolkit.Wpf">
-			<HintPath>..\..\dynamoResources\netFramework48\HelixToolkit.Wpf.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
-		<Reference Include="HelixToolkit.Wpf.SharpDX">
-			<HintPath>..\..\dynamoResources\netFramework48\HelixToolkit.Wpf.SharpDX.dll</HintPath>
-			<Private>False</Private>
-		</Reference>
+		<PackageReference Include="Prism" Version="4.1.0.0" ExcludeAssets="runtime" />
 	</ItemGroup>
 	<ItemGroup>
-		<Reference Include="DynamoPackages" Condition="Exists('$(DynamoPackagesPath)')">
-			<HintPath>$(DynamoPackagesPath)</HintPath>
-			<Private>False</Private>
-		</Reference>
 		<Reference Include="PresentationCore" />
 		<Reference Include="PresentationFramework" />
 		<Reference Include="System.Configuration" />
@@ -587,26 +542,21 @@
 		<Resource Include="Foca\Resources\customnode-64.png" />
 		<Resource Include="Foca\Resources\customnode-64.svg" />
 		<Resource Include="PackageUsage\DogeImages\cheems_heaven.jpg" />
-		<Resource Include="PackageUsage\DogeImages\david-s-pumpkins.gif" />
-		<Resource Include="PackageUsage\DogeImages\doge-comfort.png" />
+		<Resource Include="PackageUsage\DogeImages\doge-comfort.jpg" />
 		<Resource Include="PackageUsage\DogeImages\dogePreview.png" />
 		<Resource Include="PackageUsage\DogeImages\doge_business.jpg" />
 		<Resource Include="PackageUsage\DogeImages\doge_christmas.jpg" />
 		<Resource Include="PackageUsage\DogeImages\doge_dapper.jpg" />
-		<Resource Include="PackageUsage\DogeImages\doge_halloween.gif" />
+		<Resource Include="PackageUsage\DogeImages\doge_halloween.png" />
 		<Resource Include="PackageUsage\DogeImages\doge_heaven.jpg" />
 		<Resource Include="PackageUsage\DogeImages\doge_newyear.png" />
 		<Resource Include="PackageUsage\DogeImages\doge_summer.jpg" />
-		<Resource Include="PackageUsage\DogeImages\dwight-pumpkin.gif" />
+		<Resource Include="PackageUsage\DogeImages\dwight-pumpkin.png" />
 		<Resource Include="Resources\about_github.png" />
 		<Resource Include="Resources\about_john.png" />
 		<Resource Include="Resources\IconDictionary.xaml" />
-		<Resource Include="Resources\InkDropperIcon.svg" />
 		<Resource Include="Resources\monocleLogoRoundedSquare.png" />
-		<Resource Include="Resources\PaintBrushIcon.svg" />
-		<Resource Include="Resources\PaintBrushIcon.xaml" />
 		<Resource Include="Resources\smalls.JPG" />
-		<EmbeddedResource Include="Resources\Xceed.Wpf.AvalonDock.dll" />
 		<Resource Include="SimpleSearch\Resources\magnifyingGlass.png" />
 		<Resource Include="SimpleSearch\Resources\monocle.png" />
 		<Resource Include="StandardViews\Resources\3d_menu.png" />

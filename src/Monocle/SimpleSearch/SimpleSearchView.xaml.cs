@@ -32,6 +32,7 @@ namespace MonocleViewExtension.SimpleSearch
         }
         public void RefreshSelection()
         {
+            (this.DataContext as SimpleSearchViewModel)?.EnsureFresh();
             this.Filter.Clear();
             this.Filter.Focus();
         }

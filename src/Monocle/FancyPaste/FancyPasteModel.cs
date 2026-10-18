@@ -15,7 +15,6 @@ using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using MonocleViewExtension.Foca;
 using MonocleViewExtension.Utilities;
-using Xceed.Wpf.AvalonDock.Controls;
 using DragEventArgs = System.Windows.DragEventArgs;
 using ModifierKeys = System.Windows.Input.ModifierKeys;
 

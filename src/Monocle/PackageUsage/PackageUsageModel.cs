@@ -37,30 +37,18 @@ namespace MonocleViewExtension.PackageUsage
 
         public ObservableCollection<PackageUsageWrapper> GetCustomNodeInfos()
         {
-            List<PackageUsageWrapper> packages = new List<PackageUsageWrapper>();
-            List<PackageUsageWrapper> packageList = new List<PackageUsageWrapper>();
+            var resolver = CreateResolver();
 
-            foreach (var n in LoadedParams.CurrentWorkspaceModel.Nodes)
-            {
-                if (IsCustomNode(n))
+            var packageList = LoadedParams.CurrentWorkspaceModel.Nodes
+                .Where(n => resolver.IsCustomCategory(n.Category))
+                .GroupBy(n => resolver.GetPackageName(n.Category))
+                .Select(group => new PackageUsageWrapper
                 {
-                    packages.Add(new PackageUsageWrapper
-                    {
-                        PackageName = GetPackageName(n),
-                        PackageVersion = GetPackageVersion(n)
-                    });
-                }
-
-            }
-            var grouping = packages.GroupBy(p => p.PackageName)
-                .Select(group => group.OrderBy(p => p.PackageName));
-
-            foreach (var group in grouping)
-            {
-                var first = group.First();
-                first.NodeCount = group.Count();
-                packageList.Add(first);
-            }
+                    PackageName = group.Key,
+                    PackageVersion = resolver.GetPackageVersion(group.Key),
+                    NodeCount = group.Count()
+                })
+                .ToList();
 
             return new ObservableCollection<PackageUsageWrapper>(packageList);
         }
@@ -120,13 +108,16 @@ namespace MonocleViewExtension.PackageUsage
             //clear old notes first
             ClearNotes();
 
+            var resolver = CreateResolver();
+
             foreach (var node in DynamoViewModel.CurrentSpaceViewModel.Nodes)
             {
-                if (IsCustomNode(node.NodeModel) && !node.NodeModel.Name.ToLower().Contains("relay") && !node.NodeModel.Name.ToLower().Contains("remember") && !node.NodeModel.Name.ToLower().Contains("gate"))
+                if (resolver.IsCustomCategory(node.NodeModel.Category) && !IsExcludedUtilityNode(node.NodeModel))
                 {
                     var noteGuid = Guid.NewGuid();
+                    var packageName = resolver.GetPackageName(node.NodeModel.Category);
                     DynamoModel.RecordableCommand cmd = new DynamoModel.CreateNoteCommand(noteGuid,
-                        Globals.CustomNodeNotePrefix + GetPackageName(node.NodeModel) + GetPackageVersion(node.NodeModel), node.X, node.Y - 35, false);
+                        Globals.CustomNodeNotePrefix + packageName + resolver.GetPackageVersion(packageName), node.X, node.Y - 35, false);
 
                     DynamoViewModel.Model.ExecuteCommand(cmd);
 
@@ -172,7 +163,7 @@ namespace MonocleViewExtension.PackageUsage
                          ?? nv.FindName("NodeBackground") as Border;
             if (border != null) return border;
 
-            var allBorders = MiscUtils.FindVisualChildren<Border>(nv).ToList();
+            var allBorders = nv.FindVisualChildren<Border>().ToList();
             return allBorders
                 .Where(b => string.IsNullOrEmpty(b.Name) || !b.Name.Equals("selectionBorder", StringComparison.OrdinalIgnoreCase))
                 .OrderByDescending(b => b.ActualWidth * b.ActualHeight)
@@ -187,7 +178,7 @@ namespace MonocleViewExtension.PackageUsage
                        ?? nv.FindName("NodeBackground") as System.Windows.Shapes.Rectangle;
             if (rect != null) return rect;
 
-            var allRects = MiscUtils.FindVisualChildren<System.Windows.Shapes.Rectangle>(nv).ToList();
+            var allRects = nv.FindVisualChildren<System.Windows.Shapes.Rectangle>().ToList();
             return allRects
                 .Where(r => string.IsNullOrEmpty(r.Name) || !r.Name.Equals("selectionBorder", StringComparison.OrdinalIgnoreCase))
                 .OrderByDescending(r => r.ActualWidth * r.ActualHeight)
@@ -196,17 +187,15 @@ namespace MonocleViewExtension.PackageUsage
 
         public void HighlightCustomNodes()
         {
-            var nodeViews = MiscUtils.FindVisualChildren<NodeView>(DynamoView);
+            var nodeViews = NodeUtils.GetNodeViews(DynamoView);
 
-            var customPackages = GetCustomPackageList();
+            var resolver = CreateResolver();
 
             foreach (var nv in nodeViews)
             {
                 var nvm = nv.ViewModel;
 
-                bool isCustom = customPackages.Any(x => nvm.NodeModel.Category.StartsWith(x, StringComparison.OrdinalIgnoreCase));
-
-                if (isCustom && !nvm.NodeModel.Name.ToLower().Contains("relay") && !nvm.NodeModel.Name.ToLower().Contains("remember") && !nvm.NodeModel.Name.ToLower().Contains("gate"))
+                if (resolver.IsCustomCategory(nvm.NodeModel.Category) && !IsExcludedUtilityNode(nvm.NodeModel))
                 {
                     //try and fail if user is in older dynamo
                     try
@@ -265,12 +254,13 @@ namespace MonocleViewExtension.PackageUsage
 
         public void ResetCustomNodeHighlights()
         {
-            var nodeViews = MiscUtils.FindVisualChildren<NodeView>(DynamoView);
+            var nodeViews = NodeUtils.GetNodeViews(DynamoView);
+            var resolver = CreateResolver();
 
             foreach (var nv in nodeViews)
             {
                 var nvm = nv.ViewModel;
-                if (IsCustomNode(nvm.NodeModel) && !nvm.NodeModel.Name.ToLower().Contains("relay") && !nvm.NodeModel.Name.ToLower().Contains("remember") && !nvm.NodeModel.Name.ToLower().Contains("gate"))
+                if (resolver.IsCustomCategory(nvm.NodeModel.Category) && !IsExcludedUtilityNode(nvm.NodeModel))
                 {
                     //try and fail if user is in older dynamo
                     try
@@ -315,7 +305,7 @@ namespace MonocleViewExtension.PackageUsage
 
         public void RevealInputs()
         {
-            var nodeViews = MiscUtils.FindVisualChildren<NodeView>(DynamoView);
+            var nodeViews = NodeUtils.GetNodeViews(DynamoView);
 
             var inputNodeViews = nodeViews.Where(n => n.ViewModel.IsInput).ToList();
 
@@ -394,137 +384,66 @@ namespace MonocleViewExtension.PackageUsage
 
        
 
-        public List<string> GetCustomPackageList()
+        /// <summary>
+        /// Build a package-name resolver from one pass over the search library (and installed packages on 3.0+).
+        /// Callers create one per operation instead of rescanning the library for every node.
+        /// </summary>
+        internal PackageNameResolver CreateResolver()
         {
-
 #if net8 || net10
-            List<NodeSearchElement> libraries = DynamoViewModel.Model.SearchModel.Entries.ToList();
+            var libraries = DynamoViewModel.Model.SearchModel.Entries;
+#else
+            var libraries = DynamoViewModel.Model.SearchModel.SearchEntries;
 #endif
-
-#if !net8 && !net10
-            List<NodeSearchElement> libraries = DynamoViewModel.Model.SearchModel.SearchEntries.ToList();
-#endif
-
-            List<string> addOns = new List<string>();
+            var roots = new List<string>();
             foreach (var element in libraries)
             {
                 // Only include packages and custom nodes
-                if (element.ElementType.HasFlag(ElementTypes.Packaged) || element.ElementType.HasFlag(ElementTypes.CustomNode))
+                if (!element.ElementType.HasFlag(ElementTypes.Packaged) && !element.ElementType.HasFlag(ElementTypes.CustomNode)) continue;
+
+                var top = element.Categories.FirstOrDefault();
+                if (top != null && !top.StartsWith("Core") && !top.StartsWith("Revit"))
                 {
-                    // Ordered list of all categories for the search element including all nested categories
-                    var allAddOns = element.Categories.ToList();
-                    // Construct all categories levels for the element starting at the top level
-                    for (int i = 0; i < allAddOns.Count; i++)
-                    {
-                        if (i == 0 && !allAddOns[i].StartsWith("Core") && !allAddOns[i].StartsWith("Revit"))
-                        {
-                            addOns.Add(allAddOns[i]);
-                        }
-                    }
+                    roots.Add(top);
                 }
             }
-            
+
+            List<KeyValuePair<string, string>> localPackages = null;
             try
             {
 #if D30_OR_GREATER
                 if (Globals.PmExtension?.PackageLoader != null)
                 {
-                    var packageNames = Globals.PmExtension.PackageLoader.LocalPackages.Select(p => p.Name).ToList();
-                    foreach (var pName in packageNames)
-                    {
-                        if (!addOns.Contains(pName))
-                        {
-                            addOns.Add(pName);
-                        }
-                    }
+                    localPackages = Globals.PmExtension.PackageLoader.LocalPackages
+                        .Select(p => new KeyValuePair<string, string>(p.Name, p.VersionName))
+                        .ToList();
                 }
 #endif
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                DynamoViewModel.Model.Logger.LogWarning($"Monocle- GetCustomPackageList fallback failed: {e.Message}", WarningLevel.Mild);
+                DynamoViewModel.Model.Logger.LogWarning($"Monocle- reading installed packages failed: {e.Message}", WarningLevel.Mild);
             }
 
-            return addOns.Distinct().ToList();
-        }
-        //public string AllCustomNodes()
-        //{
-        //    List<NodeSearchElement> libraries = DynamoViewModel.Model.SearchModel.SearchEntries.ToList();
-        //    List<string> addOns = new List<string>();
-        //    foreach (var element in libraries)
-        //    {
-        //        // Only include packages and custom nodes
-        //        if (element.ElementType.HasFlag(ElementTypes.Packaged) || element.ElementType.HasFlag(ElementTypes.CustomNode))
-        //        {
-        //            // Ordered list of all categories for the search element including all nested categories
-        //            var allAddOns = element.Categories.ToList();
-        //            // Construct all categories levels for the element starting at the top level
-        //            for (int i = 0; i < allAddOns.Count; i++)
-        //            {
-        //                if (i == 0 && !allAddOns[i].StartsWith("Core"))
-        //                {
-        //                    addOns.Add("{" + "\"" + element.CreationName.Split('@').First() + "\"" + "," + "\"" + allAddOns[i] + "\"" + "},");
-        //                }
-        //            }
-        //        }
-        //    }
-        //    return string.Join("\n", addOns.Distinct().ToList());
-        //}
-        public bool IsCustomNode(NodeModel node)
-        {
-            bool result = GetCustomPackageList().Any(x => node.Category.StartsWith(x, StringComparison.OrdinalIgnoreCase));
-
-            return result;
+            return new PackageNameResolver(roots, localPackages);
         }
 
-        public string GetPackageName(NodeModel node)
-        {
-            List<int> values = new List<int>();
+        public List<string> GetCustomPackageList() => CreateResolver().Roots.ToList();
 
-            foreach (var c in GetCustomPackageList())
-            {
-                string nodeCat = node.Category.Split('.').First();
-                values.Add(StringUtils.Compute(nodeCat, c));
-            }
-            int minIndex = values.IndexOf(values.Min());
-            var result = GetCustomPackageList()[minIndex];
+        public bool IsCustomNode(NodeModel node) => CreateResolver().IsCustomCategory(node.Category);
 
-            string fixedResult;
-            switch (result.ToLower())
-            {
-                case "springs":
-                    fixedResult = "spring nodes";
-                    break;
-                case "archilab_bumblebee":
-                    fixedResult = "BumbleBee";
-                    break;
-                default:
-                    fixedResult = result;
-                    break;
-            }
+        public string GetPackageName(NodeModel node) => CreateResolver().GetPackageName(node.Category);
 
-
-            return fixedResult;
-        }
         public string GetPackageVersion(NodeModel node)
         {
-            string version = "";
-            //event handlers for when changes are made
-            try
-            {
-#if D30_OR_GREATER
-                if (Globals.PmExtension?.PackageLoader == null) return "";
-                var packageName = GetPackageName(node).SimplifyString();
-                var targetInfo = Globals.PmExtension.PackageLoader.LocalPackages.FirstOrDefault(x => x.Name.SimplifyString() == packageName);
+            var resolver = CreateResolver();
+            return resolver.GetPackageVersion(resolver.GetPackageName(node.Category));
+        }
 
-                version = $"v.{targetInfo.VersionName}";
-#endif
-            }
-            catch (Exception)
-            {
-                version = "";
-            }
-            return version;
+        private static bool IsExcludedUtilityNode(NodeModel node)
+        {
+            var name = node.Name?.ToLower() ?? string.Empty;
+            return name.Contains("relay") || name.Contains("remember") || name.Contains("gate");
         }
     }
 }

@@ -37,58 +37,13 @@ namespace MonocleViewExtension
         public void Dispose()
         {
             standardViewsViewModel?.Dispose();
-            AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomainOnAssemblyResolve;
-#if net8 || net10
-            System.Runtime.Loader.AssemblyLoadContext.Default.Resolving -= AssemblyLoadContext_Resolving;
-#endif
         }
 
         public void Startup(ViewStartupParams viewStartupParams)
         {
-            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainOnAssemblyResolve;
-#if net8 || net10
-            System.Runtime.Loader.AssemblyLoadContext.Default.Resolving += AssemblyLoadContext_Resolving;
-#endif
+            // Intentionally empty. Monocle used to install a process-wide AssemblyResolve handler here to serve
+            // embedded Xceed DLLs; it now has no third-party dependencies, so it never touches assembly resolution.
         }
-
-        private Assembly CurrentDomainOnAssemblyResolve(object sender, ResolveEventArgs args)
-        {
-            // Get assembly name
-            var assemblyName = new AssemblyName(args.Name).Name + ".dll";
-
-            // Get resource name
-            var resourceName = Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(x => x.EndsWith(".dll")).ToArray().FirstOrDefault(x => x.EndsWith(assemblyName));
-            if (resourceName == null)
-            {
-                return null;
-            }
-
-            // Load assembly from resource
-            using (var stream = Globals.ExecutingAssembly.GetManifestResourceStream(resourceName))
-            {
-                using (var memoryStream = new MemoryStream())
-                {
-                    stream.CopyTo(memoryStream);
-                    return Assembly.Load(memoryStream.ToArray());
-                }
-            }
-        }
-
-#if net8 || net10
-        private Assembly AssemblyLoadContext_Resolving(System.Runtime.Loader.AssemblyLoadContext context, AssemblyName assemblyName)
-        {
-            var assemblyNameStr = new AssemblyName(assemblyName.Name).Name + ".dll";
-            var resourceName = Assembly.GetExecutingAssembly().GetManifestResourceNames().Where(x => x.EndsWith(".dll")).ToArray().FirstOrDefault(x => x.EndsWith(assemblyNameStr));
-            if (resourceName == null)
-            {
-                return null;
-            }
-            using (var stream = Globals.ExecutingAssembly.GetManifestResourceStream(resourceName))
-            {
-                return context.LoadFromStream(stream);
-            }
-        }
-#endif
 
         public void Loaded(ViewLoadedParams p)
         {
@@ -174,7 +129,7 @@ namespace MonocleViewExtension
             };
             var img = new System.Windows.Controls.Image
             {
-                Source = ImageUtils.LoadImage(Assembly.GetExecutingAssembly(), "smalls.JPG"),
+                Source = ImageUtils.LoadImage(Assembly.GetExecutingAssembly(), "Resources/smalls.JPG"),
                 Height = 32,
                 Width = 32,
                 Stretch = Stretch.Uniform

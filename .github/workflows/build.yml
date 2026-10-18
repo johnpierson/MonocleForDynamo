@@ -18,7 +18,10 @@ jobs:
       fail-fast: false
       matrix:
         configuration:
+          - Release 2.0
+          - Release 2.12
           - Release 2.19
+          - Release 3.0
           - Release 3.6
           - Release 3.7
           - Release 4.1
@@ -48,6 +51,52 @@ jobs:
           /p:EnableDeploymentCopy=false
           /t:Restore,Build
 
+      - name: Guard against embedded or third-party assemblies
+        shell: pwsh
+        run: dotnet run --file tools/AssemblyGuard.cs -- "src/Monocle/bin/${{ matrix.configuration }}"
+
       - name: Run pure regression tests
         if: matrix.configuration == 'Release 4.2'
         run: dotnet run --project tests/Monocle.RegressionTests/Monocle.RegressionTests.csproj --configuration Release
+
+  loader:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build package loader
+        run: dotnet build src/MonocleLoader/MonocleExtension/MonocleExtension.csproj -c Release
+
+  deploy-folder:
+    # The loader downloads deploy/<ver>/MonocleViewExtension.dll and refuses it unless it matches deploy/SHA256SUMS.
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Verify deploy/SHA256SUMS matches every committed build
+        shell: bash
+        run: |
+          cd deploy
+          sha256sum -c SHA256SUMS
+          listed=$(awk '{print $2}' SHA256SUMS | sed 's/^\*//' | sort)
+          present=$(ls */MonocleViewExtension.dll | sort)
+          if [ "$listed" != "$present" ]; then
+            echo "SHA256SUMS does not list exactly the committed builds."
+            diff <(echo "$listed") <(echo "$present")
+            exit 1
+          fi
+
+      - name: Guard committed builds
+        run: dotnet run --file tools/AssemblyGuard.cs -- deploy

@@ -16,5 +16,9 @@
     <Compile Include="..\..\src\Monocle\NodeDocumentation\DocumentationImagePaths.cs" Link="DocumentationImagePaths.cs" />
     <Compile Include="..\..\src\Monocle\NodeDocumentation\NodeDocumentation.cs" Link="NodeDocumentation.cs" />
     <Compile Include="..\..\src\Monocle\Utilities\Settings.cs" Link="Settings.cs" />
+    <Compile Include="..\..\src\MonocleLoader\MonocleExtension\DeployManifest.cs" Link="DeployManifest.cs" />
+    <Compile Include="..\..\src\Monocle\PackageUsage\PackageNameResolver.cs" Link="PackageNameResolver.cs" />
+    <Compile Include="..\..\src\Monocle\About\UpdateCheck.cs" Link="UpdateCheck.cs" />
+    <Compile Include="..\..\src\Monocle\SimpleSearch\SearchKey.cs" Link="SearchKey.cs" />
   </ItemGroup>
 </Project>

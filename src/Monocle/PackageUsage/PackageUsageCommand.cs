@@ -7,7 +7,6 @@ using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using Dynamo.Wpf.Interfaces;
 using MonocleViewExtension.PackageUsage;
-using SharpDX.Direct2D1;
 
 namespace MonocleViewExtension.PackageUsage
 {
