@@ -43,6 +43,10 @@ jobs:
         if: matrix.configuration == 'Release 4.2'
         run: dotnet run --project tests/Monocle.LocalGroupNaming.Tests/Monocle.LocalGroupNaming.Tests.csproj --configuration Release
 
+      - name: Build local group naming bench tool
+        if: matrix.configuration == 'Release 4.2'
+        run: dotnet build tools/Monocle.LocalGroupNaming.Bench/Monocle.LocalGroupNaming.Bench.csproj --configuration Release
+
       - name: Build canonical project
         shell: pwsh
         run: >-

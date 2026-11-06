@@ -13,8 +13,10 @@ namespace MonocleViewExtension.LocalGroupNaming
         private readonly CheckBox modelAgreement;
         private readonly Button acceptButton;
 
-        public LocalModelAgreementWindow(Window owner)
+        public LocalModelAgreementWindow(Window owner, LocalModelManifest manifest)
         {
+            if (manifest == null) throw new ArgumentNullException(nameof(manifest));
+
             Title = "Set up Monocle local group naming";
             Owner = owner;
             Width = 560;
@@ -26,7 +28,7 @@ namespace MonocleViewExtension.LocalGroupNaming
             var content = new StackPanel { Margin = new Thickness(24) };
             content.Children.Add(new TextBlock
             {
-                Text = "Monocle will download about 2.5 GB of third-party software for fully local group naming.",
+                Text = $"Monocle will download about {manifest.ApproximateDownloadSize} of third-party software for fully local group naming.",
                 FontSize = 16,
                 FontWeight = FontWeights.SemiBold,
                 TextWrapping = TextWrapping.Wrap,
@@ -34,7 +36,8 @@ namespace MonocleViewExtension.LocalGroupNaming
             });
             content.Children.Add(new TextBlock
             {
-                Text = "The files are stored under your local application data folder. Dynamo node names stay on this computer and are never sent to an external AI service.",
+                Text = $"The llama.cpp runtime ({manifest.RuntimeVersion}) and the {manifest.ModelDisplayName} model are stored under your local application data folder. " +
+                       "Dynamo node names stay on this computer and are never sent to an external AI service.",
                 TextWrapping = TextWrapping.Wrap,
                 Margin = new Thickness(0, 0, 0, 10)
             });
@@ -46,11 +49,11 @@ namespace MonocleViewExtension.LocalGroupNaming
             });
 
             runtimeAgreement = CreateAgreement(
-                "I accept the llama.cpp MIT License",
-                LocalModelManifest.RuntimeLicenseUrl);
+                $"I accept the llama.cpp {manifest.RuntimeLicenseName}",
+                manifest.RuntimeLicenseUrl);
             modelAgreement = CreateAgreement(
-                "I accept the Qwen3 4B Apache License 2.0",
-                LocalModelManifest.ModelLicenseUrl);
+                $"I accept the {manifest.ModelDisplayName} {manifest.ModelLicenseName}",
+                manifest.ModelLicenseUrl);
             runtimeAgreement.Checked += AgreementChanged;
             runtimeAgreement.Unchecked += AgreementChanged;
             modelAgreement.Checked += AgreementChanged;

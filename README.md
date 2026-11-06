@@ -35,6 +35,14 @@ The pure regression checks can run independently of Dynamo:
 dotnet run --project tests/Monocle.RegressionTests/Monocle.RegressionTests.csproj --configuration Release
 ```
 
+The experimental local group naming feature (`src/Monocle/LocalGroupNaming/README.md`) has its own Dynamo-free checks, including a simulated download server for the resumable model installer:
+
+```powershell
+dotnet run --project tests/Monocle.LocalGroupNaming.Tests/Monocle.LocalGroupNaming.Tests.csproj --configuration Release
+```
+
+`tools/Monocle.LocalGroupNaming.Bench` runs the production naming path against any llama-server build and GGUF model to compare candidates before changing the pinned model; `docs/LOCAL_GROUP_NAMING_MODEL_RESEARCH.md` records how the current pin was chosen.
+
 The canonical project does not stage build output into `deploy` unless explicitly requested. For intentional local packaging, pass `/p:EnableDeploymentCopy=true` to the MSBuild command. The Revit `DynamoPackages.dll` reference is optional and defaults to the Revit 2022 install location; set `/p:DynamoPackagesPath="C:\path\to\DynamoPackages.dll"` when it is installed elsewhere. The separate `Monocle-net8.csproj` is retained as a legacy Dynamo 3.0 package project; its post-build copy is disabled by default and can be enabled with `/p:EnableLegacyPostBuildCopy=true /p:LegacyDynamoPackagePath="C:\path\to\MonocleViewExtension.dll"`.
 
 ## Known Issues

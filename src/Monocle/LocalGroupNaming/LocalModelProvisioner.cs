@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -10,22 +9,6 @@ using System.Threading.Tasks;
 
 namespace MonocleViewExtension.LocalGroupNaming
 {
-    internal sealed class LocalModelDownloadProgress
-    {
-        public LocalModelDownloadProgress(string component, long bytesReceived, long? totalBytes)
-        {
-            Component = component;
-            BytesReceived = bytesReceived;
-            TotalBytes = totalBytes;
-        }
-
-        public string Component { get; }
-
-        public long BytesReceived { get; }
-
-        public long? TotalBytes { get; }
-    }
-
     internal sealed class LocalModelProvisioner
     {
         private const string AgreementFileName = "third-party-licenses.accepted";
@@ -35,16 +18,29 @@ namespace MonocleViewExtension.LocalGroupNaming
         private const string StagingDirectoryName = "runtime-staging";
         private const string DownloadExtension = ".download";
         private readonly LocalLlamaServerOptions options;
+        private readonly HttpMessageHandler messageHandler;
 
-        public LocalModelProvisioner(LocalLlamaServerOptions options)
+        public LocalModelProvisioner(LocalLlamaServerOptions options) : this(options, null)
+        {
+        }
+
+        /// <summary>Test seam: downloads go through <paramref name="messageHandler"/> instead of the network.</summary>
+        internal LocalModelProvisioner(LocalLlamaServerOptions options, HttpMessageHandler messageHandler)
         {
             this.options = options ?? throw new ArgumentNullException(nameof(options));
+            this.messageHandler = messageHandler;
         }
+
+        public LocalModelManifest Manifest => options.Manifest;
 
         public bool RequiresAgreement => options.IsManagedInstallation && !HasAcceptedAgreements();
 
         public bool RequiresDownload => options.IsManagedInstallation &&
             (!RuntimeIsInstalled() || !ModelIsInstalled());
+
+        private string ModelComponentName => Manifest.ModelDisplayName + " model";
+
+        private string RuntimeComponentName => "llama.cpp runtime " + Manifest.RuntimeVersion;
 
         public bool HasAcceptedAgreements()
         {
@@ -56,7 +52,7 @@ namespace MonocleViewExtension.LocalGroupNaming
             var firstLine = File.ReadLines(path).FirstOrDefault();
             return string.Equals(
                 firstLine,
-                "Version=" + LocalModelManifest.InstallationVersion,
+                "Version=" + Manifest.InstallationVersion,
                 StringComparison.Ordinal);
         }
 
@@ -69,10 +65,10 @@ namespace MonocleViewExtension.LocalGroupNaming
                 Path.Combine(options.InstallationDirectory, AgreementFileName),
                 string.Join(Environment.NewLine, new[]
                 {
-                    "Version=" + LocalModelManifest.InstallationVersion,
+                    "Version=" + Manifest.InstallationVersion,
                     "AcceptedUtc=" + DateTime.UtcNow.ToString("O"),
-                    "RuntimeLicense=" + LocalModelManifest.RuntimeLicenseUrl,
-                    "ModelLicense=" + LocalModelManifest.ModelLicenseUrl
+                    "RuntimeLicense=" + Manifest.RuntimeLicenseUrl,
+                    "ModelLicense=" + Manifest.ModelLicenseUrl
                 }));
         }
 
@@ -98,13 +94,11 @@ namespace MonocleViewExtension.LocalGroupNaming
             //Revit, Civil 3D); only one process may install into it at a time.
             using (AcquireInstallLock())
             {
-                CleanUpStaleDownloads();
+                CleanUpStaleStaging();
                 EnsureAvailableDiskSpace();
 
-                using (var httpClient = new HttpClient { Timeout = TimeSpan.FromHours(6) })
+                using (var httpClient = CreateHttpClient())
                 {
-                    httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("MonocleForDynamo/2026.6");
-
                     if (!RuntimeIsInstalled())
                     {
                         await InstallRuntimeAsync(httpClient, progress, cancellationToken).ConfigureAwait(false);
@@ -118,6 +112,29 @@ namespace MonocleViewExtension.LocalGroupNaming
 
                 options.Validate();
             }
+
+            //Only once this version is complete do the files of an older pin become
+            //dead weight (a previous model alone is a multi-gigabyte download).
+            RemoveSupersededInstallations();
+        }
+
+        private HttpClient CreateHttpClient()
+        {
+            var httpClient = messageHandler == null
+                ? new HttpClient()
+                : new HttpClient(messageHandler, false);
+            httpClient.Timeout = TimeSpan.FromHours(6);
+            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("MonocleForDynamo/" + ProductVersion);
+            return httpClient;
+        }
+
+        private static string ProductVersion
+        {
+            get
+            {
+                var version = typeof(LocalModelProvisioner).Assembly.GetName().Version;
+                return version == null ? "0.0" : version.ToString(2);
+            }
         }
 
         private bool RuntimeIsInstalled()
@@ -125,7 +142,7 @@ namespace MonocleViewExtension.LocalGroupNaming
             var markerPath = Path.Combine(options.InstallationDirectory, RuntimeMarkerFileName);
             return File.Exists(options.ServerPath) && File.Exists(markerPath) && string.Equals(
                 File.ReadAllText(markerPath).Trim(),
-                LocalModelManifest.RuntimeSha256,
+                Manifest.RuntimeSha256,
                 StringComparison.OrdinalIgnoreCase);
         }
 
@@ -135,9 +152,9 @@ namespace MonocleViewExtension.LocalGroupNaming
             if (!File.Exists(options.ModelPath) || !File.Exists(markerPath)) return false;
 
             var modelInfo = new FileInfo(options.ModelPath);
-            return modelInfo.Length == LocalModelManifest.ModelFileSize && string.Equals(
+            return modelInfo.Length == Manifest.ModelFileSize && string.Equals(
                 File.ReadAllText(markerPath).Trim(),
-                LocalModelManifest.ModelSha256,
+                Manifest.ModelSha256,
                 StringComparison.OrdinalIgnoreCase);
         }
 
@@ -146,28 +163,28 @@ namespace MonocleViewExtension.LocalGroupNaming
             IProgress<LocalModelDownloadProgress> progress,
             CancellationToken cancellationToken)
         {
-            var archivePath = Path.Combine(options.InstallationDirectory, LocalModelManifest.RuntimeArchiveName + DownloadExtension);
+            var archivePath = Path.Combine(options.InstallationDirectory, Manifest.RuntimeArchiveName + DownloadExtension);
             var stagingDirectory = Path.Combine(options.InstallationDirectory, StagingDirectoryName);
             var runtimeDirectory = Path.GetDirectoryName(options.ServerPath);
+            var markerPath = Path.Combine(options.InstallationDirectory, RuntimeMarkerFileName);
 
             //Invalidate the marker before touching the runtime directory so a failed
             //reinstall is retried instead of being reported as complete.
-            DeleteFileIfPresent(Path.Combine(options.InstallationDirectory, RuntimeMarkerFileName));
-            DeleteFileIfPresent(archivePath);
+            DeleteFileIfPresent(markerPath);
             DeleteDirectoryIfPresent(stagingDirectory);
 
             try
             {
-                await DownloadAsync(
+                await ResumableDownloader.DownloadAsync(
                     httpClient,
-                    LocalModelManifest.RuntimeDownloadUrl,
+                    Manifest.RuntimeDownloadUrl,
                     archivePath,
-                    "llama.cpp runtime",
-                    null,
+                    RuntimeComponentName,
+                    Manifest.RuntimeArchiveSize,
                     progress,
                     cancellationToken).ConfigureAwait(false);
 
-                VerifySha256(archivePath, LocalModelManifest.RuntimeSha256);
+                VerifySha256(archivePath, Manifest.RuntimeSha256, cancellationToken);
                 Directory.CreateDirectory(stagingDirectory);
                 ExtractArchiveSafely(archivePath, stagingDirectory);
 
@@ -183,13 +200,19 @@ namespace MonocleViewExtension.LocalGroupNaming
                 var extractedRuntimeDirectory = Path.GetDirectoryName(serverCandidates[0]);
                 DeleteDirectoryIfPresent(runtimeDirectory);
                 CopyDirectory(extractedRuntimeDirectory, runtimeDirectory);
-                File.WriteAllText(
-                    Path.Combine(options.InstallationDirectory, RuntimeMarkerFileName),
-                    LocalModelManifest.RuntimeSha256);
+                File.WriteAllText(markerPath, Manifest.RuntimeSha256);
+                DeleteFileIfPresent(archivePath);
+            }
+            catch (InvalidDataException)
+            {
+                //A corrupt or wrong-sized download must not be resumed next time.
+                DeleteFileIfPresent(archivePath);
+                throw;
             }
             finally
             {
-                DeleteFileIfPresent(archivePath);
+                //A cancelled or interrupted download keeps its partial file so the next
+                //attempt can resume it; only the extraction scratch space is removed.
                 DeleteDirectoryIfPresent(stagingDirectory);
             }
         }
@@ -201,106 +224,56 @@ namespace MonocleViewExtension.LocalGroupNaming
         {
             var modelDirectory = Path.GetDirectoryName(options.ModelPath);
             var temporaryPath = options.ModelPath + DownloadExtension;
+            var markerPath = Path.Combine(options.InstallationDirectory, ModelMarkerFileName);
             Directory.CreateDirectory(modelDirectory);
-            DeleteFileIfPresent(Path.Combine(options.InstallationDirectory, ModelMarkerFileName));
-            DeleteFileIfPresent(temporaryPath);
+            DeleteFileIfPresent(markerPath);
 
             try
             {
-                await DownloadAsync(
+                await ResumableDownloader.DownloadAsync(
                     httpClient,
-                    LocalModelManifest.ModelDownloadUrl,
+                    Manifest.ModelDownloadUrl,
                     temporaryPath,
-                    "Qwen3 4B model",
-                    LocalModelManifest.ModelFileSize,
+                    ModelComponentName,
+                    Manifest.ModelFileSize,
                     progress,
                     cancellationToken).ConfigureAwait(false);
 
                 var downloadedFile = new FileInfo(temporaryPath);
-                if (downloadedFile.Length != LocalModelManifest.ModelFileSize)
+                if (downloadedFile.Length != Manifest.ModelFileSize)
                 {
                     throw new InvalidDataException(
-                        $"The downloaded model was {downloadedFile.Length} bytes; expected {LocalModelManifest.ModelFileSize} bytes.");
+                        $"The downloaded model was {downloadedFile.Length} bytes; expected {Manifest.ModelFileSize} bytes.");
                 }
 
-                VerifySha256(temporaryPath, LocalModelManifest.ModelSha256);
+                VerifySha256(temporaryPath, Manifest.ModelSha256, cancellationToken);
                 DeleteFileIfPresent(options.ModelPath);
                 File.Move(temporaryPath, options.ModelPath);
-                File.WriteAllText(
-                    Path.Combine(options.InstallationDirectory, ModelMarkerFileName),
-                    LocalModelManifest.ModelSha256);
+                File.WriteAllText(markerPath, Manifest.ModelSha256);
             }
-            finally
+            catch (InvalidDataException)
             {
+                //A corrupt download would fail the same way again; start over next time.
                 DeleteFileIfPresent(temporaryPath);
+                throw;
             }
         }
 
-        private static async Task DownloadAsync(
-            HttpClient httpClient,
-            string url,
-            string destinationPath,
-            string component,
-            long? expectedBytes,
-            IProgress<LocalModelDownloadProgress> progress,
-            CancellationToken cancellationToken)
-        {
-            using (var response = await httpClient.GetAsync(
-                url,
-                HttpCompletionOption.ResponseHeadersRead,
-                cancellationToken).ConfigureAwait(false))
-            {
-                response.EnsureSuccessStatusCode();
-                var totalBytes = response.Content.Headers.ContentLength;
-                if (expectedBytes.HasValue && totalBytes.HasValue && totalBytes.Value != expectedBytes.Value)
-                {
-                    throw new InvalidDataException(
-                        $"The {component} download reports {totalBytes.Value} bytes; expected {expectedBytes.Value} bytes.");
-                }
-
-                var buffer = new byte[1024 * 1024];
-                long bytesReceived = 0;
-
-                using (var input = await response.Content.ReadAsStreamAsync().ConfigureAwait(false))
-                using (var output = new FileStream(
-                    destinationPath,
-                    FileMode.CreateNew,
-                    FileAccess.Write,
-                    FileShare.None,
-                    buffer.Length,
-                    true))
-                {
-                    int bytesRead;
-                    while ((bytesRead = await input.ReadAsync(
-                        buffer,
-                        0,
-                        buffer.Length,
-                        cancellationToken).ConfigureAwait(false)) > 0)
-                    {
-                        await output.WriteAsync(
-                            buffer,
-                            0,
-                            bytesRead,
-                            cancellationToken).ConfigureAwait(false);
-                        bytesReceived += bytesRead;
-                        if (expectedBytes.HasValue && bytesReceived > expectedBytes.Value)
-                        {
-                            throw new InvalidDataException(
-                                $"The {component} download exceeded the expected {expectedBytes.Value} bytes.");
-                        }
-
-                        progress?.Report(new LocalModelDownloadProgress(component, bytesReceived, totalBytes));
-                    }
-                }
-            }
-        }
-
-        private static void VerifySha256(string path, string expectedHash)
+        private static void VerifySha256(string path, string expectedHash, CancellationToken cancellationToken)
         {
             using (var stream = File.OpenRead(path))
             using (var sha256 = SHA256.Create())
             {
-                var actualHash = string.Concat(sha256.ComputeHash(stream).Select(value => value.ToString("X2")));
+                var buffer = new byte[ResumableDownloader.BufferSize];
+                int bytesRead;
+                while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    sha256.TransformBlock(buffer, 0, bytesRead, null, 0);
+                }
+
+                sha256.TransformFinalBlock(buffer, 0, 0);
+                var actualHash = string.Concat(sha256.Hash.Select(value => value.ToString("X2")));
                 if (!string.Equals(actualHash, expectedHash, StringComparison.OrdinalIgnoreCase))
                 {
                     throw new InvalidDataException(
@@ -370,25 +343,86 @@ namespace MonocleViewExtension.LocalGroupNaming
             }
         }
 
-        private void CleanUpStaleDownloads()
+        private void CleanUpStaleStaging()
         {
-            DeleteFileIfPresent(options.ModelPath + DownloadExtension);
-            DeleteFileIfPresent(Path.Combine(options.InstallationDirectory, LocalModelManifest.RuntimeArchiveName + DownloadExtension));
+            //Partial '.download' files are deliberately kept: the downloader resumes them.
             DeleteDirectoryIfPresent(Path.Combine(options.InstallationDirectory, StagingDirectoryName));
         }
 
         private void EnsureAvailableDiskSpace()
         {
-            if (ModelIsInstalled()) return;
+            var modelInstalled = ModelIsInstalled();
+            if (modelInstalled && RuntimeIsInstalled()) return;
+
+            var required = Manifest.RequiredFreeBytes;
+            if (modelInstalled)
+            {
+                required -= Manifest.ModelFileSize;
+            }
+            else
+            {
+                var partialModel = options.ModelPath + DownloadExtension;
+                if (File.Exists(partialModel))
+                {
+                    required -= Math.Min(new FileInfo(partialModel).Length, Manifest.ModelFileSize);
+                }
+            }
 
             var root = Path.GetPathRoot(Path.GetFullPath(options.InstallationDirectory));
             var drive = new DriveInfo(root);
-            const long minimumFreeBytes = 3L * 1024 * 1024 * 1024;
-            if (drive.AvailableFreeSpace < minimumFreeBytes)
+            if (drive.AvailableFreeSpace < required)
             {
                 throw new IOException(
-                    $"At least 3 GB of free disk space is required to install local group naming. '{root}' has {drive.AvailableFreeSpace / (1024 * 1024)} MB available.");
+                    $"At least {LocalModelManifest.FormatSize(required)} of free disk space is required to install local group naming. '{root}' has {LocalModelManifest.FormatSize(drive.AvailableFreeSpace)} available.");
             }
+        }
+
+        /// <summary>
+        /// Deletes sibling installations left behind by earlier model or runtime pins.
+        /// A directory another process is installing into (its lock is held) or whose
+        /// model is still memory-mapped by a running server simply fails to delete and
+        /// is retried after the next install.
+        /// </summary>
+        internal void RemoveSupersededInstallations()
+        {
+            if (string.IsNullOrWhiteSpace(options.InstallationRootDirectory) ||
+                !Directory.Exists(options.InstallationRootDirectory))
+            {
+                return;
+            }
+
+            var current = NormalizeDirectoryPath(options.InstallationDirectory);
+            foreach (var directory in Directory.GetDirectories(options.InstallationRootDirectory))
+            {
+                if (string.Equals(NormalizeDirectoryPath(directory), current, StringComparison.OrdinalIgnoreCase)) continue;
+
+                try
+                {
+                    var lockPath = Path.Combine(directory, InstallLockFileName);
+                    if (File.Exists(lockPath))
+                    {
+                        //Opening the lock exclusively fails while another installer holds it.
+                        using (new FileStream(lockPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+                        {
+                        }
+                    }
+
+                    Directory.Delete(directory, true);
+                }
+                catch (IOException)
+                {
+                    //In use by another Dynamo instance; leave it for a later run.
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    //Not ours to remove.
+                }
+            }
+        }
+
+        private static string NormalizeDirectoryPath(string path)
+        {
+            return Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         }
 
         private static void DeleteFileIfPresent(string path)

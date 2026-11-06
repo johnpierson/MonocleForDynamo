@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -7,37 +8,62 @@ namespace MonocleViewExtension.LocalGroupNaming
 {
     internal static class GroupNamingPromptBuilder
     {
-        public static string Build(IEnumerable<string> nodeNames)
-        {
-            if (nodeNames == null) throw new ArgumentNullException(nameof(nodeNames));
+        /// <summary>Longest group listing sent to the model; larger groups are summarised.</summary>
+        public const int MaximumListedItems = 60;
 
-            var nodeCounts = nodeNames
-                .Where(name => !string.IsNullOrWhiteSpace(name))
-                .GroupBy(Clean, StringComparer.OrdinalIgnoreCase)
-                .Select(group => new { Name = group.Key, Count = group.Count() })
+        /// <summary>
+        /// Fixed system message. It is identical for every request so llama-server's prompt
+        /// cache reuses its tokens and only the group contents are processed per request.
+        /// </summary>
+        public const string SystemPrompt =
+            "You name groups of nodes in Autodesk Dynamo graphs (visual programs, often used with Revit). " +
+            "Given the contents of one group, reply with a short title that says what the group accomplishes as a whole.\n" +
+            "Rules:\n" +
+            "- 3 to 7 words in Title Case, plain words only: no quotes, punctuation, code, or explanation.\n" +
+            "- Start with a verb when the group performs an action (Create, Collect, Filter, Export, Set, Read, Calculate, Place, Compare).\n" +
+            "- Describe the purpose, not the mechanics. Never repeat a node name verbatim and never use the words Group, Nodes, Workflow, Graph, Dynamo, or Script.\n" +
+            "Examples:\n" +
+            "Contents: Number Slider x2; Point.ByCoordinates; List.Create\n" +
+            "Title: Create Points From Slider Values\n" +
+            "Contents: Categories: Doors; All Elements of Category; Element.GetParameterValueByName; String: \"Mark\"\n" +
+            "Title: Read Door Mark Values\n" +
+            "Contents: File Path: schedule.xlsx; Data.ImportExcel; List.Transpose; List.GetItemAtIndex\n" +
+            "Title: Import Schedule Data From Excel";
+
+        public static string Build(IEnumerable<string> nodeDescriptions)
+        {
+            if (nodeDescriptions == null) throw new ArgumentNullException(nameof(nodeDescriptions));
+
+            var items = nodeDescriptions
+                .Where(description => !string.IsNullOrWhiteSpace(description))
+                .Select(Clean)
+                .GroupBy(description => description, StringComparer.OrdinalIgnoreCase)
+                .Select(group => new { Description = group.Key, Count = group.Count() })
                 .ToList();
 
-            if (nodeCounts.Count == 0)
+            if (items.Count == 0)
             {
                 throw new InvalidOperationException("The selected group does not contain any nameable nodes.");
             }
 
             var prompt = new StringBuilder();
-            prompt.AppendLine("/no_think");
-            prompt.AppendLine("Given the following nodes in this group in Autodesk Dynamo, what would a logical name of this group be?");
-            prompt.AppendLine();
-            prompt.AppendLine("Nodes:");
-            foreach (var node in nodeCounts)
+            prompt.AppendLine("Contents:");
+            foreach (var item in items.Take(MaximumListedItems))
             {
-                prompt.Append("- ").Append(node.Name);
-                if (node.Count > 1) prompt.Append(" x").Append(node.Count);
+                prompt.Append("- ").Append(item.Description);
+                if (item.Count > 1) prompt.Append(" x").Append(item.Count.ToString(CultureInfo.InvariantCulture));
                 prompt.AppendLine();
             }
 
+            var omitted = items.Count - MaximumListedItems;
+            if (omitted > 0)
+            {
+                prompt.Append("- ... and ").Append(omitted.ToString(CultureInfo.InvariantCulture))
+                    .AppendLine(omitted == 1 ? " more node" : " more nodes");
+            }
+
             prompt.AppendLine();
-            prompt.AppendLine("Consider all node names together and name what the collection logically accomplishes.");
-            prompt.AppendLine("Do not copy the name of any single node as the answer.");
-            prompt.Append("Reply with only a concise 3 to 7 word proposed group name:");
+            prompt.Append("Title:");
             return prompt.ToString();
         }
 
@@ -48,8 +74,8 @@ namespace MonocleViewExtension.LocalGroupNaming
 
             return originalPrompt + Environment.NewLine + Environment.NewLine +
                    $"Rejected proposal: {Clean(rejectedTitle)}" + Environment.NewLine +
-                   "Propose a different logical name based on the complete collection. Do not copy any listed node name." + Environment.NewLine +
-                   "New group name:";
+                   "Propose a different title for the complete collection. Do not repeat any listed node name." + Environment.NewLine +
+                   "Title:";
         }
 
         private static string Clean(string value)
@@ -59,6 +85,7 @@ namespace MonocleViewExtension.LocalGroupNaming
             return string.Join(" ", value
                 .Replace('\r', ' ')
                 .Replace('\n', ' ')
+                .Replace('\t', ' ')
                 .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
         }
     }

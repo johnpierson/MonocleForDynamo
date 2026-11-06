@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Dynamo.Graph.Annotations;
-using Dynamo.Graph.Nodes;
 using Dynamo.Models;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
@@ -39,7 +38,7 @@ namespace MonocleViewExtension.LocalGroupNaming
                     {
                         if (provisioner.RequiresAgreement)
                         {
-                            var agreementWindow = new LocalModelAgreementWindow(viewLoadedParams.DynamoWindow);
+                            var agreementWindow = new LocalModelAgreementWindow(viewLoadedParams.DynamoWindow, provisioner.Manifest);
                             if (agreementWindow.ShowDialog() != true)
                             {
                                 toggle.IsChecked = false;
@@ -113,19 +112,20 @@ namespace MonocleViewExtension.LocalGroupNaming
                 CancellationToken.None).ConfigureAwait(false);
         }
 
+        /// <summary>
+        /// Snapshots the group on the UI thread: ids plus one descriptive line per member
+        /// (node names, with code, string values, drop-down selections and notes where they
+        /// exist). The snapshot is both the prompt input and the proof, after inference,
+        /// that the group has not changed in the meantime.
+        /// </summary>
         internal static LocalGroupNamingRequest CaptureRequest(AnnotationModel group, long sessionGeneration)
         {
             if (group == null) throw new ArgumentNullException(nameof(group));
 
-            var nodes = group.Nodes
-                .OfType<NodeModel>()
-                .Select(node => new LocalGroupNodeSnapshot(node.GUID, node.Name))
-                .ToList();
-
             return new LocalGroupNamingRequest(
                 group.GUID,
                 group.AnnotationText,
-                nodes,
+                CaptureNodeSnapshots(group),
                 sessionGeneration);
         }
 
@@ -161,12 +161,9 @@ namespace MonocleViewExtension.LocalGroupNaming
                 });
                 if (indicator == null) return;
 
-                var prompt = GroupNamingPromptBuilder.Build(request.NodeNames);
-                var suggestion = await RequestValidNameAsync(
-                    client,
-                    prompt,
-                    request.NodeNames,
-                    cancellationToken).ConfigureAwait(false);
+                var suggestion = await GroupNameSuggester
+                    .SuggestAsync(client, request.NodeNames, cancellationToken)
+                    .ConfigureAwait(false);
 
                 owner.Dispatcher.Invoke(() =>
                 {
@@ -190,7 +187,7 @@ namespace MonocleViewExtension.LocalGroupNaming
                     var updateCommand = new DynamoModel.UpdateModelValueCommand(
                         request.GroupId,
                         "TextBlockText",
-                        suggestion);
+                        suggestion.Title);
                     dynamoViewModel.Model.ExecuteCommand(updateCommand);
                 });
             }
@@ -259,55 +256,18 @@ namespace MonocleViewExtension.LocalGroupNaming
 
         private static List<LocalGroupNodeSnapshot> CaptureNodeSnapshots(AnnotationModel group)
         {
-            return group.Nodes
-                .OfType<NodeModel>()
-                .Select(node => new LocalGroupNodeSnapshot(node.GUID, node.Name))
-                .ToList();
-        }
-
-        private static async Task<string> RequestValidNameAsync(
-            LocalLlamaServerClient client,
-            string prompt,
-            IReadOnlyList<string> nodeNames,
-            CancellationToken cancellationToken)
-        {
-            var response = await client
-                .SuggestNameAsync(prompt, cancellationToken)
-                .ConfigureAwait(false);
-            if (TryGetValidName(response, nodeNames, out var suggestion, out var validationError))
+            var snapshots = new List<LocalGroupNodeSnapshot>();
+            foreach (var model in group.Nodes)
             {
-                return suggestion;
+                if (model == null) continue;
+
+                var description = GroupNodeDescriber.Describe(model);
+                if (string.IsNullOrWhiteSpace(description)) continue;
+
+                snapshots.Add(new LocalGroupNodeSnapshot(model.GUID, description));
             }
 
-            var retryPrompt = GroupNamingPromptBuilder.BuildRetry(prompt, response);
-            response = await client
-                .SuggestNameAsync(retryPrompt, cancellationToken)
-                .ConfigureAwait(false);
-            if (TryGetValidName(response, nodeNames, out suggestion, out validationError))
-            {
-                return suggestion;
-            }
-
-            throw new InvalidOperationException(validationError ??
-                "The local model copied a node name instead of naming the complete group.");
-        }
-
-        private static bool TryGetValidName(
-            string response,
-            IReadOnlyList<string> nodeNames,
-            out string suggestion,
-            out string error)
-        {
-            if (!GroupNameValidator.TryNormalize(response, out suggestion, out error)) return false;
-
-            if (GroupNameValidator.IsApiStyleIdentifier(suggestion) ||
-                GroupNameValidator.MatchesNodeName(suggestion, nodeNames))
-            {
-                suggestion = null;
-                return false;
-            }
-
-            return true;
+            return snapshots;
         }
     }
 }
