@@ -31,6 +31,7 @@ namespace Monocle.LocalGroupNaming.Tests
                 Run(nameof(TestPromptContainsEveryNodeDescription), TestPromptContainsEveryNodeDescription);
                 Run(nameof(TestPromptAggregatesDuplicateNames), TestPromptAggregatesDuplicateNames);
                 Run(nameof(TestPromptTruncatesLargeGroups), TestPromptTruncatesLargeGroups);
+                Run(nameof(TestPromptStaysWithinTokenBudget), TestPromptStaysWithinTokenBudget);
                 Run(nameof(TestPromptRejectsEmptyGroups), TestPromptRejectsEmptyGroups);
                 Run(nameof(TestRetryRejectsCopiedNodeName), TestRetryRejectsCopiedNodeName);
                 Run(nameof(TestSystemPromptAndExamples), TestSystemPromptAndExamples);
@@ -134,10 +135,50 @@ namespace Monocle.LocalGroupNaming.Tests
 
             var prompt = GroupNamingPromptBuilder.Build(descriptions);
 
-            AssertContains(prompt, "- Node " + GroupNamingPromptBuilder.MaximumListedItems + Environment.NewLine);
-            Assert(!prompt.Contains("- Node " + (GroupNamingPromptBuilder.MaximumListedItems + 1) + Environment.NewLine),
+            AssertContains(prompt, "- Node " + GroupNamingPromptBuilder.MaximumListedItems + "\n");
+            Assert(!prompt.Contains("- Node " + (GroupNamingPromptBuilder.MaximumListedItems + 1) + "\n"),
                 "Expected items past the listing cap to be summarised instead of listed.");
             AssertContains(prompt, "- ... and 21 more nodes");
+            Assert(!prompt.Contains("\r"), "Prompts use bare line feeds; a carriage return would be a wasted token on every line.");
+        }
+
+        private static void TestPromptStaysWithinTokenBudget()
+        {
+            // Sixty short node names fit entirely.
+            var names = Enumerable.Range(1, GroupNamingPromptBuilder.MaximumListedItems).Select(index => "Node " + index).ToList();
+            var prose = GroupNamingPromptBuilder.Build(names);
+            Assert(!prose.Contains("more node"), "Sixty short names fit within the token budget and are all listed.");
+            Assert(GroupNamingPromptBuilder.EstimateTokens(prose) <= GroupNamingPromptBuilder.MaximumPromptTokens, "The prose listing must stay within budget.");
+
+            // Sixty code blocks of arithmetic (the review's reproduction) tokenise to several
+            // times as much and must be cut down to the budget, not sent whole.
+            var codeBlocks = Enumerable.Range(0, GroupNamingPromptBuilder.MaximumListedItems)
+                .Select(index => GroupNodeDescription.Compose(
+                    "Code Block " + index,
+                    "v=" + string.Join("+", Enumerable.Range(index * 30, 30).Select(value => value.ToString()))))
+                .ToList();
+            var code = GroupNamingPromptBuilder.Build(codeBlocks);
+            var estimate = GroupNamingPromptBuilder.EstimateTokens(code);
+            Assert(estimate <= GroupNamingPromptBuilder.MaximumPromptTokens,
+                $"Expected the code-heavy listing to fit the budget, estimated {estimate} tokens.");
+            Assert(Regex.IsMatch(code, @"- \.\.\. and \d+ more nodes"), "Expected the items that did not fit to be summarised.");
+            Assert(code.Contains("- Code Block 0: v=0+1+2"), "Expected the listing to start with the first item.");
+            Assert(code.Split('\n').Count(line => line.StartsWith("- Code Block", StringComparison.Ordinal)) >= 20,
+                "Expected a substantial part of the group to still be listed.");
+
+            // The fixed parts of every request plus the listing budget plus the answer fit the server context.
+            var fixedTokens = GroupNamingPromptBuilder.EstimateTokens(GroupNamingPromptBuilder.SystemPrompt) +
+                              GroupNamingPromptBuilder.ExampleTurns.Sum(example => GroupNamingPromptBuilder.EstimateTokens(example.Prompt) + GroupNamingPromptBuilder.EstimateTokens(example.Title));
+            const int framingAllowance = 10 * 8;
+            const int retryAllowance = 60;
+            Assert(fixedTokens + framingAllowance + retryAllowance + GroupNamingPromptBuilder.MaximumPromptTokens + LocalLlamaServerClient.MaximumCompletionTokens <= LocalLlamaServerClient.ContextSize,
+                $"Fixed prompt parts ({fixedTokens} tokens) plus the listing budget and completion must fit the {LocalLlamaServerClient.ContextSize}-token context.");
+
+            // The estimator is pessimistic for prose and close for digits and punctuation.
+            Assert(GroupNamingPromptBuilder.EstimateTokens("Number Slider") >= 2, "Two words cost at least two tokens.");
+            Assert(GroupNamingPromptBuilder.EstimateTokens("v=0+1+2+3+4+5+6+7+8+9+10") >= 24, "Every digit and operator is a token for Qwen tokenisers.");
+            Assert(GroupNamingPromptBuilder.EstimateTokens("Element.GetParameterValueByName") >= 7, "Long camel-case identifiers cost several tokens.");
+            Assert(GroupNamingPromptBuilder.EstimateTokens(string.Empty) == 0 && GroupNamingPromptBuilder.EstimateTokens(null) == 0, "Empty text costs nothing.");
         }
 
         private static void TestPromptRejectsEmptyGroups()
@@ -514,6 +555,20 @@ namespace Monocle.LocalGroupNaming.Tests
                     "Original Group",
                     new[] { new LocalGroupNodeSnapshot(nodeId, "Changed Node") }),
                 "Expected a group whose nodes changed during inference to reject a suggestion.");
+
+            // Group and node GUIDs survive saving and reopening a graph; only the workspace
+            // instance tells the original editing session from a reopened or copied one.
+            var workspace = new object();
+            var reopenedWorkspace = new object();
+            var scoped = new LocalGroupNamingRequest(groupId, "Original Group", unchangedNodes, 7, workspace);
+            Assert(LocalGroupNamingState.ShouldApplySuggestion(scoped, true, groupId, "Original Group", unchangedNodes, workspace),
+                "Expected the originating workspace to accept a suggestion.");
+            Assert(!LocalGroupNamingState.ShouldApplySuggestion(scoped, true, groupId, "Original Group", unchangedNodes, reopenedWorkspace),
+                "Expected a reopened workspace with the same GUIDs to reject a stale suggestion.");
+            Assert(!LocalGroupNamingState.ShouldApplySuggestion(scoped, true, groupId, "Original Group", unchangedNodes, null),
+                "Expected a missing workspace to reject a suggestion captured in a known one.");
+            Assert(LocalGroupNamingState.ShouldApplySuggestion(request, true, groupId, "Original Group", unchangedNodes, reopenedWorkspace),
+                "A request captured without a workspace keeps the GUID-only behaviour.");
         }
 
         private static void TestNamingQueueProcessesConsecutiveGroups()
@@ -801,9 +856,16 @@ namespace Monocle.LocalGroupNaming.Tests
             var foreign = Path.Combine(root, "other-build-llama-b9-v3");
             Directory.CreateDirectory(Path.Combine(foreign, "model"));
             File.WriteAllBytes(Path.Combine(foreign, "model", "other.gguf"), new byte[1024]);
-            var leftover = Path.Combine(root, "old-model-llama-b0-v1.delete-0123456789abcdef");
+            var leftover = Path.Combine(root, "old-model-llama-b0-v1.delete-0123456789abcdef0123456789abcdef");
             Directory.CreateDirectory(leftover);
             File.WriteAllBytes(Path.Combine(leftover, "stale.bin"), new byte[16]);
+            // Folders that merely contain the pending-delete marker are not ours to remove.
+            var foreignPendingDelete = Path.Combine(root, "other-build-llama-b9-v3.delete-0123456789abcdef0123456789abcdef");
+            Directory.CreateDirectory(foreignPendingDelete);
+            File.WriteAllBytes(Path.Combine(foreignPendingDelete, "theirs.bin"), new byte[16]);
+            var malformedPendingDelete = Path.Combine(root, "old-model-llama-b0-v1.delete-v3");
+            Directory.CreateDirectory(malformedPendingDelete);
+            File.WriteAllBytes(Path.Combine(malformedPendingDelete, "odd.bin"), new byte[16]);
 
             var handler = new FakeFileHandler();
             handler.AddFile("llama-b1-bin-win-cpu-x64.zip", runtimeArchive);
@@ -855,15 +917,20 @@ namespace Monocle.LocalGroupNaming.Tests
                     "An installation whose model is open elsewhere must be left completely intact, not half deleted.");
                 Assert(Directory.Exists(foreign) && File.Exists(Path.Combine(foreign, "model", "other.gguf")),
                     "A folder that is not a known earlier pin may belong to another Monocle build and must be left alone.");
-                Assert(!Directory.GetDirectories(root).Any(directory => directory.Contains(".delete-")),
-                    "No rename leftovers may remain when the delete could not proceed.");
+                Assert(Directory.Exists(foreignPendingDelete) && File.Exists(Path.Combine(foreignPendingDelete, "theirs.bin")),
+                    "A pending-delete folder of an unknown pin belongs to another build and must be left alone.");
+                Assert(Directory.Exists(malformedPendingDelete) && File.Exists(Path.Combine(malformedPendingDelete, "odd.bin")),
+                    "A folder with a malformed pending-delete suffix was not produced by this code and must be left alone.");
+                Assert(!Directory.GetDirectories(root).Any(directory => Path.GetFileName(directory).StartsWith("old-model-llama-b0-v1.delete-", StringComparison.Ordinal) && Path.GetFileName(directory).Length == "old-model-llama-b0-v1.delete-".Length + 32),
+                    "No rename leftovers of our own may remain when the delete could not proceed.");
             }
 
             // With the handles released the remaining superseded directories are removed on the next run.
             provisioner.RemoveSupersededInstallations();
             Assert(WaitUntilGone(busy), "A released installation must be removed on the next run.");
             Assert(WaitUntilGone(running), "A no longer running installation must be removed on the next run.");
-            Assert(Directory.Exists(foreign), "Unknown folders are never removed.");
+            Assert(Directory.Exists(foreign) && Directory.Exists(foreignPendingDelete) && Directory.Exists(malformedPendingDelete),
+                "Unknown folders are never removed.");
             Assert(Directory.Exists(options.InstallationDirectory), "The current installation must never be removed.");
 
             options.Validate();
@@ -921,8 +988,22 @@ namespace Monocle.LocalGroupNaming.Tests
             Directory.CreateDirectory(Path.GetDirectoryName(options.ModelPath));
             File.WriteAllBytes(options.ModelPath + ".download", model);
 
-            await provisioner.EnsureInstalledAsync(null, CancellationToken.None);
+            // Nothing on this path awaits a network read, so without an explicit hand-off the
+            // whole verification would run synchronously on the thread that enables the feature.
+            var callerThread = Thread.CurrentThread.ManagedThreadId;
+            var reportingThreads = new List<int>();
+            var progress = new CallbackProgress(report =>
+            {
+                lock (reportingThreads)
+                {
+                    reportingThreads.Add(Thread.CurrentThread.ManagedThreadId);
+                }
+            });
+            var installation = provisioner.EnsureInstalledAsync(progress, CancellationToken.None);
+            await installation;
 
+            Assert(reportingThreads.Count > 0 && reportingThreads.All(thread => thread != callerThread),
+                "Provisioning work, including hashing a complete download, must run off the calling thread.");
             Assert(handler.RequestedNames.All(name => name == "llama-b1-bin-win-cpu-x64.zip"),
                 "Only the runtime may be fetched; the complete model file is verified in place.");
             Assert(File.Exists(options.ModelPath) && !File.Exists(options.ModelPath + ".download"), "The verified file must be promoted to the model.");

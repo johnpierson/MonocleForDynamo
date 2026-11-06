@@ -24,11 +24,19 @@ namespace MonocleViewExtension.LocalGroupNaming
         public IReadOnlyList<string> NodeNames { get; }
         public long SessionGeneration { get; }
 
+        /// <summary>
+        /// The workspace instance the group was created in, compared by reference. Group and
+        /// node GUIDs survive saving and reopening a graph, so a reopened or copied workspace
+        /// passes every GUID check; only the instance identity tells the two apart.
+        /// </summary>
+        public object Workspace { get; }
+
         public LocalGroupNamingRequest(
             Guid groupId,
             string originalTitle,
             IEnumerable<LocalGroupNodeSnapshot> nodes,
-            long sessionGeneration)
+            long sessionGeneration,
+            object workspace = null)
         {
             if (nodes == null) throw new ArgumentNullException(nameof(nodes));
 
@@ -41,6 +49,7 @@ namespace MonocleViewExtension.LocalGroupNaming
             Nodes = snapshots.AsReadOnly();
             NodeNames = snapshots.Select(node => node.Name).ToList().AsReadOnly();
             SessionGeneration = sessionGeneration;
+            Workspace = workspace;
         }
     }
 
@@ -51,9 +60,15 @@ namespace MonocleViewExtension.LocalGroupNaming
             bool sessionIsCurrent,
             Guid currentGroupId,
             string currentTitle,
-            IEnumerable<LocalGroupNodeSnapshot> currentNodes)
+            IEnumerable<LocalGroupNodeSnapshot> currentNodes,
+            object currentWorkspace = null)
         {
             if (request == null || !sessionIsCurrent || request.GroupId != currentGroupId)
+            {
+                return false;
+            }
+
+            if (request.Workspace != null && !ReferenceEquals(request.Workspace, currentWorkspace))
             {
                 return false;
             }

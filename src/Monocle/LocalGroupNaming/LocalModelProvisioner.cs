@@ -73,7 +73,20 @@ namespace MonocleViewExtension.LocalGroupNaming
                 }));
         }
 
-        public async Task EnsureInstalledAsync(
+        /// <summary>
+        /// Installs whatever is missing. Everything inside is blocking disk work (install lock,
+        /// hashing a multi-gigabyte file, zip extraction), and a complete <c>.download</c>
+        /// makes the download step finish synchronously, so the whole body runs on a worker
+        /// thread: the UI thread that enables the feature must stay free to repaint and cancel.
+        /// </summary>
+        public Task EnsureInstalledAsync(
+            IProgress<LocalModelDownloadProgress> progress,
+            CancellationToken cancellationToken)
+        {
+            return Task.Run(() => EnsureInstalledCoreAsync(progress, cancellationToken), cancellationToken);
+        }
+
+        private async Task EnsureInstalledCoreAsync(
             IProgress<LocalModelDownloadProgress> progress,
             CancellationToken cancellationToken)
         {
@@ -399,9 +412,24 @@ namespace MonocleViewExtension.LocalGroupNaming
             {
                 if (string.Equals(NormalizeDirectoryPath(directory), current, StringComparison.OrdinalIgnoreCase)) continue;
 
+                //A folder is removable only when it is a superseded pin by name, or the exact
+                //"<superseded pin>.delete-<32 hex>" staging name this method produces below.
+                //Anything else, including a stranger's folder that merely contains ".delete-",
+                //is left untouched.
                 var name = Path.GetFileName(directory);
-                var isPendingDelete = name.IndexOf(DeletePendingMarker, StringComparison.Ordinal) >= 0;
-                if (!isPendingDelete && !Manifest.SupersededInstallationVersions.Contains(name, StringComparer.OrdinalIgnoreCase)) continue;
+                var pinName = name;
+                var isPendingDelete = false;
+                var marker = name.IndexOf(DeletePendingMarker, StringComparison.Ordinal);
+                if (marker > 0)
+                {
+                    var suffix = name.Substring(marker + DeletePendingMarker.Length);
+                    if (!IsDeleteStamp(suffix)) continue;
+
+                    pinName = name.Substring(0, marker);
+                    isPendingDelete = true;
+                }
+
+                if (!Manifest.SupersededInstallationVersions.Contains(pinName, StringComparer.OrdinalIgnoreCase)) continue;
 
                 try
                 {
@@ -431,6 +459,19 @@ namespace MonocleViewExtension.LocalGroupNaming
         private static string NormalizeDirectoryPath(string path)
         {
             return Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        }
+
+        /// <summary>True for the 32 lower-case hex characters of <c>Guid.ToString("N")</c>.</summary>
+        private static bool IsDeleteStamp(string value)
+        {
+            if (value == null || value.Length != 32) return false;
+            foreach (var character in value)
+            {
+                var isHex = character >= '0' && character <= '9' || character >= 'a' && character <= 'f';
+                if (!isHex) return false;
+            }
+
+            return true;
         }
 
         private static void DeleteFileIfPresent(string path)

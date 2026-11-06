@@ -124,7 +124,7 @@ namespace MonocleViewExtension.LocalGroupNaming
 
             if (!client.TryCaptureSessionGeneration(out var sessionGeneration)) return;
 
-            var request = CaptureRequest(group, sessionGeneration);
+            var request = CaptureRequest(group, dynamoViewModel.CurrentSpace, sessionGeneration);
             await SuggestAndRenameAsync(
                 owner,
                 dynamoViewModel,
@@ -136,10 +136,11 @@ namespace MonocleViewExtension.LocalGroupNaming
         /// <summary>
         /// Snapshots the group on the UI thread: ids plus one descriptive line per member
         /// (node names, with code, string values, drop-down selections and notes where they
-        /// exist). The snapshot is both the prompt input and the proof, after inference,
-        /// that the group has not changed in the meantime.
+        /// exist), and the workspace instance it lives in. The snapshot is both the prompt
+        /// input and the proof, after inference, that the same group in the same open
+        /// workspace is still unchanged (a reopened graph reuses every GUID).
         /// </summary>
-        internal static LocalGroupNamingRequest CaptureRequest(AnnotationModel group, long sessionGeneration)
+        internal static LocalGroupNamingRequest CaptureRequest(AnnotationModel group, object workspace, long sessionGeneration)
         {
             if (group == null) throw new ArgumentNullException(nameof(group));
 
@@ -147,7 +148,8 @@ namespace MonocleViewExtension.LocalGroupNaming
                 group.GUID,
                 group.AnnotationText,
                 CaptureNodeSnapshots(group),
-                sessionGeneration);
+                sessionGeneration,
+                workspace);
         }
 
         internal static async Task SuggestAndRenameAsync(
@@ -191,8 +193,8 @@ namespace MonocleViewExtension.LocalGroupNaming
                     if (!owner.IsLoaded || !client.IsSessionCurrent(request.SessionGeneration)) return;
 
                     // The user may have undone, deleted, or switched away from the
-                    // group, edited its title, or changed its nodes while the model
-                    // was thinking; skip the rename then.
+                    // group, edited its title, changed its nodes, or closed and
+                    // reopened the graph while the model was thinking; skip the rename then.
                     var annotations = dynamoViewModel.CurrentSpaceViewModel?.Annotations;
                     var currentGroup = annotations?
                         .FirstOrDefault(a => a.AnnotationModel.GUID == request.GroupId)?
@@ -203,7 +205,8 @@ namespace MonocleViewExtension.LocalGroupNaming
                             client.IsSessionCurrent(request.SessionGeneration),
                             currentGroup.GUID,
                             currentGroup.AnnotationText,
-                            CaptureNodeSnapshots(currentGroup))) return;
+                            CaptureNodeSnapshots(currentGroup),
+                            dynamoViewModel.CurrentSpace)) return;
 
                     var updateCommand = new DynamoModel.UpdateModelValueCommand(
                         request.GroupId,
@@ -269,7 +272,8 @@ namespace MonocleViewExtension.LocalGroupNaming
                     client.IsSessionCurrent(request.SessionGeneration),
                     currentGroup.GUID,
                     currentGroup.AnnotationText,
-                    CaptureNodeSnapshots(currentGroup));
+                    CaptureNodeSnapshots(currentGroup),
+                    dynamoViewModel.CurrentSpace);
             });
 
             return isCurrent;

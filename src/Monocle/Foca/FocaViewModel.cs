@@ -171,8 +171,9 @@ namespace MonocleViewExtension.Foca
             var client = Model.LocalGroupNamingClient;
             if (group == null || client == null || !client.TryCaptureSessionGeneration(out var sessionGeneration)) return;
 
-            // Capture the group state before the request waits behind an earlier inference.
-            var request = LocalGroupNamingCommand.CaptureRequest(group.AnnotationModel, sessionGeneration);
+            // Capture the group state (and the workspace instance it lives in) before the
+            // request waits behind an earlier inference.
+            var request = LocalGroupNamingCommand.CaptureRequest(group.AnnotationModel, Model.DynamoViewModel.CurrentSpace, sessionGeneration);
             namingQueue.Enqueue(request);
         }
 

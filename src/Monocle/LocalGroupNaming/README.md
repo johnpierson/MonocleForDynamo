@@ -16,7 +16,10 @@ Dynamo node names, code and notes never leave the computer.
    model sees bare titles as answers and has no label to echo), and a GBNF grammar that only
    admits three to seven plain words. Grammar-constrained decoding makes preambles, quotes,
    markdown, JSON and reasoning tags impossible, so the model cannot answer anything but a
-   title. An answer cut off at the token limit is rejected and retried.
+   title. An answer cut off at the token limit is rejected and retried. The listing is
+   bounded by an estimated token budget as well as an item cap, so a large code-heavy group
+   is summarised ("... and N more nodes") instead of overflowing the server's 4,096-token
+   context.
 3. Reasoning is switched off at the chat-template level (`--reasoning off` on the server
    and `chat_template_kwargs.enable_thinking=false` per request), so hybrid thinking
    models answer directly instead of spending seconds on a reasoning block.

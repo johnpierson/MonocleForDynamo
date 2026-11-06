@@ -26,6 +26,18 @@ namespace MonocleViewExtension.LocalGroupNaming
         public const int MaximumListedItems = 60;
 
         /// <summary>
+        /// Estimated-token budget for one group listing. The server context is 4,096 tokens
+        /// (<c>LocalLlamaServerClient.ContextSize</c>); the fixed system prompt and example
+        /// turns take roughly 400, chat framing about 100, the completion 48 and the retry
+        /// suffix about 50, which leaves comfortable headroom under this figure even though the
+        /// estimate is deliberately pessimistic.
+        /// </summary>
+        public const int MaximumPromptTokens = 2600;
+
+        private const string Header = "Contents:\n";
+        private const string Footer = "\nTitle:";
+
+        /// <summary>
         /// Fixed system message. It is identical for every request so llama-server's prompt
         /// cache reuses its tokens and only the group contents are processed per request.
         /// </summary>
@@ -56,6 +68,11 @@ namespace MonocleViewExtension.LocalGroupNaming
                 "Import Schedule Data From Excel")
         };
 
+        /// <summary>
+        /// Builds the group listing, bounded both by item count and by the estimated token
+        /// budget, because sixty code-block descriptions tokenise to far more than sixty node
+        /// names. Items that do not fit are summarised as "... and N more nodes".
+        /// </summary>
         public static string Build(IEnumerable<string> nodeDescriptions)
         {
             if (nodeDescriptions == null) throw new ArgumentNullException(nameof(nodeDescriptions));
@@ -72,24 +89,30 @@ namespace MonocleViewExtension.LocalGroupNaming
                 throw new InvalidOperationException("The selected group does not contain any nameable nodes.");
             }
 
-            var prompt = new StringBuilder();
-            prompt.AppendLine("Contents:");
+            var budget = MaximumPromptTokens
+                         - EstimateTokens(Header)
+                         - EstimateTokens(Footer)
+                         - EstimateTokens(FormatOmitted(9999));
+            var lines = new List<string>();
+            var usedTokens = 0;
             foreach (var item in items.Take(MaximumListedItems))
             {
-                prompt.Append("- ").Append(item.Description);
-                if (item.Count > 1) prompt.Append(" x").Append(item.Count.ToString(CultureInfo.InvariantCulture));
-                prompt.AppendLine();
+                var line = "- " + item.Description +
+                           (item.Count > 1 ? " x" + item.Count.ToString(CultureInfo.InvariantCulture) : string.Empty) + "\n";
+                var cost = EstimateTokens(line);
+                if (lines.Count > 0 && usedTokens + cost > budget) break;
+
+                lines.Add(line);
+                usedTokens += cost;
             }
 
-            var omitted = items.Skip(MaximumListedItems).Sum(item => item.Count);
-            if (omitted > 0)
-            {
-                prompt.Append("- ... and ").Append(omitted.ToString(CultureInfo.InvariantCulture))
-                    .AppendLine(omitted == 1 ? " more node" : " more nodes");
-            }
+            var prompt = new StringBuilder(Header);
+            foreach (var line in lines) prompt.Append(line);
 
-            prompt.AppendLine();
-            prompt.Append("Title:");
+            var omitted = items.Skip(lines.Count).Sum(item => item.Count);
+            if (omitted > 0) prompt.Append(FormatOmitted(omitted));
+
+            prompt.Append(Footer);
             return prompt.ToString();
         }
 
@@ -98,10 +121,49 @@ namespace MonocleViewExtension.LocalGroupNaming
             if (string.IsNullOrWhiteSpace(originalPrompt))
                 throw new ArgumentException("The original prompt is required.", nameof(originalPrompt));
 
-            return originalPrompt + Environment.NewLine + Environment.NewLine +
-                   $"Rejected proposal: {Clean(rejectedTitle)}" + Environment.NewLine +
-                   "Propose a different title for the complete collection. Do not repeat any listed node name." + Environment.NewLine +
+            return originalPrompt + "\n\n" +
+                   $"Rejected proposal: {Clean(rejectedTitle)}" + "\n" +
+                   "Propose a different title for the complete collection. Do not repeat any listed node name." + "\n" +
                    "Title:";
+        }
+
+        /// <summary>
+        /// Pessimistic token estimate for Qwen-style tokenisers: every digit is a token (Qwen
+        /// splits numbers digit by digit), every punctuation character is a token, and a run of
+        /// letters costs one token per four characters. Prose is over-estimated by up to half,
+        /// code and numbers are estimated closely, which is the safe direction for a budget.
+        /// </summary>
+        public static int EstimateTokens(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return 0;
+
+            var tokens = 0;
+            var letterRun = 0;
+            foreach (var character in text)
+            {
+                if (char.IsLetter(character))
+                {
+                    letterRun++;
+                    continue;
+                }
+
+                tokens += LetterRunCost(letterRun);
+                letterRun = 0;
+
+                if (char.IsDigit(character) || !char.IsWhiteSpace(character)) tokens++;
+            }
+
+            return tokens + LetterRunCost(letterRun);
+        }
+
+        private static int LetterRunCost(int length)
+        {
+            return length == 0 ? 0 : (length + 3) / 4;
+        }
+
+        private static string FormatOmitted(int omitted)
+        {
+            return "- ... and " + omitted.ToString(CultureInfo.InvariantCulture) + (omitted == 1 ? " more node" : " more nodes") + "\n";
         }
 
         private static string Clean(string value)
