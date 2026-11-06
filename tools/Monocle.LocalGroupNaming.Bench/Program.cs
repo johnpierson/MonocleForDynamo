@@ -42,6 +42,7 @@ namespace Monocle.LocalGroupNaming.Bench
             public IReadOnlyList<string> Rejected { get; set; }
             public string Error { get; set; }
             public string Expected { get; set; }
+            public int? PromptTokens { get; set; }
         }
 
         private static async Task<int> Main(string[] args)
@@ -96,6 +97,7 @@ namespace Monocle.LocalGroupNaming.Bench
                             result.Title = suggestion.Title;
                             result.Attempts = suggestion.Attempts;
                             result.Rejected = suggestion.RejectedResponses;
+                            result.PromptTokens = suggestion.PromptTokens;
                         }
                         catch (GroupNameSuggestionException exception)
                         {
@@ -160,16 +162,26 @@ namespace Monocle.LocalGroupNaming.Bench
             var retries = results.Count(result => result.Attempts > 1);
             var failures = results.Count(result => result.Error != null);
 
-            Console.WriteLine("| Case | Title | ms | Attempts |");
-            Console.WriteLine("| --- | --- | ---: | ---: |");
+            Console.WriteLine("| Case | Title | ms | Attempts | Prompt tokens |");
+            Console.WriteLine("| --- | --- | ---: | ---: | ---: |");
             foreach (var result in results)
             {
-                Console.WriteLine($"| {result.Case} | {result.Title ?? "ERROR: " + result.Error} | {result.Milliseconds} | {result.Attempts} |");
+                Console.WriteLine($"| {result.Case} | {result.Title ?? "ERROR: " + result.Error} | {result.Milliseconds} | {result.Attempts} | {(result.PromptTokens.HasValue ? result.PromptTokens.Value.ToString(CultureInfo.InvariantCulture) : "")} |");
             }
 
             Console.WriteLine();
             Console.WriteLine($"Latency: median {median} ms, mean {mean:0} ms, p90 {p90} ms over {results.Count} requests");
             Console.WriteLine($"Retries: {retries}, failures: {failures}");
+
+            // The prompt builder bounds listings by UTF-8 bytes; the server's own token counts
+            // show how much of the context the real tokenizer actually used.
+            var tokenCounts = results.Where(result => result.PromptTokens.HasValue).Select(result => result.PromptTokens.Value).ToList();
+            if (tokenCounts.Count > 0)
+            {
+                var limit = LocalLlamaServerClient.ContextSize - LocalLlamaServerClient.MaximumCompletionTokens;
+                var over = tokenCounts.Count(count => count > limit);
+                Console.WriteLine($"Prompt tokens (server-reported): max {tokenCounts.Max()}, median {tokenCounts.OrderBy(count => count).ElementAt(tokenCounts.Count / 2)}; limit {limit}; over limit: {over}");
+            }
         }
 
         private static readonly string[] ValueOptions = { "server", "model", "server-args", "cases", "out", "repeat" };

@@ -7,11 +7,12 @@ namespace MonocleViewExtension.LocalGroupNaming
 {
     internal sealed class GroupNameSuggestion
     {
-        public GroupNameSuggestion(string title, int attempts, IReadOnlyList<string> rejectedResponses)
+        public GroupNameSuggestion(string title, int attempts, IReadOnlyList<string> rejectedResponses, int? promptTokens = null)
         {
             Title = title;
             Attempts = attempts;
             RejectedResponses = rejectedResponses ?? new string[0];
+            PromptTokens = promptTokens;
         }
 
         public string Title { get; }
@@ -19,6 +20,9 @@ namespace MonocleViewExtension.LocalGroupNaming
         public int Attempts { get; }
 
         public IReadOnlyList<string> RejectedResponses { get; }
+
+        /// <summary>Largest prompt token count the server reported across the attempts, when it did.</summary>
+        public int? PromptTokens { get; }
     }
 
     /// <summary>Thrown when every attempt produced an unusable title; carries what the model said.</summary>
@@ -58,15 +62,16 @@ namespace MonocleViewExtension.LocalGroupNaming
             var completion = await client.SuggestNameAsync(prompt, false, cancellationToken).ConfigureAwait(false);
             if (TryGetValidName(completion, nodeDescriptions, out var suggestion, out var validationError))
             {
-                return new GroupNameSuggestion(suggestion, 1, rejected);
+                return new GroupNameSuggestion(suggestion, 1, rejected, completion.PromptTokens);
             }
 
             rejected.Add(completion.Content);
+            var firstPromptTokens = completion.PromptTokens;
             var retryPrompt = GroupNamingPromptBuilder.BuildRetry(prompt, completion.Content);
             completion = await client.SuggestNameAsync(retryPrompt, true, cancellationToken).ConfigureAwait(false);
             if (TryGetValidName(completion, nodeDescriptions, out suggestion, out validationError))
             {
-                return new GroupNameSuggestion(suggestion, 2, rejected);
+                return new GroupNameSuggestion(suggestion, 2, rejected, Math.Max(firstPromptTokens ?? 0, completion.PromptTokens ?? 0));
             }
 
             rejected.Add(completion.Content);

@@ -125,6 +125,11 @@
     "expected": "Floor Material Takeoff"
   },
   {
+    "name": "japanese-labels",
+    "nodes": ["Categories: 壁", "All Elements of Category", "Element.GetParameterValueByName", "String: \"コメント\"", "Note: 壁の長さを集計する", "Watch"],
+    "expected": "Collect Wall Comments"
+  },
+  {
     "name": "large-group",
     "nodes": [
       "Categories: Walls", "All Elements of Category", "Element.GetParameterValueByName", "String: \"Length\"", "Element.GetParameterValueByName", "String: \"Area\"",

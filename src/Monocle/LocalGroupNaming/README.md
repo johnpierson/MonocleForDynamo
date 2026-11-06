@@ -17,9 +17,10 @@ Dynamo node names, code and notes never leave the computer.
    admits three to seven plain words. Grammar-constrained decoding makes preambles, quotes,
    markdown, JSON and reasoning tags impossible, so the model cannot answer anything but a
    title. An answer cut off at the token limit is rejected and retried. The listing is
-   bounded by an estimated token budget as well as an item cap, so a large code-heavy group
-   is summarised ("... and N more nodes") instead of overflowing the server's 4,096-token
-   context.
+   bounded by a token budget as well as an item cap; the budget is measured in UTF-8 bytes,
+   which no byte-level BPE tokeniser can exceed, so a large code-heavy or non-Latin group is
+   summarised ("... and N more nodes") instead of overflowing the server's 4,096-token
+   context. The bench reports the server's real prompt token counts next to that bound.
 3. Reasoning is switched off at the chat-template level (`--reasoning off` on the server
    and `chat_template_kwargs.enable_thinking=false` per request), so hybrid thinking
    models answer directly instead of spending seconds on a reasoning block.

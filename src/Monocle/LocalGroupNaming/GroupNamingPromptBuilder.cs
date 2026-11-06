@@ -26,11 +26,11 @@ namespace MonocleViewExtension.LocalGroupNaming
         public const int MaximumListedItems = 60;
 
         /// <summary>
-        /// Estimated-token budget for one group listing. The server context is 4,096 tokens
-        /// (<c>LocalLlamaServerClient.ContextSize</c>); the fixed system prompt and example
-        /// turns take roughly 400, chat framing about 100, the completion 48 and the retry
-        /// suffix about 50, which leaves comfortable headroom under this figure even though the
-        /// estimate is deliberately pessimistic.
+        /// Token budget for one group listing, measured with <see cref="TokenUpperBound"/>.
+        /// The server context is 4,096 tokens (<c>LocalLlamaServerClient.ContextSize</c>); by
+        /// the same bound the fixed system prompt and example turns take about 1,050, chat
+        /// framing about 100, the retry suffix about 60 and the completion 48, so this figure
+        /// leaves headroom even in the worst case the bound describes.
         /// </summary>
         public const int MaximumPromptTokens = 2600;
 
@@ -69,9 +69,9 @@ namespace MonocleViewExtension.LocalGroupNaming
         };
 
         /// <summary>
-        /// Builds the group listing, bounded both by item count and by the estimated token
-        /// budget, because sixty code-block descriptions tokenise to far more than sixty node
-        /// names. Items that do not fit are summarised as "... and N more nodes".
+        /// Builds the group listing, bounded both by item count and by the token budget,
+        /// because sixty code-block or non-Latin descriptions tokenise to far more than sixty
+        /// English node names. Items that do not fit are summarised as "... and N more nodes".
         /// </summary>
         public static string Build(IEnumerable<string> nodeDescriptions)
         {
@@ -90,16 +90,16 @@ namespace MonocleViewExtension.LocalGroupNaming
             }
 
             var budget = MaximumPromptTokens
-                         - EstimateTokens(Header)
-                         - EstimateTokens(Footer)
-                         - EstimateTokens(FormatOmitted(9999));
+                         - TokenUpperBound(Header)
+                         - TokenUpperBound(Footer)
+                         - TokenUpperBound(FormatOmitted(9999));
             var lines = new List<string>();
             var usedTokens = 0;
             foreach (var item in items.Take(MaximumListedItems))
             {
                 var line = "- " + item.Description +
                            (item.Count > 1 ? " x" + item.Count.ToString(CultureInfo.InvariantCulture) : string.Empty) + "\n";
-                var cost = EstimateTokens(line);
+                var cost = TokenUpperBound(line);
                 if (lines.Count > 0 && usedTokens + cost > budget) break;
 
                 lines.Add(line);
@@ -128,37 +128,16 @@ namespace MonocleViewExtension.LocalGroupNaming
         }
 
         /// <summary>
-        /// Pessimistic token estimate for Qwen-style tokenisers: every digit is a token (Qwen
-        /// splits numbers digit by digit), every punctuation character is a token, and a run of
-        /// letters costs one token per four characters. Prose is over-estimated by up to half,
-        /// code and numbers are estimated closely, which is the safe direction for a budget.
+        /// An upper bound on the number of tokens <paramref name="text"/> can take: its UTF-8
+        /// byte count. Every token of a byte-level BPE vocabulary (Qwen, Granite, Gemma,
+        /// MiniCPM's byte fallback) covers at least one byte, so no script, digit run, emoji
+        /// or exotic whitespace can tokenise to more than this. English prose costs about a
+        /// quarter of this bound, Chinese or Japanese about three quarters; the bound is spent
+        /// on listing fewer items of a very large group, never on a request the server rejects.
         /// </summary>
-        public static int EstimateTokens(string text)
+        public static int TokenUpperBound(string text)
         {
-            if (string.IsNullOrEmpty(text)) return 0;
-
-            var tokens = 0;
-            var letterRun = 0;
-            foreach (var character in text)
-            {
-                if (char.IsLetter(character))
-                {
-                    letterRun++;
-                    continue;
-                }
-
-                tokens += LetterRunCost(letterRun);
-                letterRun = 0;
-
-                if (char.IsDigit(character) || !char.IsWhiteSpace(character)) tokens++;
-            }
-
-            return tokens + LetterRunCost(letterRun);
-        }
-
-        private static int LetterRunCost(int length)
-        {
-            return length == 0 ? 0 : (length + 3) / 4;
+            return string.IsNullOrEmpty(text) ? 0 : Encoding.UTF8.GetByteCount(text);
         }
 
         private static string FormatOmitted(int omitted)

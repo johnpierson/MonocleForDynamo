@@ -144,41 +144,54 @@ namespace Monocle.LocalGroupNaming.Tests
 
         private static void TestPromptStaysWithinTokenBudget()
         {
+            // Every token of a byte-level BPE tokeniser covers at least one byte, so a listing
+            // whose UTF-8 size is within the budget cannot tokenise past it, whatever the script.
+            // These assertions therefore measure bytes directly rather than trusting the builder.
+            Func<string, int> bytes = text => Encoding.UTF8.GetByteCount(text);
+
             // Sixty short node names fit entirely.
             var names = Enumerable.Range(1, GroupNamingPromptBuilder.MaximumListedItems).Select(index => "Node " + index).ToList();
             var prose = GroupNamingPromptBuilder.Build(names);
             Assert(!prose.Contains("more node"), "Sixty short names fit within the token budget and are all listed.");
-            Assert(GroupNamingPromptBuilder.EstimateTokens(prose) <= GroupNamingPromptBuilder.MaximumPromptTokens, "The prose listing must stay within budget.");
+            Assert(bytes(prose) <= GroupNamingPromptBuilder.MaximumPromptTokens, "The prose listing must stay within budget.");
 
-            // Sixty code blocks of arithmetic (the review's reproduction) tokenise to several
-            // times as much and must be cut down to the budget, not sent whole.
+            // Sixty code blocks of arithmetic (the first review's reproduction) are cut down to the budget.
             var codeBlocks = Enumerable.Range(0, GroupNamingPromptBuilder.MaximumListedItems)
                 .Select(index => GroupNodeDescription.Compose(
                     "Code Block " + index,
                     "v=" + string.Join("+", Enumerable.Range(index * 30, 30).Select(value => value.ToString()))))
                 .ToList();
             var code = GroupNamingPromptBuilder.Build(codeBlocks);
-            var estimate = GroupNamingPromptBuilder.EstimateTokens(code);
-            Assert(estimate <= GroupNamingPromptBuilder.MaximumPromptTokens,
-                $"Expected the code-heavy listing to fit the budget, estimated {estimate} tokens.");
+            Assert(bytes(code) <= GroupNamingPromptBuilder.MaximumPromptTokens,
+                $"Expected the code-heavy listing to fit the budget, measured {bytes(code)} bytes.");
             Assert(Regex.IsMatch(code, @"- \.\.\. and \d+ more nodes"), "Expected the items that did not fit to be summarised.");
             Assert(code.Contains("- Code Block 0: v=0+1+2"), "Expected the listing to start with the first item.");
             Assert(code.Split('\n').Count(line => line.StartsWith("- Code Block", StringComparison.Ordinal)) >= 20,
                 "Expected a substantial part of the group to still be listed.");
 
-            // The fixed parts of every request plus the listing budget plus the answer fit the server context.
-            var fixedTokens = GroupNamingPromptBuilder.EstimateTokens(GroupNamingPromptBuilder.SystemPrompt) +
-                              GroupNamingPromptBuilder.ExampleTurns.Sum(example => GroupNamingPromptBuilder.EstimateTokens(example.Prompt) + GroupNamingPromptBuilder.EstimateTokens(example.Title));
-            const int framingAllowance = 10 * 8;
-            const int retryAllowance = 60;
-            Assert(fixedTokens + framingAllowance + retryAllowance + GroupNamingPromptBuilder.MaximumPromptTokens + LocalLlamaServerClient.MaximumCompletionTokens <= LocalLlamaServerClient.ContextSize,
-                $"Fixed prompt parts ({fixedTokens} tokens) plus the listing budget and completion must fit the {LocalLlamaServerClient.ContextSize}-token context.");
+            // Sixty Japanese labels (the second review's reproduction: 4,444 real tokens for the
+            // full listing) must be cut down as well; three UTF-8 bytes per character bound the
+            // one-to-two tokens per character a Qwen tokeniser actually spends on them.
+            var japanese = Enumerable.Range(0, GroupNamingPromptBuilder.MaximumListedItems)
+                .Select(index => GroupNodeDescription.Compose(index + " " + string.Concat(Enumerable.Repeat("建築構造設備解析設計図面施工管理", 7)), null))
+                .ToList();
+            Assert(japanese.All(label => label.Length <= GroupNodeDescription.MaximumLength), "Labels are capped at the description length.");
+            var cjk = GroupNamingPromptBuilder.Build(japanese);
+            Assert(bytes(cjk) <= GroupNamingPromptBuilder.MaximumPromptTokens,
+                $"Expected the non-Latin listing to fit the budget, measured {bytes(cjk)} bytes.");
+            Assert(Regex.IsMatch(cjk, @"- \.\.\. and \d+ more nodes"), "Expected the Japanese items that did not fit to be summarised.");
+            Assert(cjk.Contains("- 0 建築構造設備"), "Expected the listing to start with the first label.");
+            Assert(GroupNamingPromptBuilder.TokenUpperBound("建築") == 6, "Each ideograph is bounded by its three UTF-8 bytes.");
+            Assert(GroupNamingPromptBuilder.TokenUpperBound("v=0+1") == 5 && GroupNamingPromptBuilder.TokenUpperBound(null) == 0, "ASCII costs one per character; empty text costs nothing.");
 
-            // The estimator is pessimistic for prose and close for digits and punctuation.
-            Assert(GroupNamingPromptBuilder.EstimateTokens("Number Slider") >= 2, "Two words cost at least two tokens.");
-            Assert(GroupNamingPromptBuilder.EstimateTokens("v=0+1+2+3+4+5+6+7+8+9+10") >= 24, "Every digit and operator is a token for Qwen tokenisers.");
-            Assert(GroupNamingPromptBuilder.EstimateTokens("Element.GetParameterValueByName") >= 7, "Long camel-case identifiers cost several tokens.");
-            Assert(GroupNamingPromptBuilder.EstimateTokens(string.Empty) == 0 && GroupNamingPromptBuilder.EstimateTokens(null) == 0, "Empty text costs nothing.");
+            // The fixed parts of every request, measured by the same bound, plus the listing
+            // budget, chat framing, retry suffix and completion fit the server context.
+            var fixedBytes = bytes(GroupNamingPromptBuilder.SystemPrompt) +
+                             GroupNamingPromptBuilder.ExampleTurns.Sum(example => bytes(example.Prompt) + bytes(example.Title));
+            const int framingAllowance = 12 * 8;
+            var retryAllowance = bytes(GroupNamingPromptBuilder.BuildRetry("x", new string('W', GroupNameValidator.MaximumCharacters))) - 1;
+            Assert(fixedBytes + framingAllowance + retryAllowance + GroupNamingPromptBuilder.MaximumPromptTokens + LocalLlamaServerClient.MaximumCompletionTokens <= LocalLlamaServerClient.ContextSize,
+                $"Fixed prompt parts ({fixedBytes} bytes) plus the listing budget, framing, retry and completion must fit the {LocalLlamaServerClient.ContextSize}-token context.");
         }
 
         private static void TestPromptRejectsEmptyGroups()

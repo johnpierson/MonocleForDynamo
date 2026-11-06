@@ -18,15 +18,19 @@ namespace MonocleViewExtension.LocalGroupNaming
     /// <summary>One answer from the local model.</summary>
     internal sealed class LocalModelCompletion
     {
-        public LocalModelCompletion(string content, string finishReason)
+        public LocalModelCompletion(string content, string finishReason, int? promptTokens = null)
         {
             Content = content ?? string.Empty;
             FinishReason = finishReason ?? string.Empty;
+            PromptTokens = promptTokens;
         }
 
         public string Content { get; }
 
         public string FinishReason { get; }
+
+        /// <summary>The server's own count of prompt tokens (usage.prompt_tokens), when reported.</summary>
+        public int? PromptTokens { get; }
 
         /// <summary>True when generation stopped at the token limit, so the text may end mid-word.</summary>
         public bool IsTruncated => string.Equals(FinishReason, "length", StringComparison.OrdinalIgnoreCase);
@@ -167,12 +171,13 @@ namespace MonocleViewExtension.LocalGroupNaming
                     var choice = result.SelectToken("choices[0]");
                     var suggestion = choice?.SelectToken("message.content")?.Value<string>();
                     var finishReason = choice?.SelectToken("finish_reason")?.Value<string>();
+                    var promptTokens = result.SelectToken("usage.prompt_tokens")?.Value<int?>();
                     if (string.IsNullOrWhiteSpace(suggestion) && !string.Equals(finishReason, "length", StringComparison.OrdinalIgnoreCase))
                     {
                         throw new InvalidOperationException("The local model server response did not contain a suggestion.");
                     }
 
-                    return new LocalModelCompletion(suggestion, finishReason);
+                    return new LocalModelCompletion(suggestion, finishReason, promptTokens);
                 }
             }
             catch (ObjectDisposedException)
