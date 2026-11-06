@@ -305,6 +305,10 @@ namespace Monocle.LocalGroupNaming.Tests
             Assert(request["max_tokens"].Value<int>() == LocalLlamaServerClient.MaximumCompletionTokens, "Expected the completion token cap.");
             Assert(request["stream"].Value<bool>() == false, "Streaming is not used.");
             Assert(request["cache_prompt"].Value<bool>(), "The shared system prompt must be cached.");
+            Assert(request["top_p"].Value<double>() == 0.8 && request["top_k"].Value<int>() == 20,
+                "Expected Qwen's published non-thinking nucleus and top-k settings.");
+            Assert(request["min_p"].Value<double>() == 0.0,
+                "min_p must be sent explicitly because llama.cpp's default is non-zero.");
 
             var retry = LocalLlamaServerClient.BuildCompletionRequest("model", "prompt", true);
             Assert(retry["temperature"].Value<double>() == LocalLlamaServerClient.RetryTemperature,

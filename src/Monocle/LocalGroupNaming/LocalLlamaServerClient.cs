@@ -21,13 +21,19 @@ namespace MonocleViewExtension.LocalGroupNaming
 
         /// <summary>
         /// Prompt context in tokens. A fixed size matters: "-c 0" sizes the cache for the model's
-        /// full training context (hundreds of thousands of tokens for Qwen3.5), which would
-        /// reserve gigabytes of RAM for a prompt that never exceeds a few hundred tokens.
+        /// full training context (40,960 tokens for Qwen3-4B, far more for newer models), which
+        /// would reserve gigabytes of RAM for a prompt that never exceeds a few hundred tokens.
         /// </summary>
         public const int ContextSize = 4096;
 
-        public const double DefaultTemperature = 0.2;
-        public const double RetryTemperature = 0.7;
+        // Qwen's published non-thinking settings are temperature 0.7, top_p 0.8, top_k 20 and
+        // min_p 0 (llama.cpp's own default min_p is non-zero, so it is sent explicitly). A
+        // lower temperature keeps titles steadier; the retry raises it to get a different proposal.
+        public const double DefaultTemperature = 0.3;
+        public const double RetryTemperature = 0.8;
+        public const double TopP = 0.8;
+        public const int TopK = 20;
+        public const double MinP = 0.0;
         private const string ChatCompletionsPath = "v1/chat/completions";
         private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(120);
         private static readonly TimeSpan StartupTimeout = TimeSpan.FromSeconds(180);
@@ -168,9 +174,9 @@ namespace MonocleViewExtension.LocalGroupNaming
                     }
                 },
                 ["temperature"] = isRetry ? RetryTemperature : DefaultTemperature,
-                ["top_p"] = 0.9,
-                ["top_k"] = 40,
-                ["min_p"] = 0.05,
+                ["top_p"] = TopP,
+                ["top_k"] = TopK,
+                ["min_p"] = MinP,
                 ["max_tokens"] = MaximumCompletionTokens,
                 ["stream"] = false,
                 ["cache_prompt"] = true,

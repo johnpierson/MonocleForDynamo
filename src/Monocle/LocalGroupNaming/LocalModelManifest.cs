@@ -14,19 +14,25 @@ namespace MonocleViewExtension.LocalGroupNaming
     {
         private const long Megabyte = 1024L * 1024L;
 
+        // Model choice (2026-11-06, see docs/LOCAL_GROUP_NAMING_MODEL_RESEARCH.md): the
+        // Instruct-2507 refresh of Qwen3-4B is non-thinking by construction, Apache-2.0,
+        // and the same dense architecture and byte size as the original Qwen3-4B pin,
+        // so it costs nothing in download or CPU time while removing the whole
+        // /no_think and reasoning-stripping surface.
         public static readonly LocalModelManifest Current = new LocalModelManifest(
-            installationVersion: "qwen3.5-4b-q4km-llama-b12110-v2",
-            modelDisplayName: "Qwen3.5 4B",
-            modelFileName: "Qwen3.5-4B-Q4_K_M.gguf",
-            modelFileSize: 2740937888,
+            installationVersion: "qwen3-4b-instruct-2507-q4km-llama-b12110-v1",
+            modelDisplayName: "Qwen3 4B Instruct 2507",
+            modelFileName: "Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+            modelFileSize: 2497281120,
             // Hugging Face LFS sha256 of the file at the pinned revision.
-            modelSha256: "00FE7986FF5F6B463E62455821146049DB6F9313603938A70800D1FB69EF11A4",
+            modelSha256: "3605803B982CB64AEAD44F6C1B2AE36E3ACDB41D8E46C8A94C6533BC4C67E597",
             // Pinned to the repository revision the checksum was taken from, so a
             // re-uploaded 'main' cannot change what gets downloaded.
-            modelDownloadUrl: "https://huggingface.co/unsloth/Qwen3.5-4B-GGUF/resolve/e87f176479d0855a907a41277aca2f8ee7a09523/Qwen3.5-4B-Q4_K_M.gguf?download=true",
-            modelSourceUrl: "https://huggingface.co/unsloth/Qwen3.5-4B-GGUF",
+            modelDownloadUrl: "https://huggingface.co/unsloth/Qwen3-4B-Instruct-2507-GGUF/resolve/a06e946bb6b655725eafa393f4a9745d460374c9/Qwen3-4B-Instruct-2507-Q4_K_M.gguf?download=true",
+            modelSourceUrl: "https://huggingface.co/unsloth/Qwen3-4B-Instruct-2507-GGUF",
             modelLicenseName: "Apache License 2.0",
-            modelLicenseUrl: "https://huggingface.co/Qwen/Qwen3.5-4B/blob/main/LICENSE",
+            // The official Qwen repository carries the LICENSE file; GGUF mirrors do not.
+            modelLicenseUrl: "https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507/blob/main/LICENSE",
             runtimeVersion: "b12110",
             runtimeArchiveName: "llama-b12110-bin-win-cpu-x64.zip",
             runtimeArchiveSize: 24708445,

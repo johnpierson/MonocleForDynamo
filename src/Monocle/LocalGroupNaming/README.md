@@ -80,8 +80,11 @@ and the alternatives that were considered.
 - `--reasoning off`: hybrid thinking models answer directly.
 - No `-t`: the thread count is left to llama.cpp's physical-core default so laptops and
   workstations both get a sensible value. No `-ngl`: the CPU build ignores it.
-- Requests use `temperature 0.2` (0.7 on the retry), `max_tokens 32`, `cache_prompt`, the
-  grammar in `GroupNameGrammar.cs`, and `chat_template_kwargs.enable_thinking=false`.
+- Requests use Qwen's published non-thinking sampling (`top_p 0.8`, `top_k 20`, `min_p 0`)
+  with `temperature 0.3` (0.8 on the retry), `max_tokens 32`, `cache_prompt`, the grammar
+  in `GroupNameGrammar.cs`, and `chat_template_kwargs.enable_thinking=false`. The last two
+  are no-ops for Qwen3-4B-Instruct-2507, which has no thinking mode, but they make the same
+  request work unchanged with hybrid models such as Granite 4.2 or MiniCPM5.
 
 ## Development
 
