@@ -5,6 +5,7 @@ using Dynamo.Controls;
 using Dynamo.Logging;
 using Dynamo.Wpf.Extensions;
 using Dynamo.Wpf.Interfaces;
+using MonocleViewExtension.LocalGroupNaming;
 using MonocleViewExtension.Utilities;
 
 namespace MonocleViewExtension.Foca
@@ -40,7 +41,15 @@ namespace MonocleViewExtension.Foca
         /// <param name="p">our view loaded parameters for dynamo</param>
         public static void EnableFoca(ViewLoadedParams p, MenuItem menuItem)
         {
-            var m = new FocaModel(p);
+            EnableFoca(p, menuItem, null);
+        }
+
+        internal static void EnableFoca(
+            ViewLoadedParams p,
+            MenuItem menuItem,
+            LocalLlamaServerClient localGroupNamingClient)
+        {
+            var m = new FocaModel(p, localGroupNamingClient);
             var vm = new FocaViewModel(m);
 
             var focaWidget = new FocaView {MainGrid = {DataContext = vm}};
