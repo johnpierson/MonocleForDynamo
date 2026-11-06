@@ -115,8 +115,21 @@ namespace MonocleViewExtension.LocalGroupNaming
 
         private static void OpenLink(object sender, RequestNavigateEventArgs args)
         {
-            Process.Start(new ProcessStartInfo(args.Uri.AbsoluteUri) { UseShellExecute = true });
             args.Handled = true;
+            try
+            {
+                Process.Start(new ProcessStartInfo(args.Uri.AbsoluteUri) { UseShellExecute = true });
+            }
+            catch (Exception)
+            {
+                // No browser, or one blocked by policy (common on locked-down hosts): an
+                // exception escaping a routed event handler would take Dynamo down.
+                MessageBox.Show(
+                    "The license could not be opened in a browser. You can read it at:" + Environment.NewLine + Environment.NewLine + args.Uri.AbsoluteUri,
+                    "Monocle local group naming",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
         }
     }
 }

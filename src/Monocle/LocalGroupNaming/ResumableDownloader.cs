@@ -34,6 +34,13 @@ namespace MonocleViewExtension.LocalGroupNaming
     {
         public const int BufferSize = 1024 * 1024;
 
+        /// <summary>
+        /// How long a single body read may go without data before the download is treated
+        /// as interrupted (and left resumable) instead of hanging for the whole request
+        /// timeout. Internal so tests can shorten it.
+        /// </summary>
+        internal static TimeSpan ReadStallTimeout = TimeSpan.FromSeconds(90);
+
         public static async Task DownloadAsync(
             HttpClient httpClient,
             string url,
@@ -48,6 +55,14 @@ namespace MonocleViewExtension.LocalGroupNaming
             if (string.IsNullOrWhiteSpace(destinationPath)) throw new ArgumentException("A destination path is required.", nameof(destinationPath));
 
             var existingBytes = GetResumableLength(destinationPath, expectedBytes);
+            if (expectedBytes.HasValue && existingBytes == expectedBytes.Value)
+            {
+                // Every byte already arrived (the previous attempt stopped between the last
+                // byte and verification); the caller's checksum decides whether it is usable.
+                progress?.Report(new LocalModelDownloadProgress(component, existingBytes, expectedBytes));
+                return;
+            }
+
             for (var attempt = 0; attempt < 2; attempt++)
             {
                 if (existingBytes > 0)
@@ -123,15 +138,16 @@ namespace MonocleViewExtension.LocalGroupNaming
         }
 
         /// <summary>
-        /// Length of a partial file worth resuming. Without a known total size a partial
-        /// file cannot be trusted, and one at or past the expected size is wrong; both are deleted.
+        /// Length of an existing file worth keeping: a partial file to resume, or a complete
+        /// one awaiting verification. Without a known total size a partial file cannot be
+        /// trusted, and one past the expected size is wrong; both are deleted.
         /// </summary>
         public static long GetResumableLength(string destinationPath, long? expectedBytes)
         {
             if (!File.Exists(destinationPath)) return 0;
 
             var length = new FileInfo(destinationPath).Length;
-            if (length <= 0 || !expectedBytes.HasValue || length >= expectedBytes.Value)
+            if (length <= 0 || !expectedBytes.HasValue || length > expectedBytes.Value)
             {
                 DeleteIfPresent(destinationPath);
                 return 0;
@@ -171,10 +187,34 @@ namespace MonocleViewExtension.LocalGroupNaming
                 FileShare.None,
                 buffer.Length,
                 true))
+            using (var stall = new CancellationTokenSource())
+            using (var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, stall.Token))
+            // Closing the stream makes a pending read fail even where the framework ignores the
+            // token (.NET Framework), so Cancel and the stall deadline both take effect at once.
+            using (linked.Token.Register(() => CloseQuietly(input)))
             {
-                int bytesRead;
-                while ((bytesRead = await input.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) > 0)
+                while (true)
                 {
+                    int bytesRead;
+                    stall.CancelAfter(ReadStallTimeout);
+                    try
+                    {
+                        bytesRead = await input.ReadAsync(buffer, 0, buffer.Length, linked.Token).ConfigureAwait(false);
+                    }
+                    catch (Exception) when (cancellationToken.IsCancellationRequested)
+                    {
+                        throw new OperationCanceledException(cancellationToken);
+                    }
+                    catch (Exception) when (stall.IsCancellationRequested)
+                    {
+                        // A dead connection must not hang for the whole request timeout; the
+                        // partial file stays on disk so the next attempt resumes it.
+                        throw new IOException(
+                            $"The {component} download stalled for {ReadStallTimeout.TotalSeconds:0} seconds. Enable local group naming again to resume it.");
+                    }
+
+                    if (bytesRead <= 0) break;
+
                     await output.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
                     bytesReceived += bytesRead;
                     if (expectedBytes.HasValue && bytesReceived > expectedBytes.Value)
@@ -191,6 +231,18 @@ namespace MonocleViewExtension.LocalGroupNaming
             {
                 throw new IOException(
                     $"The {component} download ended after {bytesReceived} of {expectedBytes.Value} bytes. Enable local group naming again to resume it.");
+            }
+        }
+
+        private static void CloseQuietly(Stream stream)
+        {
+            try
+            {
+                stream.Dispose();
+            }
+            catch (Exception)
+            {
+                // Already closed by the reader.
             }
         }
 

@@ -33,7 +33,13 @@ namespace MonocleViewExtension.LocalGroupNaming
                 if (note != null) return GroupNodeDescription.Compose("Note", note.Text);
 
                 var nestedGroup = model as AnnotationModel;
-                if (nestedGroup != null) return GroupNodeDescription.Compose("Group", nestedGroup.AnnotationText);
+                if (nestedGroup != null)
+                {
+                    // Dynamo's unnamed groups carry a "<Click here to edit the group title>" placeholder.
+                    var title = nestedGroup.AnnotationText;
+                    var isUnnamed = string.IsNullOrWhiteSpace(title) || title.TrimStart().StartsWith("<", StringComparison.Ordinal);
+                    return GroupNodeDescription.Compose("Group", isUnnamed ? null : title);
+                }
 
                 var codeBlock = model as CodeBlockNodeModel;
                 if (codeBlock != null)

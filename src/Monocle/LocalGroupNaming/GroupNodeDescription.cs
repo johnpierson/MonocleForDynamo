@@ -15,12 +15,24 @@ namespace MonocleViewExtension.LocalGroupNaming
         public const int MaximumDetailLength = 60;
         private const string Ellipsis = "...";
 
-        private static readonly string[] CodeBoilerplatePrefixes =
+        /// <summary>Comment lines of Dynamo's stock Python node templates, matched whole.</summary>
+        private static readonly string[] TemplateComments =
         {
-            "import ", "from ", "clr.", "using ", "#!", "sys.path", "# -*-", "# coding", "#region", "#endregion",
-            "# Load", "#Load", "# Import", "#Import", "# The inputs", "#The inputs", "# Assign", "#Assign",
-            "# Place your code", "#Place your code", "OUT = ", "OUT=", "dataEnteringNode"
+            "load the python standard and designscript libraries",
+            "enable python support and load designscript library",
+            "the inputs to this node will be stored as a list in the in variables",
+            "place your code below this line",
+            "assign your output to the out variable"
         };
+
+        /// <summary>Comment lines that are machinery rather than prose.</summary>
+        private static readonly string[] MachineryCommentPrefixes = { "#!", "# -*-", "#-*-", "# coding", "#coding", "#region", "#endregion" };
+
+        /// <summary>Statements that are import or template plumbing, matched by prefix.</summary>
+        private static readonly string[] BoilerplateStatementPrefixes = { "import ", "from ", "clr.", "using ", "sys.path" };
+
+        /// <summary>Template statements matched whole after whitespace normalisation.</summary>
+        private static readonly string[] BoilerplateStatements = { "out = 0", "out = in", "dataenteringnode = in" };
 
         public static string Compose(string name, string detail)
         {
@@ -39,9 +51,10 @@ namespace MonocleViewExtension.LocalGroupNaming
         }
 
         /// <summary>
-        /// Picks the single most descriptive line of a code block or script: the first
-        /// human comment when there is one, otherwise the first statement that is not
-        /// import boilerplate, otherwise the first non-empty line.
+        /// Picks the single most descriptive line of a code block or script: the first human
+        /// comment that is not part of Dynamo's template, otherwise the first statement that is
+        /// not import or template plumbing, otherwise nothing (so a stock, unedited Python node
+        /// is described by its name alone).
         /// </summary>
         public static string FirstMeaningfulLine(string text)
         {
@@ -56,13 +69,21 @@ namespace MonocleViewExtension.LocalGroupNaming
             if (lines.Count == 0) return null;
 
             var comment = lines
-                .Where(line => !IsBoilerplate(line))
                 .Select(StripCommentMarker)
-                .FirstOrDefault(body => body != null);
+                .FirstOrDefault(body => body != null && !IsTemplateComment(body));
             if (comment != null) return comment;
 
-            var statement = lines.FirstOrDefault(line => !IsBoilerplate(line));
-            return TrimStatement(statement ?? lines[0]);
+            var statement = lines.FirstOrDefault(line => !IsCommentLine(line) && !IsBoilerplateStatement(line));
+            return statement == null ? null : TrimStatement(statement);
+        }
+
+        private static bool IsCommentLine(string line)
+        {
+            return line.StartsWith("#", StringComparison.Ordinal) ||
+                   line.StartsWith("//", StringComparison.Ordinal) ||
+                   line.StartsWith("/*", StringComparison.Ordinal) ||
+                   line.StartsWith("\"\"\"", StringComparison.Ordinal) ||
+                   line.StartsWith("'''", StringComparison.Ordinal);
         }
 
         public static string Clean(string value)
@@ -84,8 +105,11 @@ namespace MonocleViewExtension.LocalGroupNaming
             return value.Substring(0, maximumLength - Ellipsis.Length).TrimEnd() + Ellipsis;
         }
 
+        /// <summary>The prose of a comment line, or null when the line is not a comment (or is comment machinery).</summary>
         private static string StripCommentMarker(string line)
         {
+            if (MachineryCommentPrefixes.Any(prefix => line.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))) return null;
+
             string body = null;
             if (line.StartsWith("//", StringComparison.Ordinal)) body = line.Substring(2);
             else if (line.StartsWith("#", StringComparison.Ordinal)) body = line.Substring(1);
@@ -98,9 +122,18 @@ namespace MonocleViewExtension.LocalGroupNaming
             return body.Any(char.IsLetterOrDigit) ? body : null;
         }
 
-        private static bool IsBoilerplate(string line)
+        private static bool IsTemplateComment(string commentBody)
         {
-            return CodeBoilerplatePrefixes.Any(prefix => line.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
+            var normalized = Clean(commentBody).TrimEnd('.', ' ').ToLowerInvariant();
+            return TemplateComments.Any(template => string.Equals(normalized, template, StringComparison.Ordinal));
+        }
+
+        private static bool IsBoilerplateStatement(string line)
+        {
+            if (BoilerplateStatementPrefixes.Any(prefix => line.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))) return true;
+
+            var normalized = Clean(line).TrimEnd(';', ' ').ToLowerInvariant();
+            return BoilerplateStatements.Any(statement => string.Equals(normalized, statement, StringComparison.Ordinal));
         }
 
         private static string TrimStatement(string statement)

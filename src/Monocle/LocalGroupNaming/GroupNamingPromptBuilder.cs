@@ -6,6 +6,20 @@ using System.Text;
 
 namespace MonocleViewExtension.LocalGroupNaming
 {
+    /// <summary>A few-shot example: one group listing and the title the model should answer with.</summary>
+    internal sealed class GroupNamingExample
+    {
+        public GroupNamingExample(string prompt, string title)
+        {
+            Prompt = prompt;
+            Title = title;
+        }
+
+        public string Prompt { get; }
+
+        public string Title { get; }
+    }
+
     internal static class GroupNamingPromptBuilder
     {
         /// <summary>Longest group listing sent to the model; larger groups are summarised.</summary>
@@ -17,18 +31,30 @@ namespace MonocleViewExtension.LocalGroupNaming
         /// </summary>
         public const string SystemPrompt =
             "You name groups of nodes in Autodesk Dynamo graphs (visual programs, often used with Revit). " +
-            "Given the contents of one group, reply with a short title that says what the group accomplishes as a whole.\n" +
+            "Given the contents of one group, reply with only a short title that says what the group accomplishes as a whole.\n" +
             "Rules:\n" +
-            "- 3 to 7 words in Title Case, plain words only: no quotes, punctuation, code, or explanation.\n" +
+            "- 3 to 7 words in Title Case, plain words only: no quotes, punctuation, code, labels, or explanation.\n" +
             "- Start with a verb when the group performs an action (Create, Collect, Filter, Export, Set, Read, Calculate, Place, Compare).\n" +
-            "- Describe the purpose, not the mechanics. Never repeat a node name verbatim and never use the words Group, Nodes, Workflow, Graph, Dynamo, or Script.\n" +
-            "Examples:\n" +
-            "Contents: Number Slider x2; Point.ByCoordinates; List.Create\n" +
-            "Title: Create Points From Slider Values\n" +
-            "Contents: Categories: Doors; All Elements of Category; Element.GetParameterValueByName; String: \"Mark\"\n" +
-            "Title: Read Door Mark Values\n" +
-            "Contents: File Path: schedule.xlsx; Data.ImportExcel; List.Transpose; List.GetItemAtIndex\n" +
-            "Title: Import Schedule Data From Excel";
+            "- Describe the purpose, not the mechanics. Never repeat a node name verbatim and never use the words Group, Nodes, Workflow, Graph, Dynamo, or Script.";
+
+        /// <summary>
+        /// Few-shot examples sent as prior user/assistant turns rather than inside the system
+        /// prompt, so the model sees bare titles as answers and never has a "Title:" label to
+        /// echo. They are built with <see cref="Build"/> so their shape matches real requests,
+        /// and they never change, so the prompt cache covers them too.
+        /// </summary>
+        public static readonly IReadOnlyList<GroupNamingExample> ExampleTurns = new[]
+        {
+            new GroupNamingExample(
+                Build(new[] { "Number Slider", "Number Slider", "Point.ByCoordinates", "List.Create" }),
+                "Create Points From Slider Values"),
+            new GroupNamingExample(
+                Build(new[] { "Categories: Doors", "All Elements of Category", "Element.GetParameterValueByName", "String: \"Mark\"" }),
+                "Read Door Mark Values"),
+            new GroupNamingExample(
+                Build(new[] { "File Path: schedule.xlsx", "Data.ImportExcel", "List.Transpose", "List.GetItemAtIndex" }),
+                "Import Schedule Data From Excel")
+        };
 
         public static string Build(IEnumerable<string> nodeDescriptions)
         {
@@ -55,7 +81,7 @@ namespace MonocleViewExtension.LocalGroupNaming
                 prompt.AppendLine();
             }
 
-            var omitted = items.Count - MaximumListedItems;
+            var omitted = items.Skip(MaximumListedItems).Sum(item => item.Count);
             if (omitted > 0)
             {
                 prompt.Append("- ... and ").Append(omitted.ToString(CultureInfo.InvariantCulture))

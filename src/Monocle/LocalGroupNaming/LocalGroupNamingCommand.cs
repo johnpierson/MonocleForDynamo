@@ -87,6 +87,27 @@ namespace MonocleViewExtension.LocalGroupNaming
                 toggle.ToolTip = "Set up and load the local model for this Dynamo session. It stops when unchecked or when Dynamo closes.";
             };
 
+            // The server process died while enabled (Task Manager, antivirus, a GGML abort):
+            // the client has already shut down; reflect that in the menu and say so once.
+            client.ServerFaulted += (sender, message) =>
+            {
+                var dispatcher = viewLoadedParams.DynamoWindow.Dispatcher;
+                if (dispatcher.HasShutdownStarted) return;
+
+                dispatcher.BeginInvoke(new Action(() =>
+                {
+                    if (toggle.IsChecked == true) toggle.IsChecked = false;
+                    if (!viewLoadedParams.DynamoWindow.IsLoaded) return;
+
+                    MessageBox.Show(
+                        viewLoadedParams.DynamoWindow,
+                        message,
+                        "Monocle local group naming",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning);
+                }));
+            };
+
             parentMenuItem.Items.Add(toggle);
         }
 

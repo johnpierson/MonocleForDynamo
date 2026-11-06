@@ -19,42 +19,45 @@ namespace Monocle.LocalGroupNaming.Tests
     internal static class Program
     {
         private static int failures;
+        private static string testRoot;
 
         public static int Main()
         {
-            var testRoot = Path.Combine(Path.GetTempPath(), "MonocleLocalGroupNamingTests", Guid.NewGuid().ToString("N"));
+            testRoot = Path.Combine(Path.GetTempPath(), "MonocleLocalGroupNamingTests", Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(testRoot);
 
             try
             {
-                TestPromptContainsEveryNodeDescription();
-                TestPromptAggregatesDuplicateNames();
-                TestPromptTruncatesLargeGroups();
-                TestPromptRejectsEmptyGroups();
-                TestRetryRejectsCopiedNodeName();
-                TestSystemPromptStatesTheRules();
-                TestGrammarShape();
-                TestGrammarAndValidatorAgree();
-                TestValidatorAcceptsConciseTitle();
-                TestValidatorStripsCommonModelFormatting();
-                TestValidatorRejectsLongAndStructuredResponses();
-                TestValidatorRecognizesCopiedNodeNames();
-                TestNodeDescriptionHelpers();
-                TestCompletionRequestShape();
-                TestServerArguments();
-                TestDownloadManifestIsPinnedAndSecure();
-                TestNamingStateRejectsManualEditsAndCancelledSessions();
-                TestNamingQueueProcessesConsecutiveGroups();
-                TestNamingQueueRecoversAfterRequestFailure();
-                TestNamingQueueCancelsPendingRequests();
-                TestResumableDownloadResumesAfterInterruption(testRoot).GetAwaiter().GetResult();
-                TestResumableDownloadRestartsWhenRangeIsIgnored(testRoot).GetAwaiter().GetResult();
-                TestProvisionerInstallsResumesAndRemovesSupersededVersions(testRoot).GetAwaiter().GetResult();
-            }
-            catch (Exception exception)
-            {
-                failures++;
-                Console.Error.WriteLine(exception);
+                Run(nameof(TestPromptContainsEveryNodeDescription), TestPromptContainsEveryNodeDescription);
+                Run(nameof(TestPromptAggregatesDuplicateNames), TestPromptAggregatesDuplicateNames);
+                Run(nameof(TestPromptTruncatesLargeGroups), TestPromptTruncatesLargeGroups);
+                Run(nameof(TestPromptRejectsEmptyGroups), TestPromptRejectsEmptyGroups);
+                Run(nameof(TestRetryRejectsCopiedNodeName), TestRetryRejectsCopiedNodeName);
+                Run(nameof(TestSystemPromptAndExamples), TestSystemPromptAndExamples);
+                Run(nameof(TestGrammarShape), TestGrammarShape);
+                Run(nameof(TestGrammarAndValidatorAgree), TestGrammarAndValidatorAgree);
+                Run(nameof(TestValidatorAcceptsConciseTitle), TestValidatorAcceptsConciseTitle);
+                Run(nameof(TestValidatorStripsCommonModelFormatting), TestValidatorStripsCommonModelFormatting);
+                Run(nameof(TestValidatorRejectsLongAndStructuredResponses), TestValidatorRejectsLongAndStructuredResponses);
+                Run(nameof(TestValidatorRejectsGenericAndShortensLongTitles), TestValidatorRejectsGenericAndShortensLongTitles);
+                Run(nameof(TestValidatorRecognizesCopiedNodeNames), TestValidatorRecognizesCopiedNodeNames);
+                Run(nameof(TestSuggesterRejectsTruncatedCompletions), TestSuggesterRejectsTruncatedCompletions);
+                Run(nameof(TestNodeDescriptionHelpers), TestNodeDescriptionHelpers);
+                Run(nameof(TestNodeDescriptionSkipsPythonTemplate), TestNodeDescriptionSkipsPythonTemplate);
+                Run(nameof(TestCompletionRequestShape), TestCompletionRequestShape);
+                Run(nameof(TestServerArguments), TestServerArguments);
+                Run(nameof(TestDownloadManifestIsPinnedAndSecure), TestDownloadManifestIsPinnedAndSecure);
+                Run(nameof(TestNamingStateRejectsManualEditsAndCancelledSessions), TestNamingStateRejectsManualEditsAndCancelledSessions);
+                Run(nameof(TestNamingQueueProcessesConsecutiveGroups), TestNamingQueueProcessesConsecutiveGroups);
+                Run(nameof(TestNamingQueueRecoversAfterRequestFailure), TestNamingQueueRecoversAfterRequestFailure);
+                Run(nameof(TestNamingQueueCancelsPendingRequests), TestNamingQueueCancelsPendingRequests);
+                Run(nameof(TestResumableDownloadResumesAfterInterruption), () => TestResumableDownloadResumesAfterInterruption().GetAwaiter().GetResult());
+                Run(nameof(TestResumableDownloadRestartsWhenRangeIsIgnored), () => TestResumableDownloadRestartsWhenRangeIsIgnored().GetAwaiter().GetResult());
+                Run(nameof(TestResumableDownloadHandlesBadOffsetsCompleteFilesAndStalls), () => TestResumableDownloadHandlesBadOffsetsCompleteFilesAndStalls().GetAwaiter().GetResult());
+                Run(nameof(TestProvisionerInstallsResumesAndRemovesSupersededVersions), () => TestProvisionerInstallsResumesAndRemovesSupersededVersions().GetAwaiter().GetResult());
+                Run(nameof(TestProvisionerDiscardsCorruptDownloads), () => TestProvisionerDiscardsCorruptDownloads().GetAwaiter().GetResult());
+                Run(nameof(TestProvisionerVerifiesACompleteDownloadWithoutRefetching), () => TestProvisionerVerifiesACompleteDownloadWithoutRefetching().GetAwaiter().GetResult());
+                Run(nameof(TestProvisionerKeepsPartialFileWhenCancelled), () => TestProvisionerKeepsPartialFileWhenCancelled().GetAwaiter().GetResult());
             }
             finally
             {
@@ -69,6 +72,21 @@ namespace Monocle.LocalGroupNaming.Tests
 
             Console.Error.WriteLine($"{failures} local group naming test(s) failed.");
             return 1;
+        }
+
+        /// <summary>Runs one test so an unexpected exception fails that test alone instead of skipping the rest.</summary>
+        private static void Run(string name, Action test)
+        {
+            try
+            {
+                test();
+            }
+            catch (Exception exception)
+            {
+                failures++;
+                Console.Error.WriteLine($"{name} threw {exception.GetType().Name}: {exception.Message}");
+                Console.Error.WriteLine(exception.StackTrace);
+            }
         }
 
         private static void TestPromptContainsEveryNodeDescription()
@@ -111,13 +129,15 @@ namespace Monocle.LocalGroupNaming.Tests
             var descriptions = Enumerable.Range(1, GroupNamingPromptBuilder.MaximumListedItems + 20)
                 .Select(index => "Node " + index)
                 .ToList();
+            // Duplicates past the listing cap count as nodes, not as distinct descriptions.
+            descriptions.Add("Node " + (GroupNamingPromptBuilder.MaximumListedItems + 1));
 
             var prompt = GroupNamingPromptBuilder.Build(descriptions);
 
             AssertContains(prompt, "- Node " + GroupNamingPromptBuilder.MaximumListedItems + Environment.NewLine);
             Assert(!prompt.Contains("- Node " + (GroupNamingPromptBuilder.MaximumListedItems + 1) + Environment.NewLine),
                 "Expected items past the listing cap to be summarised instead of listed.");
-            AssertContains(prompt, "- ... and 20 more nodes");
+            AssertContains(prompt, "- ... and 21 more nodes");
         }
 
         private static void TestPromptRejectsEmptyGroups()
@@ -140,14 +160,24 @@ namespace Monocle.LocalGroupNaming.Tests
             Assert(retry.TrimEnd().EndsWith("Title:", StringComparison.Ordinal), "Expected the retry to end with the title cue.");
         }
 
-        private static void TestSystemPromptStatesTheRules()
+        private static void TestSystemPromptAndExamples()
         {
             var system = GroupNamingPromptBuilder.SystemPrompt;
             AssertContains(system, "3 to 7 words");
             AssertContains(system, "Never repeat a node name");
-            AssertContains(system, "Contents: Number Slider x2; Point.ByCoordinates; List.Create");
-            AssertContains(system, "Title: Create Points From Slider Values");
-            Assert(system.Length < 1500, "The system prompt is cached per request; keep it short.");
+            Assert(!system.Contains("Title:"), "Examples live in example turns so the model never sees a label it could echo.");
+            Assert(system.Length < 1000, "The system prompt is cached per request; keep it short.");
+
+            var examples = GroupNamingPromptBuilder.ExampleTurns;
+            Assert(examples.Count == 3, "Expected three few-shot examples.");
+            foreach (var example in examples)
+            {
+                Assert(example.Prompt.StartsWith("Contents:", StringComparison.Ordinal) && example.Prompt.TrimEnd().EndsWith("Title:", StringComparison.Ordinal),
+                    "Example prompts must have the same shape as real requests.");
+                Assert(Regex.IsMatch(example.Title, GroupNameGrammar.RegexPattern), $"Example title '{example.Title}' must satisfy the grammar.");
+                Assert(GroupNameSuggester.TryGetValidName(example.Title, new[] { "Number Slider" }, out _, out _),
+                    $"Example title '{example.Title}' must pass validation.");
+            }
         }
 
         private static void TestGrammarShape()
@@ -231,10 +261,28 @@ namespace Monocle.LocalGroupNaming.Tests
                 out _,
                 out _), "Expected structured output to be rejected.");
 
+            Assert(!GroupNameValidator.TryNormalize(new string('A', GroupNameValidator.MaximumCharacters + 1), out _, out _),
+                "Expected a single over-long word to be rejected.");
+        }
+
+        private static void TestValidatorRejectsGenericAndShortensLongTitles()
+        {
             Assert(!GroupNameValidator.TryNormalize("Group", out _, out _), "Expected a generic title to be rejected.");
             Assert(!GroupNameValidator.TryNormalize("Untitled Group", out _, out _), "Expected a generic title to be rejected.");
-            Assert(!GroupNameValidator.TryNormalize(new string('A', GroupNameValidator.MaximumCharacters + 1), out _, out _),
-                "Expected an over-long title to be rejected.");
+            Assert(!GroupNameValidator.TryNormalize("Dynamo Node Group", out _, out _), "Expected a title made only of generic words to be rejected.");
+            Assert(!GroupNameValidator.TryNormalize("Group Of Nodes", out _, out _), "Expected a title made only of generic words to be rejected.");
+            Assert(GroupNameValidator.TryNormalize("Group Walls By Type", out var grouping, out _),
+                "A title that merely contains a generic word is informative and must be accepted.");
+            AssertEqual("Group Walls By Type", grouping);
+
+            // Seven words, 61 characters: valid for the grammar, one over the header cap.
+            var longTitle = "Summarise Quarterly Construction Wall Quantities Cost Reports";
+            Assert(longTitle.Length > GroupNameValidator.MaximumCharacters && Regex.IsMatch(longTitle, GroupNameGrammar.RegexPattern),
+                "Test precondition: a grammar-valid title can exceed the character cap.");
+            Assert(GroupNameValidator.TryNormalize(longTitle, out var shortened, out var error),
+                error ?? "Expected an over-long but grammar-valid title to be shortened rather than rejected.");
+            AssertEqual("Summarise Quarterly Construction Wall Quantities Cost", shortened);
+            Assert(shortened.Length <= GroupNameValidator.MaximumCharacters, "Expected the shortened title to fit the cap.");
         }
 
         private static void TestValidatorRecognizesCopiedNodeNames()
@@ -254,13 +302,28 @@ namespace Monocle.LocalGroupNaming.Tests
                 "Expected a synthesized group name not to match a node name.");
             Assert(GroupNameValidator.IsApiStyleIdentifier("Point.ByCoordinates"), "Dotted identifiers are API style.");
             Assert(GroupNameValidator.IsApiStyleIdentifier("Get_Elements"), "Underscored identifiers are API style.");
+            Assert(GroupNameValidator.IsApiStyleIdentifier("Element GetParameterValueByName Values"),
+                "A camel-case word is a node name whose punctuation the grammar stripped.");
             Assert(!GroupNameValidator.IsApiStyleIdentifier("Collect Door Marks"), "Plain words are not API style.");
+            Assert(!GroupNameValidator.IsApiStyleIdentifier("Export BIM Data To Excel"), "Acronyms are not camel case.");
 
             Assert(GroupNameSuggester.TryGetValidName("Read Door Mark Values", nodeNames, out var accepted, out _),
                 "Expected a synthesized title to pass the suggester's checks.");
             AssertEqual("Read Door Mark Values", accepted);
             Assert(!GroupNameSuggester.TryGetValidName("Point By Coordinates", nodeNames, out _, out _),
                 "Expected the suggester to reject a copied node name.");
+        }
+
+        private static void TestSuggesterRejectsTruncatedCompletions()
+        {
+            var nodeNames = new[] { "Number Slider" };
+            Assert(!GroupNameSuggester.TryGetValidName(new LocalModelCompletion("Create Points From Sli", "length"), nodeNames, out _, out var error),
+                "A completion cut off at the token limit must be rejected.");
+            AssertContains(error, "cut off");
+            Assert(GroupNameSuggester.TryGetValidName(new LocalModelCompletion("Create Points From Sliders", "stop"), nodeNames, out var title, out _),
+                "A complete answer must be accepted.");
+            AssertEqual("Create Points From Sliders", title);
+            Assert(new LocalModelCompletion(null, null).Content == string.Empty, "Missing content normalises to empty.");
         }
 
         private static void TestNodeDescriptionHelpers()
@@ -290,19 +353,61 @@ namespace Monocle.LocalGroupNaming.Tests
             AssertEqual("ab...", GroupNodeDescription.Truncate("abcdefgh", 5));
         }
 
+        private static void TestNodeDescriptionSkipsPythonTemplate()
+        {
+            const string template =
+                "# Load the Python Standard and DesignScript Libraries\n" +
+                "import sys\n" +
+                "import clr\n" +
+                "clr.AddReference('ProtoGeometry')\n" +
+                "from Autodesk.DesignScript.Geometry import *\n" +
+                "\n" +
+                "# The inputs to this node will be stored as a list in the IN variables.\n" +
+                "dataEnteringNode = IN\n" +
+                "\n" +
+                "# Place your code below this line\n" +
+                "\n" +
+                "# Assign your output to the OUT variable.\n" +
+                "OUT = 0";
+
+            Assert(GroupNodeDescription.FirstMeaningfulLine(template) == null,
+                "An unedited Dynamo Python template says nothing about the group and must yield no detail.");
+            AssertEqual("Python Script", GroupNodeDescription.Compose("Python Script", GroupNodeDescription.FirstMeaningfulLine(template)));
+
+            AssertEqual("Assign fire ratings to doors", GroupNodeDescription.FirstMeaningfulLine(
+                template.Replace("# Place your code below this line", "# Place your code below this line\n# Assign fire ratings to doors\ndoors = FilteredElementCollector(doc)")));
+            AssertEqual("OUT = sheets", GroupNodeDescription.FirstMeaningfulLine(
+                template.Replace("OUT = 0", "OUT = sheets")));
+            AssertEqual("doors = FilteredElementCollector(doc)", GroupNodeDescription.FirstMeaningfulLine(
+                template.Replace("# Place your code below this line", "# Place your code below this line\ndoors = FilteredElementCollector(doc)")));
+            Assert(GroupNodeDescription.FirstMeaningfulLine("#!/usr/bin/env python\n# -*- coding: utf-8 -*-\nimport os") == null,
+                "Shebang and encoding lines are machinery, not prose.");
+        }
+
         private static void TestCompletionRequestShape()
         {
             var request = LocalLlamaServerClient.BuildCompletionRequest("model", "Contents:\n- Watch\n\nTitle:", false);
             var messages = (JArray)request["messages"];
+            var exampleCount = GroupNamingPromptBuilder.ExampleTurns.Count;
+            Assert(messages.Count == 2 + 2 * exampleCount, $"Expected system, {exampleCount} example pairs and the user turn.");
             AssertEqual("system", messages[0]["role"].Value<string>());
             AssertEqual(GroupNamingPromptBuilder.SystemPrompt, messages[0]["content"].Value<string>());
-            AssertEqual("user", messages[1]["role"].Value<string>());
-            AssertEqual("Contents:\n- Watch\n\nTitle:", messages[1]["content"].Value<string>());
+            for (var index = 0; index < exampleCount; index++)
+            {
+                AssertEqual("user", messages[1 + 2 * index]["role"].Value<string>());
+                AssertEqual(GroupNamingPromptBuilder.ExampleTurns[index].Prompt, messages[1 + 2 * index]["content"].Value<string>());
+                AssertEqual("assistant", messages[2 + 2 * index]["role"].Value<string>());
+                AssertEqual(GroupNamingPromptBuilder.ExampleTurns[index].Title, messages[2 + 2 * index]["content"].Value<string>());
+            }
+
+            AssertEqual("user", messages[messages.Count - 1]["role"].Value<string>());
+            AssertEqual("Contents:\n- Watch\n\nTitle:", messages[messages.Count - 1]["content"].Value<string>());
             AssertEqual(GroupNameGrammar.Gbnf, request["grammar"].Value<string>());
             Assert(request["chat_template_kwargs"]["enable_thinking"].Value<bool>() == false,
                 "Thinking must be disabled through the chat template.");
             Assert(request["temperature"].Value<double>() == LocalLlamaServerClient.DefaultTemperature, "Expected the default temperature.");
             Assert(request["max_tokens"].Value<int>() == LocalLlamaServerClient.MaximumCompletionTokens, "Expected the completion token cap.");
+            Assert(LocalLlamaServerClient.MaximumCompletionTokens >= 40, "The token cap must cover the grammar's longest title.");
             Assert(request["stream"].Value<bool>() == false, "Streaming is not used.");
             Assert(request["cache_prompt"].Value<bool>(), "The shared system prompt must be cached.");
             Assert(request["top_p"].Value<double>() == 0.8 && request["top_k"].Value<int>() == 20,
@@ -319,7 +424,7 @@ namespace Monocle.LocalGroupNaming.Tests
         private static void TestServerArguments()
         {
             var options = LocalLlamaServerOptions.CreateExternal(@"C:\runtime\llama-server.exe", @"C:\models\my model.gguf", LocalModelManifest.Current);
-            var arguments = LocalLlamaServerClient.BuildServerArguments(options, 4321);
+            var arguments = LocalLlamaServerClient.BuildServerArguments(options, 4321, "secret123");
 
             AssertContains(arguments, "-m \"C:\\models\\my model.gguf\"");
             AssertContains(arguments, "--host 127.0.0.1 --port 4321");
@@ -327,12 +432,15 @@ namespace Monocle.LocalGroupNaming.Tests
             AssertContains(arguments, "-np 1");
             AssertContains(arguments, "--jinja --reasoning off");
             AssertContains(arguments, "--no-ui --no-slots");
+            AssertContains(arguments, "--api-key secret123");
             Assert(!arguments.Contains("-ngl"), "GPU layer flags are left to the runtime build.");
             Assert(!arguments.Contains(" -t "), "The thread count is left to llama.cpp's physical-core default.");
             Assert(!options.IsManagedInstallation, "An external runtime is not a managed installation.");
+            Assert(!LocalLlamaServerClient.BuildServerArguments(options, 4321, null).Contains("--api-key"),
+                "No key, no flag.");
 
             var withExtra = options.WithAdditionalServerArguments("  -t 6 ");
-            Assert(LocalLlamaServerClient.BuildServerArguments(withExtra, 1).EndsWith(" -t 6", StringComparison.Ordinal),
+            Assert(LocalLlamaServerClient.BuildServerArguments(withExtra, 1, "k").EndsWith(" -t 6", StringComparison.Ordinal),
                 "Additional arguments are appended after the defaults so they can override them.");
 
             var managed = LocalLlamaServerOptions.CreateManaged(@"C:\root", LocalModelManifest.Current);
@@ -349,6 +457,8 @@ namespace Monocle.LocalGroupNaming.Tests
                 "Expected the model download to use HTTPS.");
             Assert(Regex.IsMatch(manifest.ModelDownloadUrl, "/resolve/[0-9a-f]{40}/"),
                 "Expected the model download to pin an immutable commit instead of a mutable branch.");
+            Assert(Regex.IsMatch(manifest.ModelLicenseUrl, "/blob/[0-9a-f]{40}/") && !manifest.ModelLicenseUrl.Contains("/main/"),
+                "Expected the model license link to pin a commit so the accepted text cannot change.");
             Assert(manifest.RuntimeDownloadUrl.StartsWith("https://github.com/ggml-org/llama.cpp/releases/download/" + manifest.RuntimeVersion + "/", StringComparison.Ordinal),
                 "Expected the runtime download to come from the pinned llama.cpp release.");
             Assert(manifest.RuntimeDownloadUrl.EndsWith("/" + manifest.RuntimeArchiveName, StringComparison.Ordinal),
@@ -361,6 +471,9 @@ namespace Monocle.LocalGroupNaming.Tests
             Assert(manifest.RuntimeArchiveSize > 1024 * 1024, "Expected the runtime archive size in the manifest.");
             Assert(manifest.InstallationVersion.Contains(manifest.RuntimeVersion),
                 "Expected the installation version to change with the runtime pin.");
+            Assert(manifest.SupersededInstallationVersions.Count > 0 &&
+                   !manifest.SupersededInstallationVersions.Contains(manifest.InstallationVersion, StringComparer.OrdinalIgnoreCase),
+                "Expected the earlier pins to be listed for cleanup, never the current one.");
             Assert(manifest.RequiredFreeBytes > manifest.ModelFileSize, "Expected disk space headroom beyond the model size.");
             Assert(manifest.ApproximateDownloadSize.EndsWith(" GB", StringComparison.Ordinal), "Expected the download size in gigabytes.");
             // Binary units, matching Windows Explorer and the setup window.
@@ -506,7 +619,7 @@ namespace Monocle.LocalGroupNaming.Tests
             }
         }
 
-        private static async Task TestResumableDownloadResumesAfterInterruption(string testRoot)
+        private static async Task TestResumableDownloadResumesAfterInterruption()
         {
             var payload = CreatePayload(3 * 1024 * 1024 + 123, seed: 1);
             var handler = new FakeFileHandler();
@@ -549,7 +662,7 @@ namespace Monocle.LocalGroupNaming.Tests
             }
         }
 
-        private static async Task TestResumableDownloadRestartsWhenRangeIsIgnored(string testRoot)
+        private static async Task TestResumableDownloadRestartsWhenRangeIsIgnored()
         {
             var payload = CreatePayload(2 * 1024 * 1024 + 7, seed: 2);
             var handler = new FakeFileHandler { IgnoreRange = true };
@@ -573,6 +686,13 @@ namespace Monocle.LocalGroupNaming.Tests
             File.WriteAllBytes(destination, new byte[10]);
             Assert(ResumableDownloader.GetResumableLength(destination, null) == 0 && !File.Exists(destination),
                 "Expected a partial file of unknown total size to be discarded.");
+        }
+
+        private static async Task TestResumableDownloadHandlesBadOffsetsCompleteFilesAndStalls()
+        {
+            var payload = CreatePayload(2 * 1024 * 1024 + 7, seed: 4);
+            var destination = Path.Combine(testRoot, "edge", "runtime.zip.download");
+            Directory.CreateDirectory(Path.GetDirectoryName(destination));
 
             // A server that answers a range request from the wrong offset must not have its body stitched on.
             var misbehaving = new FakeFileHandler { MisreportRangeStart = true };
@@ -586,36 +706,104 @@ namespace Monocle.LocalGroupNaming.Tests
             }
 
             Assert(!File.Exists(destination), "Expected the untrustworthy partial file to be discarded so the next attempt restarts.");
+
+            // A file that already has every byte (interrupted between the last byte and verification) is not re-downloaded.
+            var complete = new FakeFileHandler();
+            complete.AddFile("runtime.zip", payload);
+            File.WriteAllBytes(destination, payload);
+            using (var client = new HttpClient(complete, false))
+            {
+                await ResumableDownloader.DownloadAsync(client, "https://example.test/runtime.zip", destination, "runtime", payload.Length, null, CancellationToken.None);
+            }
+
+            Assert(complete.Requests == 0, "Expected no request for a file that is already complete.");
+            Assert(File.Exists(destination) && new FileInfo(destination).Length == payload.Length, "Expected the complete file to be kept for verification.");
+
+            // A connection that stops delivering data is treated as interrupted, not left hanging.
+            var stalling = new FakeFileHandler();
+            stalling.AddFile("runtime.zip", payload);
+            stalling.StallAfterBytes("runtime.zip", 700_000);
+            File.Delete(destination);
+            var previousStallTimeout = ResumableDownloader.ReadStallTimeout;
+            ResumableDownloader.ReadStallTimeout = TimeSpan.FromMilliseconds(300);
+            try
+            {
+                using (var client = new HttpClient(stalling, false))
+                {
+                    await AssertThrowsAsync<IOException>(
+                        () => ResumableDownloader.DownloadAsync(client, "https://example.test/runtime.zip", destination, "runtime", payload.Length, null, CancellationToken.None),
+                        "Expected a stalled connection to be reported as an interruption.");
+                }
+            }
+            finally
+            {
+                ResumableDownloader.ReadStallTimeout = previousStallTimeout;
+            }
+
+            Assert(File.Exists(destination) && new FileInfo(destination).Length == 700_000,
+                "Expected the bytes received before the stall to be kept for resumption.");
+
+            // Cancelling while stalled ends the download at once as a cancellation.
+            var stalledAgain = new FakeFileHandler();
+            stalledAgain.AddFile("runtime.zip", payload);
+            stalledAgain.StallAfterBytes("runtime.zip", 1_000_000);
+            File.Delete(destination);
+            using (var client = new HttpClient(stalledAgain, false))
+            using (var cancellation = new CancellationTokenSource(TimeSpan.FromMilliseconds(400)))
+            {
+                await AssertThrowsAsync<OperationCanceledException>(
+                    () => ResumableDownloader.DownloadAsync(client, "https://example.test/runtime.zip", destination, "runtime", payload.Length, null, cancellation.Token),
+                    "Expected the caller's cancellation to end a stalled read.");
+            }
+
+            Assert(File.Exists(destination) && new FileInfo(destination).Length == 1_000_000,
+                "Expected the bytes received before the cancellation to be kept for resumption.");
         }
 
-        private static async Task TestProvisionerInstallsResumesAndRemovesSupersededVersions(string testRoot)
+        private static LocalModelManifest CreateFakeManifest(byte[] runtimeArchive, byte[] model, string modelSha256 = null, IEnumerable<string> superseded = null)
         {
-            var runtimeArchive = CreateRuntimeArchive();
-            var model = CreatePayload(2 * 1024 * 1024 + 1, seed: 3);
-            var manifest = new LocalModelManifest(
+            return new LocalModelManifest(
                 installationVersion: "test-model-llama-b1-v2",
                 modelDisplayName: "Test 4B",
                 modelFileName: "test-4b.gguf",
                 modelFileSize: model.Length,
-                modelSha256: Sha256(model),
+                modelSha256: modelSha256 ?? Sha256(model),
                 modelDownloadUrl: "https://example.test/resolve/0123456789abcdef0123456789abcdef01234567/test-4b.gguf?download=true",
                 modelSourceUrl: "https://example.test/test-4b",
                 modelLicenseName: "Apache License 2.0",
-                modelLicenseUrl: "https://example.test/LICENSE",
+                modelLicenseUrl: "https://example.test/blob/0123456789abcdef0123456789abcdef01234567/LICENSE",
                 runtimeVersion: "b1",
                 runtimeArchiveName: "llama-b1-bin-win-cpu-x64.zip",
                 runtimeArchiveSize: runtimeArchive.Length,
                 runtimeSha256: Sha256(runtimeArchive),
                 runtimeDownloadUrl: "https://example.test/releases/download/b1/llama-b1-bin-win-cpu-x64.zip",
                 runtimeLicenseName: "MIT License",
-                runtimeLicenseUrl: "https://example.test/b1/LICENSE");
+                runtimeLicenseUrl: "https://example.test/b1/LICENSE",
+                supersededInstallationVersions: superseded);
+        }
+
+        private static async Task TestProvisionerInstallsResumesAndRemovesSupersededVersions()
+        {
+            var runtimeArchive = CreateRuntimeArchive();
+            var model = CreatePayload(2 * 1024 * 1024 + 1, seed: 3);
+            var manifest = CreateFakeManifest(runtimeArchive, model, superseded: new[] { "old-model-llama-b0-v1", "busy-model-llama-b0-v1", "running-model-llama-b0-v1", "test-model-llama-b1-v2" });
+            Assert(!manifest.SupersededInstallationVersions.Contains("test-model-llama-b1-v2"), "The current version is never listed as superseded.");
 
             var root = Path.Combine(testRoot, "installs");
             var superseded = Path.Combine(root, "old-model-llama-b0-v1");
             Directory.CreateDirectory(Path.Combine(superseded, "model"));
             File.WriteAllBytes(Path.Combine(superseded, "model", "old.gguf"), new byte[1024]);
-            var inUse = Path.Combine(root, "busy-model-llama-b0-v1");
-            Directory.CreateDirectory(inUse);
+            var busy = Path.Combine(root, "busy-model-llama-b0-v1");
+            Directory.CreateDirectory(busy);
+            var running = Path.Combine(root, "running-model-llama-b0-v1");
+            Directory.CreateDirectory(Path.Combine(running, "model"));
+            File.WriteAllBytes(Path.Combine(running, "model", "running.gguf"), new byte[1024]);
+            var foreign = Path.Combine(root, "other-build-llama-b9-v3");
+            Directory.CreateDirectory(Path.Combine(foreign, "model"));
+            File.WriteAllBytes(Path.Combine(foreign, "model", "other.gguf"), new byte[1024]);
+            var leftover = Path.Combine(root, "old-model-llama-b0-v1.delete-0123456789abcdef");
+            Directory.CreateDirectory(leftover);
+            File.WriteAllBytes(Path.Combine(leftover, "stale.bin"), new byte[16]);
 
             var handler = new FakeFileHandler();
             handler.AddFile("llama-b1-bin-win-cpu-x64.zip", runtimeArchive);
@@ -633,14 +821,15 @@ namespace Monocle.LocalGroupNaming.Tests
             provisioner.RecordAgreementAcceptance();
             Assert(!provisioner.RequiresAgreement, "Acceptance must be remembered for this installation version.");
 
-            using (new FileStream(Path.Combine(inUse, ".install.lock"), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
+            using (new FileStream(Path.Combine(busy, ".install.lock"), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
+            using (new FileStream(Path.Combine(running, "model", "running.gguf"), FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 await AssertThrowsAsync<IOException>(() => provisioner.EnsureInstalledAsync(null, CancellationToken.None),
                     "The simulated network failure during the model download must surface.");
 
                 Assert(File.Exists(options.ServerPath), "The runtime must be installed before the model download starts.");
                 Assert(File.Exists(Path.Combine(options.InstallationDirectory, ".runtime.complete")), "The runtime marker must be written.");
-                Assert(!File.Exists(Path.Combine(options.InstallationDirectory, "runtime-staging")), "Extraction scratch space must be removed.");
+                Assert(!Directory.Exists(Path.Combine(options.InstallationDirectory, "runtime-staging")), "Extraction scratch space must be removed.");
                 var partial = options.ModelPath + ".download";
                 Assert(File.Exists(partial) && new FileInfo(partial).Length == 1024 * 1024,
                     "The interrupted model download must keep its partial file.");
@@ -659,19 +848,123 @@ namespace Monocle.LocalGroupNaming.Tests
                     "The verified runtime archive must be removed after extraction.");
                 Assert(!provisioner.RequiresDownload, "A complete installation needs no download.");
                 Assert(progress.Count > 0 && progress[0] == 1024 * 1024, "Progress must report the resumed offset first.");
-                Assert(!Directory.Exists(superseded), "A superseded installation must be removed after a successful install.");
-                Assert(Directory.Exists(inUse), "An installation locked by another process must be left alone.");
+                Assert(WaitUntilGone(superseded), "A superseded installation must be removed after a successful install.");
+                Assert(WaitUntilGone(leftover), "A half-deleted installation from an earlier run must be cleaned up.");
+                Assert(Directory.Exists(busy), "An installation locked by another installer must be left alone.");
+                Assert(Directory.Exists(running) && File.Exists(Path.Combine(running, "model", "running.gguf")),
+                    "An installation whose model is open elsewhere must be left completely intact, not half deleted.");
+                Assert(Directory.Exists(foreign) && File.Exists(Path.Combine(foreign, "model", "other.gguf")),
+                    "A folder that is not a known earlier pin may belong to another Monocle build and must be left alone.");
+                Assert(!Directory.GetDirectories(root).Any(directory => directory.Contains(".delete-")),
+                    "No rename leftovers may remain when the delete could not proceed.");
             }
 
-            // With the lock released the busy directory is removed on the next run.
+            // With the handles released the remaining superseded directories are removed on the next run.
             provisioner.RemoveSupersededInstallations();
-            Assert(!Directory.Exists(inUse), "A released installation must be removed on the next run.");
+            Assert(WaitUntilGone(busy), "A released installation must be removed on the next run.");
+            Assert(WaitUntilGone(running), "A no longer running installation must be removed on the next run.");
+            Assert(Directory.Exists(foreign), "Unknown folders are never removed.");
             Assert(Directory.Exists(options.InstallationDirectory), "The current installation must never be removed.");
 
             options.Validate();
-            var third = handler.Requests;
+            var requestsBefore = handler.Requests;
             await provisioner.EnsureInstalledAsync(null, CancellationToken.None);
-            Assert(handler.Requests == third, "A complete installation must not download anything.");
+            Assert(handler.Requests == requestsBefore, "A complete installation must not download anything.");
+        }
+
+        private static async Task TestProvisionerDiscardsCorruptDownloads()
+        {
+            var runtimeArchive = CreateRuntimeArchive();
+            var model = CreatePayload(1024 * 1024 + 3, seed: 5);
+            var wrongHash = Sha256(CreatePayload(16, seed: 6));
+            var manifest = CreateFakeManifest(runtimeArchive, model, modelSha256: wrongHash);
+            var root = Path.Combine(testRoot, "corrupt");
+            var handler = new FakeFileHandler();
+            handler.AddFile("llama-b1-bin-win-cpu-x64.zip", runtimeArchive);
+            handler.AddFile("test-4b.gguf", model);
+
+            var options = LocalLlamaServerOptions.CreateManaged(root, manifest);
+            var provisioner = new LocalModelProvisioner(options, handler);
+            provisioner.RecordAgreementAcceptance();
+
+            await AssertThrowsAsync<InvalidDataException>(() => provisioner.EnsureInstalledAsync(null, CancellationToken.None),
+                "A model whose checksum does not match the manifest must be refused.");
+
+            Assert(File.Exists(options.ServerPath), "The runtime, which verified correctly, stays installed.");
+            Assert(!File.Exists(options.ModelPath), "A corrupt model must not be installed.");
+            Assert(!File.Exists(options.ModelPath + ".download"), "A corrupt download must be deleted so the next attempt starts over instead of resuming it.");
+            Assert(!File.Exists(Path.Combine(options.InstallationDirectory, ".model.complete")), "No model marker may be written for a corrupt download.");
+            Assert(provisioner.RequiresDownload, "The model still needs downloading.");
+
+            var requestsBefore = handler.Requests;
+            await AssertThrowsAsync<InvalidDataException>(() => provisioner.EnsureInstalledAsync(null, CancellationToken.None),
+                "The second attempt fetches again and fails the same way.");
+            Assert(handler.Requests == requestsBefore + 1 && handler.RangeHeaders.Last() == null,
+                "The second attempt must start the model download from the beginning.");
+        }
+
+        private static async Task TestProvisionerVerifiesACompleteDownloadWithoutRefetching()
+        {
+            var runtimeArchive = CreateRuntimeArchive();
+            var model = CreatePayload(1024 * 1024 + 9, seed: 7);
+            var manifest = CreateFakeManifest(runtimeArchive, model);
+            var root = Path.Combine(testRoot, "complete");
+            var handler = new FakeFileHandler();
+            handler.AddFile("llama-b1-bin-win-cpu-x64.zip", runtimeArchive);
+            handler.AddFile("test-4b.gguf", model);
+
+            var options = LocalLlamaServerOptions.CreateManaged(root, manifest);
+            var provisioner = new LocalModelProvisioner(options, handler);
+            provisioner.RecordAgreementAcceptance();
+
+            // An earlier run was interrupted after the last byte but before verification.
+            Directory.CreateDirectory(Path.GetDirectoryName(options.ModelPath));
+            File.WriteAllBytes(options.ModelPath + ".download", model);
+
+            await provisioner.EnsureInstalledAsync(null, CancellationToken.None);
+
+            Assert(handler.RequestedNames.All(name => name == "llama-b1-bin-win-cpu-x64.zip"),
+                "Only the runtime may be fetched; the complete model file is verified in place.");
+            Assert(File.Exists(options.ModelPath) && !File.Exists(options.ModelPath + ".download"), "The verified file must be promoted to the model.");
+            AssertEqual(Sha256(model), Sha256File(options.ModelPath));
+            Assert(!provisioner.RequiresDownload, "The installation is complete.");
+        }
+
+        private static async Task TestProvisionerKeepsPartialFileWhenCancelled()
+        {
+            var runtimeArchive = CreateRuntimeArchive();
+            var model = CreatePayload(3 * 1024 * 1024, seed: 8);
+            var manifest = CreateFakeManifest(runtimeArchive, model);
+            var root = Path.Combine(testRoot, "cancel");
+            var handler = new FakeFileHandler();
+            handler.AddFile("llama-b1-bin-win-cpu-x64.zip", runtimeArchive);
+            handler.AddFile("test-4b.gguf", model);
+
+            var options = LocalLlamaServerOptions.CreateManaged(root, manifest);
+            var provisioner = new LocalModelProvisioner(options, handler);
+            provisioner.RecordAgreementAcceptance();
+
+            using (var cancellation = new CancellationTokenSource())
+            {
+                var cancelAt = 1024 * 1024;
+                var progress = new CallbackProgress(report =>
+                {
+                    if (report.Component.EndsWith(" model", StringComparison.Ordinal) && report.BytesReceived >= cancelAt) cancellation.Cancel();
+                });
+                await AssertThrowsAsync<OperationCanceledException>(() => provisioner.EnsureInstalledAsync(progress, cancellation.Token),
+                    "Cancelling from the setup window must surface as a cancellation.");
+            }
+
+            var partial = options.ModelPath + ".download";
+            Assert(File.Exists(partial), "A cancelled model download must keep its partial file.");
+            var partialLength = new FileInfo(partial).Length;
+            Assert(partialLength >= 1024 * 1024 && partialLength < model.Length, $"Expected a partial file, found {partialLength} bytes.");
+            Assert(!File.Exists(options.ModelPath), "A cancelled download must not be installed.");
+
+            await provisioner.EnsureInstalledAsync(null, CancellationToken.None);
+            Assert(handler.RangeHeaders.Last() == "bytes=" + partialLength + "-", "The next attempt must resume at the cancelled offset.");
+            Assert(File.Exists(options.ModelPath) && !provisioner.RequiresDownload, "The resumed installation must complete.");
+            AssertEqual(Sha256(model), Sha256File(options.ModelPath));
         }
 
         private static byte[] CreateRuntimeArchive()
@@ -719,6 +1012,18 @@ namespace Monocle.LocalGroupNaming.Tests
             return Sha256(File.ReadAllBytes(path));
         }
 
+        /// <summary>Waits briefly for a directory to disappear; antivirus or indexing can delay deletes on Windows.</summary>
+        private static bool WaitUntilGone(string directory)
+        {
+            for (var attempt = 0; attempt < 40; attempt++)
+            {
+                if (!Directory.Exists(directory)) return true;
+                Thread.Sleep(50);
+            }
+
+            return !Directory.Exists(directory);
+        }
+
         private sealed class SynchronousProgress : IProgress<LocalModelDownloadProgress>
         {
             private readonly List<long> values;
@@ -737,11 +1042,27 @@ namespace Monocle.LocalGroupNaming.Tests
             }
         }
 
-        /// <summary>Serves in-memory files with Range support and one simulated mid-stream failure per file.</summary>
+        private sealed class CallbackProgress : IProgress<LocalModelDownloadProgress>
+        {
+            private readonly Action<LocalModelDownloadProgress> callback;
+
+            public CallbackProgress(Action<LocalModelDownloadProgress> callback)
+            {
+                this.callback = callback;
+            }
+
+            public void Report(LocalModelDownloadProgress value)
+            {
+                callback(value);
+            }
+        }
+
+        /// <summary>Serves in-memory files with Range support and one simulated mid-stream failure or stall per file.</summary>
         private sealed class FakeFileHandler : HttpMessageHandler
         {
             private readonly Dictionary<string, byte[]> files = new Dictionary<string, byte[]>(StringComparer.OrdinalIgnoreCase);
             private readonly Dictionary<string, long> failures = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
+            private readonly Dictionary<string, long> stalls = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
 
             public bool IgnoreRange { get; set; }
 
@@ -751,6 +1072,8 @@ namespace Monocle.LocalGroupNaming.Tests
             public int Requests { get; private set; }
 
             public List<string> RangeHeaders { get; } = new List<string>();
+
+            public List<string> RequestedNames { get; } = new List<string>();
 
             public void AddFile(string name, byte[] content)
             {
@@ -762,6 +1085,11 @@ namespace Monocle.LocalGroupNaming.Tests
                 failures[name] = bytes;
             }
 
+            public void StallAfterBytes(string name, long bytes)
+            {
+                stalls[name] = bytes;
+            }
+
             protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
             {
                 Requests++;
@@ -769,6 +1097,7 @@ namespace Monocle.LocalGroupNaming.Tests
                 var name = files.Keys.FirstOrDefault(key => path.EndsWith("/" + key, StringComparison.OrdinalIgnoreCase));
                 if (name == null) return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound));
 
+                RequestedNames.Add(name);
                 var payload = files[name];
                 var range = request.Headers.Range?.Ranges.FirstOrDefault();
                 RangeHeaders.Add(request.Headers.Range?.ToString());
@@ -794,7 +1123,14 @@ namespace Monocle.LocalGroupNaming.Tests
                     failures.Remove(name);
                 }
 
-                response.Content = new StreamContent(new FailingStream(payload, (int)from, failAfter));
+                long? stallAfter = null;
+                if (stalls.TryGetValue(name, out var stallAt))
+                {
+                    stallAfter = stallAt;
+                    stalls.Remove(name);
+                }
+
+                response.Content = new StreamContent(new FailingStream(payload, (int)from, failAfter, stallAfter));
                 response.Content.Headers.ContentLength = payload.Length - from;
                 if (response.StatusCode == HttpStatusCode.PartialContent)
                 {
@@ -805,19 +1141,24 @@ namespace Monocle.LocalGroupNaming.Tests
             }
         }
 
-        /// <summary>Reads a byte array and throws like a dropped connection once a given number of bytes has been delivered.</summary>
+        /// <summary>
+        /// Reads a byte array and, once a given number of bytes has been delivered, either
+        /// throws like a dropped connection or blocks like a stalled one (until cancelled).
+        /// </summary>
         private sealed class FailingStream : Stream
         {
             private readonly byte[] payload;
             private readonly long? failAfter;
+            private readonly long? stallAfter;
             private int position;
             private long delivered;
 
-            public FailingStream(byte[] payload, int offset, long? failAfter)
+            public FailingStream(byte[] payload, int offset, long? failAfter, long? stallAfter = null)
             {
                 this.payload = payload;
                 position = offset;
                 this.failAfter = failAfter;
+                this.stallAfter = stallAfter;
             }
 
             public override bool CanRead => true;
@@ -838,10 +1179,22 @@ namespace Monocle.LocalGroupNaming.Tests
 
                 var toCopy = Math.Min(count, remaining);
                 if (failAfter.HasValue) toCopy = (int)Math.Min(toCopy, failAfter.Value - delivered);
+                if (stallAfter.HasValue) toCopy = (int)Math.Min(toCopy, stallAfter.Value - delivered);
                 Array.Copy(payload, position, buffer, offset, toCopy);
                 position += toCopy;
                 delivered += toCopy;
                 return toCopy;
+            }
+
+            public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+            {
+                if (stallAfter.HasValue && delivered >= stallAfter.Value)
+                {
+                    // Never deliver another byte; only cancellation ends the read.
+                    await Task.Delay(Timeout.Infinite, cancellationToken).ConfigureAwait(false);
+                }
+
+                return Read(buffer, offset, count);
             }
 
             public override void Flush()
@@ -923,7 +1276,7 @@ namespace Monocle.LocalGroupNaming.Tests
 
         private static void AssertContains(string value, string expected)
         {
-            Assert(value.Contains(expected), $"Expected '{value}' to contain '{expected}'.");
+            Assert(value != null && value.Contains(expected), $"Expected '{value}' to contain '{expected}'.");
         }
 
         private static void AssertEqual(string expected, string actual)
@@ -942,6 +1295,10 @@ namespace Monocle.LocalGroupNaming.Tests
             catch (TException)
             {
             }
+            catch (Exception exception)
+            {
+                Assert(false, $"Expected {typeof(TException).Name} but received {exception.GetType().Name}: {exception.Message}");
+            }
         }
 
         private static async Task AssertThrowsAsync<TException>(Func<Task> action, string message) where TException : Exception
@@ -953,6 +1310,10 @@ namespace Monocle.LocalGroupNaming.Tests
             }
             catch (TException)
             {
+            }
+            catch (Exception exception)
+            {
+                Assert(false, message + $" (expected {typeof(TException).Name} but received {exception.GetType().Name}: {exception.Message})");
             }
         }
 

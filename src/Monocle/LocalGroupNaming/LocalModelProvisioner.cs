@@ -17,6 +17,7 @@ namespace MonocleViewExtension.LocalGroupNaming
         private const string InstallLockFileName = ".install.lock";
         private const string StagingDirectoryName = "runtime-staging";
         private const string DownloadExtension = ".download";
+        private const string DeletePendingMarker = ".delete-";
         private readonly LocalLlamaServerOptions options;
         private readonly HttpMessageHandler messageHandler;
 
@@ -378,10 +379,12 @@ namespace MonocleViewExtension.LocalGroupNaming
         }
 
         /// <summary>
-        /// Deletes sibling installations left behind by earlier model or runtime pins.
-        /// A directory another process is installing into (its lock is held) or whose
-        /// model is still memory-mapped by a running server simply fails to delete and
-        /// is retried after the next install.
+        /// Deletes the installation folders of earlier pins named in the manifest. Only those
+        /// names are touched: a folder with any other name may belong to another Monocle
+        /// build (Revit 2024 and Revit 2026 can run different Monocle versions against the
+        /// same %LOCALAPPDATA%). Each folder is renamed before it is deleted, which fails as a
+        /// whole while another installer holds its lock or a running server has its model
+        /// mapped, so an installation is either removed completely or left intact.
         /// </summary>
         internal void RemoveSupersededInstallations()
         {
@@ -396,18 +399,23 @@ namespace MonocleViewExtension.LocalGroupNaming
             {
                 if (string.Equals(NormalizeDirectoryPath(directory), current, StringComparison.OrdinalIgnoreCase)) continue;
 
+                var name = Path.GetFileName(directory);
+                var isPendingDelete = name.IndexOf(DeletePendingMarker, StringComparison.Ordinal) >= 0;
+                if (!isPendingDelete && !Manifest.SupersededInstallationVersions.Contains(name, StringComparer.OrdinalIgnoreCase)) continue;
+
                 try
                 {
-                    var lockPath = Path.Combine(directory, InstallLockFileName);
-                    if (File.Exists(lockPath))
+                    //Never follow a junction or symbolic link out of the installation root.
+                    if ((new DirectoryInfo(directory).Attributes & FileAttributes.ReparsePoint) != 0) continue;
+
+                    var target = directory;
+                    if (!isPendingDelete)
                     {
-                        //Opening the lock exclusively fails while another installer holds it.
-                        using (new FileStream(lockPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
-                        {
-                        }
+                        target = Path.Combine(options.InstallationRootDirectory, name + DeletePendingMarker + Guid.NewGuid().ToString("N"));
+                        Directory.Move(directory, target);
                     }
 
-                    Directory.Delete(directory, true);
+                    Directory.Delete(target, true);
                 }
                 catch (IOException)
                 {

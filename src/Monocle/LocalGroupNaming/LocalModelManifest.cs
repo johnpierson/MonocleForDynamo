@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace MonocleViewExtension.LocalGroupNaming
 {
@@ -31,8 +33,9 @@ namespace MonocleViewExtension.LocalGroupNaming
             modelDownloadUrl: "https://huggingface.co/unsloth/Qwen3-4B-Instruct-2507-GGUF/resolve/a06e946bb6b655725eafa393f4a9745d460374c9/Qwen3-4B-Instruct-2507-Q4_K_M.gguf?download=true",
             modelSourceUrl: "https://huggingface.co/unsloth/Qwen3-4B-Instruct-2507-GGUF",
             modelLicenseName: "Apache License 2.0",
-            // The official Qwen repository carries the LICENSE file; GGUF mirrors do not.
-            modelLicenseUrl: "https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507/blob/main/LICENSE",
+            // The official Qwen repository carries the LICENSE file (GGUF mirrors do not);
+            // pinned to a commit so the text the user accepts cannot change afterwards.
+            modelLicenseUrl: "https://huggingface.co/Qwen/Qwen3-4B-Instruct-2507/blob/cdbee75f17c01a7cc42f958dc650907174af0554/LICENSE",
             runtimeVersion: "b12110",
             runtimeArchiveName: "llama-b12110-bin-win-cpu-x64.zip",
             runtimeArchiveSize: 24708445,
@@ -40,7 +43,15 @@ namespace MonocleViewExtension.LocalGroupNaming
             runtimeSha256: "98901E327C252875ACCAF2D1BF364E10E868843B0B63468BAAD1AA945CDC5DA2",
             runtimeDownloadUrl: "https://github.com/ggml-org/llama.cpp/releases/download/b12110/llama-b12110-bin-win-cpu-x64.zip",
             runtimeLicenseName: "MIT License",
-            runtimeLicenseUrl: "https://github.com/ggml-org/llama.cpp/blob/b12110/LICENSE");
+            runtimeLicenseUrl: "https://github.com/ggml-org/llama.cpp/blob/b12110/LICENSE",
+            // Earlier pins whose installation folders this version may remove once it is
+            // installed. Folders with other names belong to other Monocle builds (a Revit
+            // 2024 and a Revit 2026 install can pin different versions) and are left alone.
+            supersededInstallationVersions: new[]
+            {
+                "qwen3-4b-q4km-llama-b10075-v1",
+                "qwen3.5-4b-q4km-llama-b12110-v2"
+            });
 
         public LocalModelManifest(
             string installationVersion,
@@ -58,10 +69,19 @@ namespace MonocleViewExtension.LocalGroupNaming
             string runtimeSha256,
             string runtimeDownloadUrl,
             string runtimeLicenseName,
-            string runtimeLicenseUrl)
+            string runtimeLicenseUrl,
+            IEnumerable<string> supersededInstallationVersions = null)
         {
             if (modelFileSize <= 0) throw new ArgumentOutOfRangeException(nameof(modelFileSize));
             if (runtimeArchiveSize <= 0) throw new ArgumentOutOfRangeException(nameof(runtimeArchiveSize));
+
+            var superseded = (supersededInstallationVersions ?? new string[0])
+                .Where(version => !string.IsNullOrWhiteSpace(version))
+                .Select(version => version.Trim())
+                .Where(version => !string.Equals(version, installationVersion, StringComparison.OrdinalIgnoreCase))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+            SupersededInstallationVersions = superseded.AsReadOnly();
 
             InstallationVersion = Require(installationVersion, nameof(installationVersion));
             ModelDisplayName = Require(modelDisplayName, nameof(modelDisplayName));
@@ -112,6 +132,9 @@ namespace MonocleViewExtension.LocalGroupNaming
         public string RuntimeLicenseName { get; }
 
         public string RuntimeLicenseUrl { get; }
+
+        /// <summary>Installation folder names of earlier pins that may be removed once this one is installed.</summary>
+        public IReadOnlyList<string> SupersededInstallationVersions { get; }
 
         /// <summary>Free space needed for a fresh install: the model, the archive plus its extraction, and headroom.</summary>
         public long RequiredFreeBytes => ModelFileSize + 3 * RuntimeArchiveSize + 256 * Megabyte;

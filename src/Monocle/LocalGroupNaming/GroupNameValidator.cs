@@ -9,23 +9,48 @@ namespace MonocleViewExtension.LocalGroupNaming
     {
         public const int MaximumCharacters = 60;
         public const int MaximumWords = GroupNameGrammar.MaximumWords;
+        public const int MinimumWords = GroupNameGrammar.MinimumWords;
 
-        private static readonly string[] GenericNames =
+        /// <summary>
+        /// Words that carry no information about a group. A title made only of these
+        /// ("Dynamo Node Group", "Untitled Group") is rejected; a title that merely contains
+        /// one ("Group Walls By Type") is fine.
+        /// </summary>
+        private static readonly HashSet<string> GenericWords = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            "Group", "Dynamo Group", "New Group", "Node Group", "Group Name", "Group Title",
-            "Untitled", "Untitled Group", "Nodes", "Workflow"
+            "group", "groups", "node", "nodes", "workflow", "graph", "dynamo", "script", "untitled",
+            "new", "name", "title", "of", "the", "for", "a", "an", "and", "this", "these", "some"
         };
 
         private static readonly string[] LabelPrefixes = { "Title:", "Group name:", "Name:", "Answer:" };
         private static readonly char[] TrimCharacters = { '`', '"', '\'', '.', ':', ';', '-', '*', '#', ' ', '\t' };
         private static readonly char[] StructuralCharacters = { '{', '}', '[', ']', '<', '>' };
 
+        /// <summary>
+        /// True for API-style text: dotted or underscored identifiers, and camel-case words
+        /// such as "GetParameterValueByName" that a model produces when it copies a node name
+        /// but the grammar has stripped the punctuation.
+        /// </summary>
         public static bool IsApiStyleIdentifier(string groupName)
         {
-            return !string.IsNullOrWhiteSpace(groupName) &&
-                   (groupName.IndexOf('.') >= 0 ||
-                    groupName.IndexOf("::", StringComparison.Ordinal) >= 0 ||
-                    groupName.IndexOf('_') >= 0);
+            if (string.IsNullOrWhiteSpace(groupName)) return false;
+
+            if (groupName.IndexOf('.') >= 0 ||
+                groupName.IndexOf("::", StringComparison.Ordinal) >= 0 ||
+                groupName.IndexOf('_') >= 0)
+            {
+                return true;
+            }
+
+            foreach (var word in groupName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                for (var index = 1; index < word.Length; index++)
+                {
+                    if (char.IsLower(word[index - 1]) && char.IsUpper(word[index])) return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -98,28 +123,40 @@ namespace MonocleViewExtension.LocalGroupNaming
                 }
             }
 
-            normalized = string.Join(" ", normalized.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries));
-
-            if (normalized.Length == 0 || normalized.Length > MaximumCharacters)
-            {
-                error = $"The suggested name must contain between 1 and {MaximumCharacters} characters.";
-                return false;
-            }
-
             if (normalized.IndexOfAny(StructuralCharacters) >= 0)
             {
                 error = "The local model returned structured or unsafe text instead of a title.";
                 return false;
             }
 
-            var words = normalized.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            if (words.Length == 0 || words.Length > MaximumWords)
+            var words = normalized.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            if (words.Count == 0)
+            {
+                error = "The local model returned an empty name.";
+                return false;
+            }
+
+            if (words.Count > MaximumWords)
             {
                 error = $"The suggested name must contain no more than {MaximumWords} words.";
                 return false;
             }
 
-            if (GenericNames.Any(generic => string.Equals(normalized, generic, StringComparison.OrdinalIgnoreCase)))
+            // The grammar allows longer titles than a group header can show; shorten by whole
+            // words rather than rejecting an otherwise good proposal.
+            while (string.Join(" ", words).Length > MaximumCharacters && words.Count > MinimumWords)
+            {
+                words.RemoveAt(words.Count - 1);
+            }
+
+            normalized = string.Join(" ", words);
+            if (normalized.Length > MaximumCharacters)
+            {
+                error = $"The suggested name must contain between 1 and {MaximumCharacters} characters.";
+                return false;
+            }
+
+            if (words.All(word => GenericWords.Contains(word)))
             {
                 error = "The local model returned a generic group name.";
                 return false;

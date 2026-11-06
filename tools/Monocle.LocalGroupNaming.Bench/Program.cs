@@ -67,7 +67,7 @@ namespace Monocle.LocalGroupNaming.Bench
 
             Console.WriteLine($"Model:      {Path.GetFileName(modelPath)} ({LocalModelManifest.FormatSize(new FileInfo(modelPath).Length)})");
             Console.WriteLine($"Server:     {serverPath}");
-            Console.WriteLine($"Arguments:  {LocalLlamaServerClient.BuildServerArguments(options, 0)}");
+            Console.WriteLine($"Arguments:  {LocalLlamaServerClient.BuildServerArguments(options, 0, "<per-session key>")}");
             Console.WriteLine($"Cases:      {cases.Count} x {repeat}");
             Console.WriteLine();
 
@@ -97,10 +97,18 @@ namespace Monocle.LocalGroupNaming.Bench
                             result.Attempts = suggestion.Attempts;
                             result.Rejected = suggestion.RejectedResponses;
                         }
+                        catch (GroupNameSuggestionException exception)
+                        {
+                            // Every proposal was rejected; keep them so models can be compared on failures too.
+                            result.Error = exception.Message;
+                            result.Attempts = exception.Attempts;
+                            result.Rejected = exception.RejectedResponses;
+                        }
                         catch (Exception exception)
                         {
-                            result.Error = exception.Message;
-                            result.Attempts = 2;
+                            // Transport or server failure rather than a bad title.
+                            result.Error = "transport: " + exception.Message;
+                            result.Attempts = 0;
                         }
 
                         stopwatch.Stop();
@@ -120,12 +128,22 @@ namespace Monocle.LocalGroupNaming.Bench
                 {
                     ["model"] = Path.GetFileName(modelPath),
                     ["server"] = serverPath,
-                    ["arguments"] = LocalLlamaServerClient.BuildServerArguments(options, 0),
+                    ["arguments"] = LocalLlamaServerClient.BuildServerArguments(options, 0, "<per-session key>"),
                     ["startupMilliseconds"] = startupMilliseconds,
                     ["results"] = JArray.FromObject(results)
                 };
                 File.WriteAllText(outputPath, report.ToString(Formatting.Indented));
                 Console.WriteLine($"Wrote {outputPath}");
+            }
+
+            if (results.Any(result => result.Rejected != null && result.Rejected.Count > 0))
+            {
+                Console.WriteLine();
+                Console.WriteLine("Rejected proposals:");
+                foreach (var result in results.Where(result => result.Rejected != null && result.Rejected.Count > 0))
+                {
+                    Console.WriteLine($"  {result.Case}: {string.Join(" | ", result.Rejected.Select(text => text.Replace("\r", " ").Replace("\n", " ")))}");
+                }
             }
 
             return results.Any(result => result.Error != null) ? 1 : 0;
@@ -154,18 +172,38 @@ namespace Monocle.LocalGroupNaming.Bench
             Console.WriteLine($"Retries: {retries}, failures: {failures}");
         }
 
+        private static readonly string[] ValueOptions = { "server", "model", "server-args", "cases", "out", "repeat" };
+
         private static Dictionary<string, string> ParseArguments(string[] args)
         {
             var parsed = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             for (var index = 0; index < args.Length; index++)
             {
-                if (!args[index].StartsWith("--", StringComparison.Ordinal)) continue;
+                if (!args[index].StartsWith("--", StringComparison.Ordinal))
+                {
+                    throw new ArgumentException($"Unexpected argument '{args[index]}'.");
+                }
 
                 var key = args[index].Substring(2);
-                var value = index + 1 < args.Length && !args[index + 1].StartsWith("--", StringComparison.Ordinal)
-                    ? args[++index]
-                    : "true";
-                parsed[key] = value;
+                var equals = key.IndexOf('=');
+                if (equals > 0)
+                {
+                    parsed[key.Substring(0, equals)] = key.Substring(equals + 1);
+                    continue;
+                }
+
+                if (!ValueOptions.Contains(key, StringComparer.OrdinalIgnoreCase))
+                {
+                    throw new ArgumentException($"Unknown option '--{key}'. Known options: {string.Join(", ", ValueOptions.Select(option => "--" + option))}.");
+                }
+
+                if (index + 1 >= args.Length)
+                {
+                    throw new ArgumentException($"Option '--{key}' needs a value.");
+                }
+
+                // Values such as "--threads 8" for --server-args legitimately start with dashes.
+                parsed[key] = args[++index];
             }
 
             return parsed;

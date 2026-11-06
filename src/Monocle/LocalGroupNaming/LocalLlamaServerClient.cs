@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -14,10 +15,30 @@ using Newtonsoft.Json.Linq;
 
 namespace MonocleViewExtension.LocalGroupNaming
 {
+    /// <summary>One answer from the local model.</summary>
+    internal sealed class LocalModelCompletion
+    {
+        public LocalModelCompletion(string content, string finishReason)
+        {
+            Content = content ?? string.Empty;
+            FinishReason = finishReason ?? string.Empty;
+        }
+
+        public string Content { get; }
+
+        public string FinishReason { get; }
+
+        /// <summary>True when generation stopped at the token limit, so the text may end mid-word.</summary>
+        public bool IsTruncated => string.Equals(FinishReason, "length", StringComparison.OrdinalIgnoreCase);
+    }
+
     internal sealed class LocalLlamaServerClient : IDisposable
     {
-        /// <summary>Tokens the server may generate for one title; seven 20-character words fit comfortably.</summary>
-        public const int MaximumCompletionTokens = 32;
+        /// <summary>
+        /// Tokens the server may generate for one title. The grammar's longest output (seven
+        /// 20-character words) is about 40 tokens; anything cut off here is rejected and retried.
+        /// </summary>
+        public const int MaximumCompletionTokens = 48;
 
         /// <summary>
         /// Prompt context in tokens. A fixed size matters: "-c 0" sizes the cache for the model's
@@ -53,6 +74,13 @@ namespace MonocleViewExtension.LocalGroupNaming
         private bool disposed;
 
         public bool IsEnabled { get; private set; }
+
+        /// <summary>
+        /// Raised on a worker thread when a request finds the server process dead while the
+        /// feature was enabled. The client has already disabled itself; the message explains
+        /// what happened and how to recover.
+        /// </summary>
+        public event EventHandler<string> ServerFaulted;
 
         public LocalLlamaServerClient(LocalLlamaServerOptions options)
         {
@@ -91,13 +119,20 @@ namespace MonocleViewExtension.LocalGroupNaming
         /// temperature so a second attempt explores a different proposal instead of
         /// repeating the rejected one.
         /// </summary>
-        public async Task<string> SuggestNameAsync(string prompt, bool isRetry, CancellationToken cancellationToken)
+        public async Task<LocalModelCompletion> SuggestNameAsync(string prompt, bool isRetry, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(prompt)) throw new ArgumentException("A prompt is required.", nameof(prompt));
             ThrowIfDisposed();
             ThrowIfDisabled();
 
-            await EnsureStartedAsync(cancellationToken).ConfigureAwait(false);
+            if (!IsServerRunning())
+            {
+                // The process died (Task Manager, antivirus, a GGML abort). Restarting it here
+                // would keep the user waiting for minutes behind a "Naming group..." indicator
+                // and then discard the answer; stop cleanly and tell them instead.
+                FaultServer("The local model server stopped unexpectedly. Turn local group naming off and on again to restart it.");
+                throw new OperationCanceledException("Local group naming was turned off.");
+            }
 
             HttpClient client;
             CancellationTokenSource session;
@@ -129,13 +164,15 @@ namespace MonocleViewExtension.LocalGroupNaming
                     }
 
                     var result = JObject.Parse(body);
-                    var suggestion = result.SelectToken("choices[0].message.content")?.Value<string>();
-                    if (string.IsNullOrWhiteSpace(suggestion))
+                    var choice = result.SelectToken("choices[0]");
+                    var suggestion = choice?.SelectToken("message.content")?.Value<string>();
+                    var finishReason = choice?.SelectToken("finish_reason")?.Value<string>();
+                    if (string.IsNullOrWhiteSpace(suggestion) && !string.Equals(finishReason, "length", StringComparison.OrdinalIgnoreCase))
                     {
                         throw new InvalidOperationException("The local model server response did not contain a suggestion.");
                     }
 
-                    return suggestion;
+                    return new LocalModelCompletion(suggestion, finishReason);
                 }
             }
             catch (ObjectDisposedException)
@@ -150,29 +187,36 @@ namespace MonocleViewExtension.LocalGroupNaming
         }
 
         /// <summary>
-        /// The llama-server chat completion request. Besides the OpenAI-compatible fields it
-        /// uses two llama.cpp extensions: <c>grammar</c> constrains decoding to a bare 3-7 word
-        /// title, and <c>chat_template_kwargs.enable_thinking=false</c> makes hybrid reasoning
-        /// models (Qwen3, Qwen3.5) answer directly instead of emitting a reasoning block.
+        /// The llama-server chat completion request: the fixed system prompt, the few-shot
+        /// examples as prior user/assistant turns (so the model sees bare titles as answers and
+        /// has no label to echo), then the group. Besides the OpenAI-compatible fields it uses
+        /// two llama.cpp extensions: <c>grammar</c> constrains decoding to a bare 3-7 word title,
+        /// and <c>chat_template_kwargs.enable_thinking=false</c> makes hybrid reasoning models
+        /// answer directly instead of emitting a reasoning block.
         /// </summary>
         internal static JObject BuildCompletionRequest(string modelName, string prompt, bool isRetry)
         {
+            var messages = new JArray
+            {
+                new JObject
+                {
+                    ["role"] = "system",
+                    ["content"] = GroupNamingPromptBuilder.SystemPrompt
+                }
+            };
+
+            foreach (var example in GroupNamingPromptBuilder.ExampleTurns)
+            {
+                messages.Add(new JObject { ["role"] = "user", ["content"] = example.Prompt });
+                messages.Add(new JObject { ["role"] = "assistant", ["content"] = example.Title });
+            }
+
+            messages.Add(new JObject { ["role"] = "user", ["content"] = prompt });
+
             return new JObject
             {
                 ["model"] = modelName,
-                ["messages"] = new JArray
-                {
-                    new JObject
-                    {
-                        ["role"] = "system",
-                        ["content"] = GroupNamingPromptBuilder.SystemPrompt
-                    },
-                    new JObject
-                    {
-                        ["role"] = "user",
-                        ["content"] = prompt
-                    }
-                },
+                ["messages"] = messages,
                 ["temperature"] = isRetry ? RetryTemperature : DefaultTemperature,
                 ["top_p"] = TopP,
                 ["top_k"] = TopK,
@@ -190,11 +234,12 @@ namespace MonocleViewExtension.LocalGroupNaming
 
         /// <summary>
         /// Command line for llama-server. One slot with a fixed context, the jinja chat
-        /// template with reasoning switched off, and no web UI or slot metrics endpoints.
+        /// template with reasoning switched off, no web UI or slot metrics endpoints, and a
+        /// per-session API key so no other local process or web page can drive the server.
         /// The thread count is left to llama.cpp's physical-core default so small laptops
         /// and large workstations both get a sensible value.
         /// </summary>
-        internal static string BuildServerArguments(LocalLlamaServerOptions options, int port)
+        internal static string BuildServerArguments(LocalLlamaServerOptions options, int port, string apiKey)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
 
@@ -204,6 +249,11 @@ namespace MonocleViewExtension.LocalGroupNaming
             arguments.Append(" -c ").Append(ContextSize.ToString(CultureInfo.InvariantCulture)).Append(" -np 1");
             arguments.Append(" --jinja --reasoning off");
             arguments.Append(" --no-ui --no-slots");
+            if (!string.IsNullOrEmpty(apiKey))
+            {
+                arguments.Append(" --api-key ").Append(apiKey);
+            }
+
             if (!string.IsNullOrWhiteSpace(options.AdditionalServerArguments))
             {
                 arguments.Append(' ').Append(options.AdditionalServerArguments.Trim());
@@ -246,6 +296,23 @@ namespace MonocleViewExtension.LocalGroupNaming
             StopServer();
         }
 
+        private void FaultServer(string message)
+        {
+            CancellationTokenSource cancellation;
+            lock (stateLock)
+            {
+                if (!IsEnabled) return;
+
+                IsEnabled = false;
+                stopRequested = true;
+                cancellation = sessionCancellation;
+            }
+
+            cancellation?.Cancel();
+            StopServer();
+            ServerFaulted?.Invoke(this, message);
+        }
+
         private async Task EnsureStartedAsync(CancellationToken cancellationToken)
         {
             if (IsServerRunning()) return;
@@ -259,6 +326,7 @@ namespace MonocleViewExtension.LocalGroupNaming
 
                 options.Validate();
                 var port = FindAvailablePort();
+                var apiKey = Guid.NewGuid().ToString("N");
                 lastServerError = null;
 
                 // Published before the process starts so a concurrent Disable() can
@@ -275,7 +343,7 @@ namespace MonocleViewExtension.LocalGroupNaming
                 var startInfo = new ProcessStartInfo
                 {
                     FileName = options.ServerPath,
-                    Arguments = BuildServerArguments(options, port),
+                    Arguments = BuildServerArguments(options, port, apiKey),
                     CreateNoWindow = true,
                     UseShellExecute = false,
                     RedirectStandardError = true,
@@ -298,6 +366,7 @@ namespace MonocleViewExtension.LocalGroupNaming
                     BaseAddress = new Uri($"http://127.0.0.1:{port}/"),
                     Timeout = RequestTimeout
                 };
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
                 lock (stateLock)
                 {
                     serverProcess = process;
@@ -373,28 +442,20 @@ namespace MonocleViewExtension.LocalGroupNaming
         }
 
         /// <summary>
-        /// Runs one throw-away request so the system prompt is tokenised and cached by the
-        /// server before the user creates a group; the first real request then only has to
-        /// process the group listing. Any failure here is ignored, the real request simply
-        /// pays the prompt processing itself.
+        /// Runs one throw-away request so the system prompt and examples are tokenised and
+        /// cached by the server before the user creates a group; the first real request then
+        /// only has to process the group listing. Failures are ignored (the real request simply
+        /// pays the prompt processing itself), except that a cancellation or disable while
+        /// warming up is reported as such.
         /// </summary>
         private static async Task WarmUpAsync(HttpClient client, CancellationToken cancellationToken)
         {
             try
             {
-                var request = new JObject
-                {
-                    ["messages"] = new JArray
-                    {
-                        new JObject { ["role"] = "system", ["content"] = GroupNamingPromptBuilder.SystemPrompt },
-                        new JObject { ["role"] = "user", ["content"] = "Contents:\n- Warm up\n\nTitle:" }
-                    },
-                    ["max_tokens"] = 1,
-                    ["temperature"] = 0,
-                    ["stream"] = false,
-                    ["cache_prompt"] = true,
-                    ["chat_template_kwargs"] = new JObject { ["enable_thinking"] = false }
-                };
+                var request = BuildCompletionRequest("warm-up", "Contents:\n- Warm up\n\nTitle:", false);
+                request["max_tokens"] = 1;
+                request["temperature"] = 0;
+                request.Remove("grammar");
 
                 using (var timeout = new CancellationTokenSource(WarmUpTimeout))
                 using (var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeout.Token))
@@ -403,7 +464,16 @@ namespace MonocleViewExtension.LocalGroupNaming
                 {
                 }
             }
-            catch (Exception) when (!cancellationToken.IsCancellationRequested)
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
+            }
+            catch (Exception) when (cancellationToken.IsCancellationRequested)
+            {
+                // Disable() disposed the client under us; report it as the cancellation it is.
+                throw new OperationCanceledException("Local group naming was turned off.");
+            }
+            catch (Exception)
             {
                 // Best effort only.
             }
