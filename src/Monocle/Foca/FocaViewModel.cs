@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -10,6 +12,7 @@ using Dynamo.Graph.Annotations;
 using Dynamo.Logging;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
+using MonocleViewExtension.LocalGroupNaming;
 using MonocleViewExtension.SimpleSearch;
 using MonocleViewExtension.Utilities;
 
@@ -20,6 +23,7 @@ namespace MonocleViewExtension.Foca
         public FocaModel Model { get; set; }
 
         public FocaView View;
+        private readonly LocalGroupNamingQueue namingQueue;
 
         public DelegateCommand CreateGroup { get; set; }
         public DelegateCommand MouseEnter { get; set; }
@@ -134,6 +138,7 @@ namespace MonocleViewExtension.Foca
         {
             Model = model;
             model.LoadedParams.SelectionCollectionChanged += LoadedParamsOnSelectionCollectionChanged;
+            namingQueue = new LocalGroupNamingQueue(ProcessNamingRequestAsync, HandleNamingRequestError);
 
             //set color wheel size
             ColorWheelHeight = 48;
@@ -162,7 +167,35 @@ namespace MonocleViewExtension.Foca
 
         public void OnCreateGroup(object o)
         {
-            Model.CreateGroup(o.ToString());
+            var group = Model.CreateGroup(o.ToString());
+            var client = Model.LocalGroupNamingClient;
+            if (group == null || client == null || !client.TryCaptureSessionGeneration(out var sessionGeneration)) return;
+
+            // Capture the group state before the request waits behind an earlier inference.
+            var request = LocalGroupNamingCommand.CaptureRequest(group.AnnotationModel, sessionGeneration);
+            namingQueue.Enqueue(request);
+        }
+
+        private Task ProcessNamingRequestAsync(
+            LocalGroupNamingRequest request,
+            CancellationToken cancellationToken)
+        {
+            var client = Model.LocalGroupNamingClient;
+            if (client == null) throw new InvalidOperationException("Local group naming is not configured.");
+
+            return LocalGroupNamingCommand.SuggestAndRenameAsync(
+                Model.LoadedParams.DynamoWindow,
+                Model.DynamoViewModel,
+                request,
+                client,
+                cancellationToken);
+        }
+
+        private void HandleNamingRequestError(LocalGroupNamingRequest request, Exception exception)
+        {
+            Model.DynamoViewModel.Model.Logger.LogWarning(
+                $"Monocle - local group naming request failed: {exception.Message}",
+                WarningLevel.Mild);
         }
 
         public void OnAlignClick(object o)
