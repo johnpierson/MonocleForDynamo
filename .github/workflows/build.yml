@@ -24,6 +24,7 @@ jobs:
           - Release 4.1
           - Release 4.2
           - Release 4.3
+          - Release 4.4
 
     steps:
       - name: Checkout code
