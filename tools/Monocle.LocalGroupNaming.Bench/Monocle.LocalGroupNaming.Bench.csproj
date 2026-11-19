@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <RootNamespace>Monocle.LocalGroupNaming.Bench</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <!-- Windows-only like the llama.cpp runtime it drives; keep the console app tiny. -->
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <!-- The exact production code path: prompt, grammar, sampling, validation, retry and server flags. -->
+    <Compile Include="..\..\src\Monocle\LocalGroupNaming\GroupNameGrammar.cs" Link="LocalGroupNaming\GroupNameGrammar.cs" />
+    <Compile Include="..\..\src\Monocle\LocalGroupNaming\GroupNameSuggester.cs" Link="LocalGroupNaming\GroupNameSuggester.cs" />
+    <Compile Include="..\..\src\Monocle\LocalGroupNaming\GroupNameValidator.cs" Link="LocalGroupNaming\GroupNameValidator.cs" />
+    <Compile Include="..\..\src\Monocle\LocalGroupNaming\GroupNamingPromptBuilder.cs" Link="LocalGroupNaming\GroupNamingPromptBuilder.cs" />
+    <Compile Include="..\..\src\Monocle\LocalGroupNaming\GroupNodeDescription.cs" Link="LocalGroupNaming\GroupNodeDescription.cs" />
+    <Compile Include="..\..\src\Monocle\LocalGroupNaming\KillOnCloseJobObject.cs" Link="LocalGroupNaming\KillOnCloseJobObject.cs" />
+    <Compile Include="..\..\src\Monocle\LocalGroupNaming\LocalLlamaServerClient.cs" Link="LocalGroupNaming\LocalLlamaServerClient.cs" />
+    <Compile Include="..\..\src\Monocle\LocalGroupNaming\LocalLlamaServerOptions.cs" Link="LocalGroupNaming\LocalLlamaServerOptions.cs" />
+    <Compile Include="..\..\src\Monocle\LocalGroupNaming\LocalModelManifest.cs" Link="LocalGroupNaming\LocalModelManifest.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="cases.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+</Project>

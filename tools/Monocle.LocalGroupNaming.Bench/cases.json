@@ -1,0 +1,144 @@
+[
+  {
+    "name": "points-from-sliders",
+    "nodes": ["Number Slider", "Number Slider", "Number Slider", "Point.ByCoordinates", "List.Create"],
+    "expected": "Create Points From Sliders"
+  },
+  {
+    "name": "door-marks",
+    "nodes": ["Categories: Doors", "All Elements of Category", "Element.GetParameterValueByName", "String: \"Mark\"", "Watch"],
+    "expected": "Read Door Mark Values"
+  },
+  {
+    "name": "excel-import",
+    "nodes": ["File Path: RoomSchedule.xlsx", "File From Path", "Data.ImportExcel", "String: \"Sheet1\"", "List.Transpose", "List.GetItemAtIndex", "Code Block: 0"],
+    "expected": "Import Room Schedule From Excel"
+  },
+  {
+    "name": "export-rooms",
+    "nodes": ["Categories: Rooms", "All Elements of Category", "Room.Name", "Room.Number", "Room.Area", "List.Create", "List.Transpose", "Data.ExportExcel", "File Path: Rooms.xlsx"],
+    "expected": "Export Room Data To Excel"
+  },
+  {
+    "name": "walls-from-lines",
+    "nodes": ["Select Model Elements", "Element.Curves", "Levels", "Wall Types", "Wall.ByCurveAndHeight", "Code Block: 3000"],
+    "expected": "Create Walls From Selected Lines"
+  },
+  {
+    "name": "sheets-from-views",
+    "nodes": ["Views", "String: \"A1\"", "String: \"Floor Plans\"", "Family Types", "Sheet.ByNameNumberTitleBlockAndViews", "List.Create"],
+    "expected": "Create Sheets With Floor Plans"
+  },
+  {
+    "name": "set-comments",
+    "nodes": ["Categories: Windows", "All Elements of Category", "Element.SetParameterByName", "String: \"Comments\"", "String: \"Checked 2026\""],
+    "expected": "Set Window Comments Parameter"
+  },
+  {
+    "name": "sine-surface",
+    "nodes": ["Number Range", "Math.Sin", "Code Block: x * 2", "Point.ByCoordinates", "NurbsCurve.ByPoints", "Surface.ByLoft"],
+    "expected": "Loft Surface From Sine Curves"
+  },
+  {
+    "name": "bounding-box",
+    "nodes": ["Select Model Element", "Element.Geometry", "BoundingBox.ByGeometry", "BoundingBox.MinPoint", "BoundingBox.MaxPoint", "Geometry.DistanceTo"],
+    "expected": "Measure Element Bounding Box"
+  },
+  {
+    "name": "python-sheet-names",
+    "nodes": ["Python Script: collect all sheet names and numbers", "Watch", "Watch"],
+    "expected": "Collect Sheet Names And Numbers"
+  },
+  {
+    "name": "python-boilerplate",
+    "nodes": ["Python Script: doc = DocumentManager.Instance.CurrentDBDocument", "Watch"],
+    "expected": "Access Current Revit Document"
+  },
+  {
+    "name": "note-driven",
+    "nodes": ["Note: Filter out elements that are already placed on sheets", "List.FilterByBoolMask", "Element.GetParameterValueByName", "String: \"Sheet Number\"", "String.IsNullOrEmpty"],
+    "expected": "Filter Elements Not On Sheets"
+  },
+  {
+    "name": "family-placement",
+    "nodes": ["Family Types", "Point.ByCoordinates", "Number Sequence", "FamilyInstance.ByPoint", "Code Block: 0..10..2"],
+    "expected": "Place Family Instances Along Points"
+  },
+  {
+    "name": "view-export",
+    "nodes": ["Views", "View.ExportAsImage", "File Path: exports", "String.Concat", "String: \".png\""],
+    "expected": "Export Views As PNG Images"
+  },
+  {
+    "name": "dictionary-lookup",
+    "nodes": ["Dictionary.ByKeysValues", "Dictionary.ValueAtKey", "String: \"Fire Rating\"", "Code Block: {\"A\", \"B\"}"],
+    "expected": "Look Up Fire Rating Values"
+  },
+  {
+    "name": "topography",
+    "nodes": ["Topography.ByPoints", "Point.ByCoordinates", "Math.RandomList", "Number Slider", "Code Block: 0..100..5"],
+    "expected": "Generate Random Topography"
+  },
+  {
+    "name": "preview-only",
+    "nodes": ["Watch", "Watch 3D"],
+    "expected": "Preview Results"
+  },
+  {
+    "name": "single-python",
+    "nodes": ["Python Script"],
+    "expected": "Run Custom Python Logic"
+  },
+  {
+    "name": "clockwork-custom",
+    "nodes": ["Element.Location+", "Element.Phase", "Element.Workset", "List.Create"],
+    "expected": "Collect Element Location Data"
+  },
+  {
+    "name": "compare-levels",
+    "nodes": ["Levels", "Level.Elevation", "Math.Abs", "Code Block: a - b", "If", "Boolean"],
+    "expected": "Compare Level Elevations"
+  },
+  {
+    "name": "geometry-translate",
+    "nodes": ["Line.ByStartPointEndPoint", "Curve.PointAtParameter", "Geometry.Translate", "Vector.ZAxis", "Number Slider"],
+    "expected": "Move Points Along Line"
+  },
+  {
+    "name": "nested-groups",
+    "nodes": ["Group: Collect Walls", "Group: Measure Wall Lengths", "List.Flatten", "Math.Sum", "Watch"],
+    "expected": "Total Wall Length"
+  },
+  {
+    "name": "string-processing",
+    "nodes": ["String.Split", "String: \"-\"", "String.ToUpper", "String.Replace", "List.Map", "String.Join"],
+    "expected": "Clean And Format Text"
+  },
+  {
+    "name": "repeated-node",
+    "nodes": ["Element.GetParameterValueByName", "Element.GetParameterValueByName", "Element.GetParameterValueByName", "String: \"Area\"", "String: \"Volume\"", "String: \"Level\""],
+    "expected": "Read Area Volume And Level"
+  },
+  {
+    "name": "material-takeoff",
+    "nodes": ["Categories: Floors", "All Elements of Category", "Element.Materials", "Material.Name", "Element.GetParameterValueByName", "String: \"Volume\""],
+    "expected": "Floor Material Takeoff"
+  },
+  {
+    "name": "japanese-labels",
+    "nodes": ["Categories: 壁", "All Elements of Category", "Element.GetParameterValueByName", "String: \"コメント\"", "Note: 壁の長さを集計する", "Watch"],
+    "expected": "Collect Wall Comments"
+  },
+  {
+    "name": "large-group",
+    "nodes": [
+      "Categories: Walls", "All Elements of Category", "Element.GetParameterValueByName", "String: \"Length\"", "Element.GetParameterValueByName", "String: \"Area\"",
+      "Element.GetParameterValueByName", "String: \"Unconnected Height\"", "List.Create", "List.Transpose", "List.Flatten", "List.Count", "List.FilterByBoolMask",
+      "Code Block: x > 0", "Code Block: 1000", "Math.Sum", "Math.Round", "Number Slider", "Number Slider", "String.Concat", "String: \"Total:\"",
+      "String from Object", "Watch", "Watch", "Watch", "Note: Summarise wall quantities for the cost report", "Element.Name", "Element.Id", "Element.Level",
+      "Level.Name", "List.GroupByKey", "List.Map", "List.Sort", "List.Reverse", "List.FirstItem", "List.LastItem", "Object.IsNull", "If", "Boolean", "Data.ExportExcel",
+      "File Path: WallQuantities.xlsx", "String: \"Walls\"", "Code Block: 0", "Code Block: true", "List.Join"
+    ],
+    "expected": "Export Wall Quantities For Cost Report"
+  }
+]
