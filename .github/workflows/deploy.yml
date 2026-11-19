@@ -1,0 +1,49 @@
+name: Deploy to package folder
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - uses: microsoft/setup-msbuild@v1.3
+
+      - name: Build all configurations into deploy
+        shell: pwsh
+        run: |
+          $configs = "Release 2.19","Release 3.6","Release 3.7","Release 4.1","Release 4.2","Release 4.3","Release 4.4"
+          foreach ($c in $configs) {
+            Write-Host "::group::$c"
+            msbuild src/Monocle/Monocle.sln /p:Configuration="$c" /p:Platform="Any CPU" /p:EnableDeploymentCopy=true /t:Restore,Build /v:minimal
+            if ($LASTEXITCODE -ne 0) { throw "Build failed for $c" }
+            Write-Host "::endgroup::"
+          }
+
+      - name: Commit deploy changes
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898299+github-actions[bot]@users.noreply.github.com"
+          git add deploy
+          git diff --cached --quiet
+          if ($LASTEXITCODE -eq 0) { Write-Host "No deploy changes."; exit 0 }
+          git commit -m "Deploy build of ${{ github.sha }} [skip ci]"
+          git push origin HEAD:${{ github.ref_name }}
